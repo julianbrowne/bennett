@@ -2,11 +2,11 @@
 root: "https://some-alertme-server.somwhere.com/v99"
 
 user:
-	name: "webtest1234"
-	password: "somesecret"
-	reset_code: 123456
-	new_password: "somenewsecret"
+   name: "webtest1234"
+   password: "somesecret"
+   reset_code: 123456
+   new_password: "somenewsecret"
 
 caller:
-	name: "BGCH web site"
-	ip:   123.456.789.999
+   name: "BGCH web site"
+   ip: "123.456.789.999"

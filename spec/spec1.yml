@@ -13,10 +13,10 @@ resources:
             - caller
          encoding: html
          response: 200
-         schema: {
-            "hubIds":     { "type": "array" },
-            "ApiSession": { "type": "string" }
-         }
+         schema: > {
+               "hubIds": { "type": "array" },
+               "ApiSession": { "type": "string" }
+            }
 
       log_out:
          desc: "Destroys the session, the session cookie will no longer be valid"
@@ -57,27 +57,29 @@ resources:
          uri: /users/{username}
          method: get
          response: 200
-         schema: {
-            "title": "User Schema",
-            "type": "object",
-            "properties": {
-               "username":    { "type": "string" },
-               "firstname":   { "type": "string" },
-               "lastname":    { "type": "string" },
-               "address":     { "type": "string" },
-               "pin":         { "type": "string" },
-               "city":        { "type": "string" },
-               "county":      { "type": "string" },
-               "postcode":    { "type": "string" },
-               "country":     { "type": "string" },
-               "answer":      { "type": "string" },
-               "userlevel":   { "type": "string" },
-               "dob":         { "type": "string" },
-               "currency":    { "type": "string" },
-               "language":    { "type": "string" },
-               "temperature": { "type": "string" },
-               "phone":       { "type": "string" },
-               "email":       { "type": "string" },
-               "mobile":      { "type": "string" },
-            }
+         schema:
+         	---
+         	{
+               "title": "User Schema",
+               "type": "object",
+               "properties": {
+                  "username":    { "type": "string" },
+                  "firstname":   { "type": "string" },
+                  "lastname":    { "type": "string" },
+                  "address":     { "type": "string" },
+                  "pin":         { "type": "string" },
+                  "city":        { "type": "string" },
+                  "county":      { "type": "string" },
+                  "postcode":    { "type": "string" },
+                  "country":     { "type": "string" },
+                  "answer":      { "type": "string" },
+                  "userlevel":   { "type": "string" },
+                  "dob":         { "type": "string" },
+                  "currency":    { "type": "string" },
+                  "language":    { "type": "string" },
+                  "temperature": { "type": "string" },
+                  "phone":       { "type": "string" },
+                  "email":       { "type": "string" },
+                  "mobile":      { "type": "string" },
+               }
          }
