@@ -1,0 +1,27 @@
+<html>
+<head>
+	<script src="lib/jquery-2.0.3.js"></script>
+	<script src="lib/js-yaml-2.1.0.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		$(function() {
+
+			var configUrl = "/conf/app1.yml";
+			var specUrl   = "/spec/spec1.yml";
+
+			$.get(configUrl, function(config) {
+
+				$.get(specUrl, function(spec) {
+
+					console.log(jsyaml.load(config));
+					console.log(jsyaml.load(spec));
+
+				}).fail(function(e) { console.log(e); });
+
+			}).fail(function(e) { console.log(e); });
+
+		});
+	</script>
+</body>
+</html>
