@@ -12,3 +12,26 @@ simple_journey:
    - resources.session.log_in
    - resources.users.user_information
    - resources.session.log_out
+
+test_case_three:
+   - this
+   - that
+   - the_other
+
+test_case_four:
+   - step_one
+   - next_one
+
+test_case_five:
+   - something
+   - another_thing
+   - big_finish
+
+test_case_six:
+   - hip
+   - hop
+   - skip
+   - jump
+
+test_case_seven:
+   - just_one_call

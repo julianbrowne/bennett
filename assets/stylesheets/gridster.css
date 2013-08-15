@@ -2,46 +2,110 @@
 * http://gridster.net/
 * Copyright (c) 2013 ducksboard; Licensed MIT */
 
-.gridster {
-    margin: 3em 0;
-    padding: 7.5em 0 5.5em;
-    background: #004756;
+body {
+    font-family: helvetica;
 }
 
-.gridster:hover {
-    opacity: 1;
+.gridster {
+    margin: 3em 0;
+    padding: 20px;
+}
+
+#test-log {
+    color: #000000;
+    background: #FFFFFF;
+    padding: 5px;
+    margin: 5px;
 }
 
 .test-name {
     text-align: center;
     font-size: 20px;
-    font-family: helvetica;
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+h1 {
+    color: #A52E01;
+    font-size: 2.2em;
+}
+
+h2 {
+    color: #FFFFFF;
+}
+
+.bennett {
+    font-family: 'Jolly Lodger', cursive;
+}
+
+ul {
+    list-style: none;
+}
+
+ul.leaders {
+    max-width: 40em;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+ul.leaders li {
+    margin: 5px;
+}
+
+ul.leaders li:before {
+    float: left;
+    width: 0;
+    white-space: nowrap;
+    content: ". . . . . . . . . . . . . . . . . . . . ";
+}
+
+ul.leaders span:first-child {
+    padding-right: 0.33em;
+    background: #FFFFFF;
+}
+
+ul.leaders span + span {
+    float: right;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 li p {
     margin: 5px;
     font-size: 16px;
-    font-family: helvetica;
+}
+
+li.pass {
+    color: #000000;
+    background: #FFFFFF;
+    border: 2px solid #00CC66;
+}
+
+span.pass {
+    color: #FFFFFF;
+    background: #00CC66;
+}
+
+span.fail {
+    color: #FFFFFF;
+    background: #FF3333;
+}
+
+li.fail {
+    color: #000000;
+    background: #FFFFFF;
+    border: 2px solid #FF3333;
 }
 
 .gridster {
-    width: 940px;
+    width: 80%;
     margin: 0 auto;
-    opacity: .8;
     position:relative;
-    -webkit-transition: opacity .6s;
-    -moz-transition: opacity .6s;
-    -o-transition: opacity .6s;
-    -ms-transition: opacity .6s;
-    transition: opacity .6s;
-}
-
-li {
-    list-style: none;
 }
 
 .gridster .gs_w {
-    background: #FFF;
     cursor: pointer;
     -webkit-box-shadow: 0 0 5px rgba(0,0,0,0.3);
     box-shadow: 0 0 5px rgba(0,0,0,0.3);
@@ -113,8 +177,3 @@ li {
     -o-transition: all 0s !important;
     transition: all 0s !important;
 }
-
-/* Uncomment this if you set helper : "clone" in draggable options */
-/*.gridster .player {
-  opacity:0;
-}*/

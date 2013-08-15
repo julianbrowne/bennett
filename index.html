@@ -1,8 +1,11 @@
 <html>
 <head>
+	<title>Bennett</title>
 	<link rel="stylesheet" media="all" href="assets/stylesheets/gridster.css" />
-
+	<link rel="stylesheet" media="all" href="assets/jquery-ui-1.10.3/css/le-frog/jquery-ui-1.10.3.custom.css" />
+	<link href='http://fonts.googleapis.com/css?family=Jolly+Lodger' rel='stylesheet' type='text/css'>
 	<script src="assets/javascripts/jquery-2.0.3.js"></script>
+	<script src="assets/jquery-ui-1.10.3/js/jquery-ui-1.10.3.custom.js"></script>
 	<script src="assets/javascripts/js-yaml-2.1.0.js"></script>
 	<script src="assets/javascripts/orphan-0.0.1.js"></script>
 	<script src="assets/javascripts/gridster-0.1.0.js"></script>
@@ -10,12 +13,26 @@
 </head>
 <body>
 
-	<div class="gridster">
-		<ul></ul>
+	<h1 class="bennett">Bennett: REST API Verifier</h1>
+	<div id="tabs">
+		<ul>
+			<li><a href="#tab1" class="bennett">Results</a></li>
+			<li><a href="#tab2" class="bennett">Test Log</a></li>
+		</ul>
+		<div id="tab1" class="gridster">
+			<h2>Test Results</h2>
+			<ul></ul>
+		</div>
+		<div id="tab2">
+			<ul id="test-log">
+			</ul>
+		</div>
 	</div>
 
 	<script type="text/javascript">
 		$(function() {
+
+			$( "#tabs" ).tabs();
 
 			var gridster;
 
@@ -45,15 +62,15 @@
 					gridster = $(".gridster ul")
 						.gridster({
 							widget_margins: [10, 10],
-							widget_base_dimensions: [200, 100]
+							widget_base_dimensions: [215, 100]
 						}).data('gridster');
 
 					Object.keys(testDriver.cases).forEach( function(testCase) {
 						if(testDriver.cases.hasOwnProperty(testCase)) {
-							var tests = "";
-							console.log(testDriver.cases[testCase]);
-							testDriver.cases[testCase].forEach(function(test) { tests += "<p>" + test.toString().split('.')[test.toString().split('.').length-1].replace(/_/," ") + "</p>" });
-							gridster.add_widget("<li>" + '<div class="test-name">' + testCase.toString().replace(/_/g," ") + "</div>" + tests + "</li>", 1, 2);
+							var tests = "<ul class='leaders'>";
+							logAction(testDriver.cases[testCase]);
+							testDriver.cases[testCase].forEach(function(test) { tests += "<li><span>" + test.toString().split('.')[test.toString().split('.').length-1].replace(/_/," ") + "</span><span class='pass'> pass </span></li>" });
+							gridster.add_widget("<li class='pass'>" + '<div class="test-name">' + testCase.toString().replace(/_/g," ") + "</div>" + tests + "</li>", 1, 2);
 						}
 					});
 
