@@ -1,0 +1,10 @@
+---
+
+log_in_and_log_out:
+   - resources.session.log_in
+   - resources.session.log_out
+
+simple_journey:
+   - resources.session.log_in
+   - resources.users.user_information
+   - resources.session.log_out

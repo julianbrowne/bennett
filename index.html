@@ -2,24 +2,42 @@
 <head>
 	<script src="lib/jquery-2.0.3.js"></script>
 	<script src="lib/js-yaml-2.1.0.js"></script>
+	<script src="lib/orphan-0.0.1.js"></script>
 </head>
 <body>
 	<script type="text/javascript">
 		$(function() {
 
-			var configUrl = "/conf/app1.yml";
-			var specUrl   = "/spec/spec1.yml";
+			var dataUrl = "/spec/data.yml";
+			var specUrl = "/spec/spec.yml";
+			var testUrl = "/spec/test.yml";
 
-			$.get(configUrl, function(config) {
+			config = $.when(getDataFrom(dataUrl), getDataFrom(specUrl), getDataFrom(testUrl));
 
-				$.get(specUrl, function(spec) {
+			config.done(
 
-					console.log(jsyaml.load(config));
-					console.log(jsyaml.load(spec));
+				function(data, spec, test) {
 
-				}).fail(function(e) { console.log(e); });
+					var data = data[2];
+					var spec = spec[2];
+					var test = test[2];
 
-			}).fail(function(e) { console.log(e); });
+					console.log(jsyaml.load(data.responseText));
+					console.log(jsyaml.load(spec.responseText));
+					console.log(jsyaml.load(test.responseText));	
+
+					var client = new Orphan();
+					console.log(client);
+
+				}
+
+			);
+
+			function getDataFrom(url) {
+				return $.get(url)
+				.done(function(data, status, xhr) { console.log("Called " + url + ", got status " + xhr.status); })
+				.fail(function(e) { console.log(e); });
+			};
 
 		});
 	</script>
