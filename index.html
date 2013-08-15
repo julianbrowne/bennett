@@ -31,16 +31,16 @@
 
 			config.done(
 
-				function(data, spec, test) {
+				function(dataResult, specResult, testResult) {
 
-					var data = data[2];
-					var spec = spec[2];
-					var test = test[2];
+					var dataObj = dataResult[2];
+					var specObj = specResult[2];
+					var testObj = testResult[2];
 
 					var testDriver = {};
-					testDriver.fixtures = jsyaml.load(data.responseText);
-					testDriver.api = jsyaml.load(spec.responseText);
-					testDriver.cases = jsyaml.load(test.responseText);
+					testDriver.fixtures = jsyaml.load(dataObj.responseText);
+					testDriver.api = jsyaml.load(specObj.responseText);
+					testDriver.cases = jsyaml.load(testObj.responseText);
 
 					gridster = $(".gridster ul")
 						.gridster({
@@ -50,7 +50,10 @@
 
 					Object.keys(testDriver.cases).forEach( function(testCase) {
 						if(testDriver.cases.hasOwnProperty(testCase)) {
-							gridster.add_widget("<li>" + '<div class="test-name">' + testCase.toString().replace(/_/g," ") + "</div>" + "</li>", 1, 1);
+							var tests = "";
+							console.log(testDriver.cases[testCase]);
+							testDriver.cases[testCase].forEach(function(test) { tests += "<p>" + test.toString().split('.')[test.toString().split('.').length-1].replace(/_/," ") + "</p>" });
+							gridster.add_widget("<li>" + '<div class="test-name">' + testCase.toString().replace(/_/g," ") + "</div>" + tests + "</li>", 1, 2);
 						}
 					});
 
