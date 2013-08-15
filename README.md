@@ -63,6 +63,7 @@ Which essentially indicates the test **log\_in\_and\_out\_test** comprises runni
 All dependencies are packaged, but they are:
 
 *	JQuery v2.0.3 (DOM manipulation)
+*	JQuery UI v1.10.3 (Tabs)
 *	Gridster v0.1.0 (Jenkins-like test status grid layout)
 *	JS-Yaml v2.1.0 (for reading and parsing the config files)
 *	Orphan v0.0.1 (Javascript REST client)
