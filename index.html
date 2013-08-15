@@ -3,6 +3,7 @@
 	<script src="lib/jquery-2.0.3.js"></script>
 	<script src="lib/js-yaml-2.1.0.js"></script>
 	<script src="lib/orphan-0.0.1.js"></script>
+	<script src="lib/gridster-0.1.0.js"></script>
 </head>
 <body>
 	<script type="text/javascript">
@@ -22,11 +23,24 @@
 					var spec = spec[2];
 					var test = test[2];
 
-					console.log(jsyaml.load(data.responseText));
-					console.log(jsyaml.load(spec.responseText));
-					console.log(jsyaml.load(test.responseText));	
+					var testDriver = {};
+					testDriver.fixtures = jsyaml.load(data.responseText);
+					testDriver.api = jsyaml.load(spec.responseText);
+					testDriver.cases = jsyaml.load(test.responseText);
+
+					console.log("--->");
+					console.log(testDriver.cases);
+
+					Object.keys(testDriver.cases).forEach( function(testCase) {
+
+						if(testDriver.cases.hasOwnProperty(testCase)) {
+							console.log(testCase);
+						}
+
+					});
 
 					var client = new Orphan();
+
 					console.log(client);
 
 				}
