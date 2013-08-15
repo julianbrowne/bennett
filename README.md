@@ -3,6 +3,9 @@
 
 A simple REST API test framework, designed to be (nearly) 100% data-driven.
 
+> Bennett is thoughtware only right now - don't even try to use yet.  
+> But do comment on anything that doesn't make sense
+
 ###Design
 
 Bennett is designed to auto-generate and run Jasmine tests from three YAML files:
