@@ -42,15 +42,17 @@
 					testDriver.api = jsyaml.load(spec.responseText);
 					testDriver.cases = jsyaml.load(test.responseText);
 
-					gridster = $(".gridster ul").gridster().data('gridster');
+					gridster = $(".gridster ul")
+						.gridster({
+							widget_margins: [10, 10],
+							widget_base_dimensions: [200, 100]
+						}).data('gridster');
 
 					Object.keys(testDriver.cases).forEach( function(testCase) {
 						if(testDriver.cases.hasOwnProperty(testCase)) {
-							gridster.add_widget("<li>" + '<div class="test-name">' + testCase.toString() + "</div>" + "</li>", 1, 1);
+							gridster.add_widget("<li>" + '<div class="test-name">' + testCase.toString().replace(/_/g," ") + "</div>" + "</li>", 1, 1);
 						}
 					});
-
-					
 
 				    var client = new Orphan();
 					console.log(client);
