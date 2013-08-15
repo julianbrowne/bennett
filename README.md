@@ -14,6 +14,8 @@ Bennett is designed to auto-generate and run Jasmine tests from three YAML files
 -	Some sample test data (login names etc)   
 -	A method, or flow, for running generated tests   
 
+![screen-shot](https://raw.github.com/julianbrowne/bennett/master/assets/images/bennett.png)
+
 ###Example
 
 A simple API spec might look like this:
