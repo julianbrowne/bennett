@@ -58,4 +58,19 @@ And the test flow is:
 
 Which essentially indicates the test **log\_in\_and\_out\_test** comprises running **log\_in** followed by **log\_out**
 
+### Ingredients
+
+All dependencies are packaged. 
+
+### Installation
+
+	git clone https://github.com/julianbrowne/bennett.git
+	
+Then put bennett directory behind a decent HTTP server such as Apache.
+
+e.g.
+
+	<VirtualHost 127.0.0.1:80>
+    	DocumentRoot /path/to/bennett
+	</VirtualHost>
 
