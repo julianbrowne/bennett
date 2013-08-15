@@ -1,19 +1,33 @@
 <html>
 <head>
-	<script src="lib/jquery-2.0.3.js"></script>
-	<script src="lib/js-yaml-2.1.0.js"></script>
-	<script src="lib/orphan-0.0.1.js"></script>
-	<script src="lib/gridster-0.1.0.js"></script>
+	<link rel="stylesheet" media="all" href="assets/stylesheets/gridster.css" />
+
+	<script src="assets/javascripts/jquery-2.0.3.js"></script>
+	<script src="assets/javascripts/js-yaml-2.1.0.js"></script>
+	<script src="assets/javascripts/orphan-0.0.1.js"></script>
+	<script src="assets/javascripts/gridster-0.1.0.js"></script>
+	<script src="assets/javascripts/bennett.js"></script>
 </head>
 <body>
+
+	<div class="gridster">
+		<ul></ul>
+	</div>
+
 	<script type="text/javascript">
 		$(function() {
+
+			var gridster;
 
 			var dataUrl = "/spec/data.yml";
 			var specUrl = "/spec/spec.yml";
 			var testUrl = "/spec/test.yml";
 
-			config = $.when(getDataFrom(dataUrl), getDataFrom(specUrl), getDataFrom(testUrl));
+			config = $.when(
+				getDataFrom(dataUrl),
+				getDataFrom(specUrl),
+				getDataFrom(testUrl)
+			);
 
 			config.done(
 
@@ -28,32 +42,23 @@
 					testDriver.api = jsyaml.load(spec.responseText);
 					testDriver.cases = jsyaml.load(test.responseText);
 
-					console.log("--->");
-					console.log(testDriver.cases);
+					gridster = $(".gridster ul").gridster().data('gridster');
 
 					Object.keys(testDriver.cases).forEach( function(testCase) {
-
 						if(testDriver.cases.hasOwnProperty(testCase)) {
-							console.log(testCase);
+							gridster.add_widget("<li>" + '<div class="test-name">' + testCase.toString() + "</div>" + "</li>", 1, 1);
 						}
-
 					});
 
-					var client = new Orphan();
+					
 
+				    var client = new Orphan();
 					console.log(client);
-
 				}
 
 			);
-
-			function getDataFrom(url) {
-				return $.get(url)
-				.done(function(data, status, xhr) { console.log("Called " + url + ", got status " + xhr.status); })
-				.fail(function(e) { console.log(e); });
-			};
-
 		});
 	</script>
+
 </body>
 </html>
