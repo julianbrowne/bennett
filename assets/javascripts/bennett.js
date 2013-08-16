@@ -26,10 +26,16 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
         Object.keys(testDriver.cases).forEach( function(testCase) {
             if(testDriver.cases.hasOwnProperty(testCase)) {
-                var tests = "<ul class='leaders'>";
-                logAction(testDriver.cases[testCase]);
-                testDriver.cases[testCase].forEach(function(test) { tests += "<li><span>" + test.toString().split('.')[test.toString().split('.').length-1].replace(/_/," ") + "</span><span class='pass'> pass </span></li>" });
-                gridster.add_widget("<li class='pass'>" + '<div class="test-name">' + testCase.toString().replace(/_/g," ") + "</div>" + tests + "</li>", 1, 2);
+                logAction("Case : " + niceName(testCase));
+                var widget = new Widget(gridster);
+                widget.testCase(testCase);
+                testDriver.cases[testCase].forEach(
+                    function(test) {
+                        logAction("Test : " + niceName(test));
+                        widget.addTestResult(testName(test), "pass");
+                    }
+                );
+                widget.publish();
             }
         });
 
@@ -38,24 +44,77 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         }
    );
 
-   function logAction(message) {
-      var date = new Date();
-      var timestamp = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ":" + date.getMilliseconds();
-      $("#test-log").append("<li><span style='color: #A52E01'>" + timestamp + "</span>: " + message + "</li>");
-   };
+    function logAction(message) {
+        var date = new Date();
+        var timestamp = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ":" + date.getMilliseconds();
+        $("#test-log").append(
+              "<li class='log-action'>" 
+                + "<span class='timestamp'>"
+                    + timestamp
+                + "</span> - " 
+                + "<span class='message'>"
+                + message 
+                + "</span>" 
+            + "</li>"
+        );
+    };
 
-   function assert(outcome, description ) {
-       var li = document.createElement('li');
-       li.className = outcome ? 'pass' : 'fail';
-       li.appendChild( document.createTextNode( description ) );
-       output.appendChild(li);
-   };
+    function Widget(gridster) {
+        var widget = this;
+        this.gridster = gridster;
+        this.content = "<ul class='leaders'>";
+        this.addContent = function(content) { this.content += content; };
+        this.testCase = function(testCase) { this.testCase = testCase; };
+        this.addTestResult = function(test, result) {
+            this.addContent(
+                  "<li>"
+                + "<span class='result'>"
+                + niceName(test) 
+                + "</span>"
+                + "<span class='result + " + result + "'>"
+                + result
+                + "</span>"
+                + "</li>"
+            );
+        };
+        this.publish = function() {
+            widget.addContent("</ul>");     
+            widget.gridster.add_widget("<li class='pass'>" + '<div class="test-name">' + this.testCase + "</div>" + this.content + "</li>", 1, 2);
+        };
+    };
+
+    function assert(outcome, description ) {
+        var li = document.createElement('li');
+        li.className = outcome ? 'pass' : 'fail';
+        li.appendChild( document.createTextNode( description ) );
+        output.appendChild(li);
+    };
 
     function getDataFrom(url) {
         logAction("Loading data from " + url);
         return $.get(url)
             .done(function(data, status, xhr) { logAction("Called " + url + ", got status " + xhr.status); })
             .fail(function(e) { logAction(e); });
+    };
+
+    function testName(fulltestPath) {
+        var elements = fulltestPath.toString().split('.');
+        return elements[elements.length - 1];
+    };
+
+    function niceName(str) {
+
+        function capitalise(lowercaseString) {
+            var capitalisedString = "";
+            var words = lowercaseString.split(" ");
+            words.forEach(function(word) {
+                var capitalisedWord = word.charAt(0).toUpperCase() + word.slice(1);
+                capitalisedString += capitalisedWord + " ";
+            });
+            return capitalisedString.slice(0,-1);
+        };
+        return capitalise(str.toString().replace(/_/g," "));
+
     };
 
 };
