@@ -65,7 +65,7 @@ resources:
       response: 200
       schema: 
           {
-             "title": "User Schema",
+             "title": "user",
              "type": "object",
              "properties": {
                 "username":    { "type": "string" },

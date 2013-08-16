@@ -4,7 +4,7 @@
 
 ---
 
-root: "https://some-alertme-server.somwhere.com/v99"
+root: "http://127.0.0.1:9292/"
 
 user: 
   name: webtest1234

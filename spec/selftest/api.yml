@@ -1,0 +1,17 @@
+#
+#    API Specification
+#
+
+---
+
+get_user:
+  desc: "Get user details"
+  uri: /user/42
+  method: get
+  response: 200
+  schema:
+    {
+      "username": { "type": "string" }
+    }
+
+

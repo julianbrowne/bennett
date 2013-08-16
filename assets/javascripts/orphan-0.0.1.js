@@ -27,24 +27,13 @@ Orphan.prototype.request = function(resourceURI, displayFunction, method)
 
 }
 
-Orphan.prototype.get = function(resourceURI, displayFunction, contentType)
-{
-	var params = { type: 'get', success: displayFunction, error: this.reportError };
+Orphan.prototype.get = function(resourceURI, handler) {
 
-	if (contentType === undefined)
-		params.contentType = this.contentType;
-	else
-		params.contentType = contentType;
-	
-	if(this.remote === true && params.contentType === 'application/json')
-	{
-		params.dataType = 'jsonp';
-	}
-		
-	
-	params.url = (this.baseURI + resourceURI).replace(/([^:])\/\//g, "$1\/");
+	var url = (this.baseURI + resourceURI).replace(/([^:])\/\//g, "$1\/");
 
-	$.ajax(params);
+	$.get(url)
+		.done(handler)
+		.fail(this.reportError(resourceURI));
 }
 
 Orphan.prototype.delete = function(resourceURI, displayFunction, contentType)
@@ -87,16 +76,14 @@ Orphan.prototype.post = function(resourceURI, displayFunction)
 	$.ajax(params);
 }
 
-Orphan.prototype.reportError = function(jqXHR, textStatus, errorThrown)
-{
-	console.log("****");
-	console.log("** ERROR : Called        : " + Orphan.callee);
-	console.log("**         Error         : " + errorThrown);
-	console.log("**         Status        : " + textStatus);
-	console.log("**         Response Text : " + jqXHR.responseText);
-	console.log("**         Response XML  : " + jqXHR.responseXML);
-	console.log("****");
-}
+Orphan.prototype.reportError = function(url) {
+	return function(xhr, textStatus, errorThrown) {
+		console.log("*** Error calling " + url);
+		console.log(xhr);
+		console.log(textStatus);
+		console.log(errorThrown);
+	};
+};
 
 Orphan.prototype.extract = function(data, extractor)
 {
