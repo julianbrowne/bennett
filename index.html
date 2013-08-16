@@ -18,6 +18,7 @@
 		<ul>
 			<li><a href="#tab1" class="bennett">Results</a></li>
 			<li><a href="#tab2" class="bennett">Test Log</a></li>
+			<li><a href="#tab3" class="bennett">Self Test</a></li>
 		</ul>
 		<div id="tab1" class="gridster">
 			<h2>Test Results</h2>
@@ -25,6 +26,10 @@
 		</div>
 		<div id="tab2">
 			<ul id="test-log">
+			</ul>
+		</div>
+		<div id="tab3">
+			<ul id="self-test">
 			</ul>
 		</div>
 	</div>
@@ -40,45 +45,8 @@
 			var specUrl = "/spec/spec.yml";
 			var testUrl = "/spec/test.yml";
 
-			config = $.when(
-				getDataFrom(dataUrl),
-				getDataFrom(specUrl),
-				getDataFrom(testUrl)
-			);
+			var tester = new Bennett(dataUrl, specUrl, testUrl);
 
-			config.done(
-
-				function(dataResult, specResult, testResult) {
-
-					var dataObj = dataResult[2];
-					var specObj = specResult[2];
-					var testObj = testResult[2];
-
-					var testDriver = {};
-					testDriver.fixtures = jsyaml.load(dataObj.responseText);
-					testDriver.api = jsyaml.load(specObj.responseText);
-					testDriver.cases = jsyaml.load(testObj.responseText);
-
-					gridster = $(".gridster ul")
-						.gridster({
-							widget_margins: [10, 10],
-							widget_base_dimensions: [215, 100]
-						}).data('gridster');
-
-					Object.keys(testDriver.cases).forEach( function(testCase) {
-						if(testDriver.cases.hasOwnProperty(testCase)) {
-							var tests = "<ul class='leaders'>";
-							logAction(testDriver.cases[testCase]);
-							testDriver.cases[testCase].forEach(function(test) { tests += "<li><span>" + test.toString().split('.')[test.toString().split('.').length-1].replace(/_/," ") + "</span><span class='pass'> pass </span></li>" });
-							gridster.add_widget("<li class='pass'>" + '<div class="test-name">' + testCase.toString().replace(/_/g," ") + "</div>" + tests + "</li>", 1, 2);
-						}
-					});
-
-				    var client = new Orphan();
-					console.log(client);
-				}
-
-			);
 		});
 	</script>
 
