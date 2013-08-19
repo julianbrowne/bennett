@@ -29,14 +29,14 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 widget_base_dimensions: [215, 100]
             }).data('gridster');
 
-        Object.keys(testdriver.cases).forEach( function(testCase) {
-            if(testdriver.cases.hasOwnProperty(testCase)) {
+        Object.keys(testdriver.cases).forEach( function(testCase) { 
+            if(testdriver.cases.hasOwnProperty(testCase)) { 
                 logAction("Case : " + niceName(testCase), true);
                 var widget = new Widget(gridster);
                 widget.testCase(testCase);
                 var tests = $.when(testCycle(testCase, widget));
-                tests.done(
-                    function() {
+                tests.done( 
+                    function() { 
                         logAction("Test case " + niceName(testCase) + " complete")
                         widget.publish();
                     }
@@ -45,27 +45,26 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         });
     });
 
-    function testCycle(testCase, widget) {
+    function testCycle(testCase, widget) { 
+
+        var bank = new Piggybank("http://127.0.0.1:9292");
+
+        bank.ignore404 = true;
+
         testdriver.cases[testCase].forEach(
             function(test) {
+                test = test;
                 logAction("Test : " + test);
                 var testDetails = eval("testdriver.api." + test);
 
                 if(testDetails !== undefined) {
                     logAction("Desc : " + testDetails.desc);
-
                     var uri = testDetails.uri;
                     var method = testDetails.method;
-                    if(method === "post" && testDetails.arguments !== undefined) {
-                        var messageBody = {};
-                    }
-                    else {
-                        var messageBody = {};
-                    }
-                    var client = new Orphan(testdriver.fixtures.root);
+                    bank.addCall(testDetails.uri, testDetails.method);
+
                     logAction("Url  : " + uri);
                     var assert = assertment(widget, test);
-                    client.request(uri, assert(testDetails.response), method, messageBody);
                 }
                 else {
                     widget.addTestResult(testName(test), "fail"); // skipped?
@@ -73,6 +72,9 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 }
             }
         );
+
+        bank.makeCallsSynchronously().done(function(results) { console.log(results); });
+
     };
 
     function makeCall() {
@@ -159,6 +161,36 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         output.appendChild(li);
     };
 */
+
+
+
+    function getFields(url) {
+
+      var ajaxPromise = $.get(url);
+
+      var dff = $.Deferred();
+
+      ajaxPromise.then(function(data) {
+
+        var result = {
+          'field1' : field1,
+          'field2' : field2
+        };
+
+        dff.resolve(result);
+
+      }, function() {
+        dff.reject( );
+      });
+
+      return dff.promise();
+    };
+
+    var fieldPromise = getFields('http://something');
+
+    fieldPromise.done(function(result){
+      console.log(JSON.stringify(result)); 
+    });
 
     function getDataFrom(url) {
         logAction("Loading data from " + url);

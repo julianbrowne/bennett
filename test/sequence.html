@@ -1,0 +1,76 @@
+<html>
+<head>
+    <title>Bennett - Sequential Self Test</title>
+
+    <link rel="stylesheet" media="all" href="../assets/stylesheets/bennett.css" />
+    <link rel="stylesheet" media="all" href="../assets/jquery-ui-1.10.3/css/le-frog/jquery-ui-1.10.3.custom.css" />
+    <link rel="stylesheet" media="all" href="../assets/stylesheets/prettify.css" />
+    <link href='http://fonts.googleapis.com/css?family=Jolly+Lodger' rel='stylesheet' type='text/css'>
+
+    <script src="../assets/javascripts/jquery-2.0.3.js"></script>
+    <script src="../assets/javascripts/prettify.js"></script>
+</head>
+<body>
+    <h1 class="bennett">Bennett: REST API - Sequential Self-Test Page</h1>
+
+    <div id="results">
+        <pre><code class="prettyprint">
+        </code></pre>
+    </div>
+
+    <script type="text/javascript">
+
+        var apis = [
+            "/?1",
+            "/?2",
+            "/?3",
+            "/?4",
+            "/?5"
+        ];
+
+        var a = 0;
+
+        var results = [];
+
+        var start = $.Deferred();
+
+        builder(apis, 0, start);
+
+        function builder(queue, index, deferred, lastResult) { 
+
+            if(lastResult !== undefined) {
+                results.push({ url: queue[index-1], status: lastResult.status });
+            }
+
+            if(index === queue.length) {
+                publish(results);
+            }
+            else {
+                deferred.then(
+                    function() { 
+                        $.get(queue[index]).then( 
+                            function(data, textStatus, jqXHR) { 
+                                next = $.Deferred();
+                                builder(queue, ++index, next, jqXHR);
+                                next.resolve();
+                            },
+                            handleError
+                        )
+                    }
+                );
+                deferred.resolve();
+            }
+        };
+
+        function handleError(jqXHR, textStatus, errorThrown) {
+            console.log("failed");
+        };
+
+        function publish(data) {
+            $("#results pre code").html(JSON.stringify(data, null, 4));
+            prettyPrint();
+        };
+
+    </script>
+</body>
+</html>

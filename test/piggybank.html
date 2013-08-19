@@ -1,0 +1,49 @@
+<html>
+<head>
+	<title>Bennett Test</title>
+
+	<link rel="stylesheet" media="all" href="../assets/stylesheets/bennett.css" />
+	<link rel="stylesheet" media="all" href="../assets/jquery-ui-1.10.3/css/le-frog/jquery-ui-1.10.3.custom.css" />
+	<link rel="stylesheet" media="all" href="../assets/stylesheets/prettify.css" />
+	<link href='http://fonts.googleapis.com/css?family=Jolly+Lodger' rel='stylesheet' type='text/css'>
+
+	<script src="../assets/javascripts/jquery-2.0.3.js"></script>
+	<script src="../assets/javascripts/prettify.js"></script>
+	<script src="../assets/javascripts/piggybank/piggybank.js"></script>
+</head>
+<body>
+	<h1 class="bennett">Bennett: REST API - Piggybank Self-Test Page</h1>
+
+	<div id="results">
+		<pre><code class="prettyprint">
+		</code></pre>
+	</div>
+
+	<script type="text/javascript">
+
+		var manager = new Piggybank("http://127.0.0.1:8105");
+
+		manager.timeout = 5000;
+
+		manager.ignore404 = true;
+
+		manager.addCall('/test/piggybank.html');
+		manager.addCall('/fff.html', "post");
+		manager.addCall('/index.html', "put");
+
+		// make calls in order but async (i.e. continues on error)
+		// manager.makeCalls().done(publish);
+
+		// make calls in order and async (stops on error)
+		manager.makeCallsSynchronously().done(publish);
+
+		function publish(data) {
+			$("#results pre code").append(JSON.stringify(data, null, 4));
+			$("#results pre code").append("\n\r\n\r");
+			prettyPrint();
+		};
+
+	</script>
+
+</body>
+</html>

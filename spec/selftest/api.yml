@@ -14,4 +14,9 @@ get_user:
       "username": { "type": "string" }
     }
 
+get_nonexistent_user:
+  desc: "404 test"
+  uri: /userz/42
+  method: get
+  response: 200
 
