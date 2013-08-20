@@ -6,7 +6,7 @@
 
 get_user:
   desc: "Get user details"
-  uri: /user/42
+  url: /user/42
   method: get
   response: 200
   schema:
@@ -16,7 +16,7 @@ get_user:
 
 get_nonexistent_user:
   desc: "404 test"
-  uri: /userz/42
+  url: /userz/42
   method: get
   response: 200
 

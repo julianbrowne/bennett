@@ -66,12 +66,12 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
                 if(testDetails !== undefined) {
                     logAction("Desc : " + testDetails.desc);
-                    var uri = testDetails.uri;
-                    var method = testDetails.method;
-                    b.addCall(testDetails.uri, testDetails.method);
-
-                    logAction("Url  : " + uri);
-                    //var assert = assertment(widget, test);
+                    b.addCall(testDetails.url, { 
+                        method: testDetails.method, 
+                        name: test,
+                        expect: testDetails.response
+                    });
+                    logAction("URL  : " + testDetails.url);
                 }
                 else {
                     logAction("***  : No test details found for " + test);
@@ -83,55 +83,42 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
     };
 
+/*
     function makeCall() {
         return $.get(url)
             .done(function(data, status, xhr) { logAction("Called " + url + ", got status " + xhr.status); })
             .fail(function(e) { logAction(e); });
     };
+*/
 
     function logAction(message, bold) {
         var bold = bold === undefined ? false : true;
-        var date = new Date();
-        var timestamp = date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + ":" + date.getMilliseconds();
-        if(bold) {
-            message = "<b>" + message + "</b>";
-        }
         $("#test-log").append(
               "<li class='log-action'>" 
-                + "<span class='timestamp'>"
-                    + timestamp
-                + "</span> - " 
-                + "<span class='message'>"
-                + message 
-                + "</span>" 
+                + "<span class='timestamp'>" + timestamp() + "</span>" 
+                + "<span class='message " + (bold ? "bold" : "") + "'>" + message + "</span>" 
             + "</li>"
         );
     };
 
-    function assertment(widget, test) {
-        return function(expectedStatus, expectedSchema) {
-            return function(data, status, xhr) {
-                console.log(widget);
-                if(xhr.status !== expectedStatus) {
-                    widget.addTestResult(testName(test), "fail");
-                    logAction("FAIL : " + test + " - Expected " + expectedStatus + " but got " + xhr.status);
-                }
-                else {
-                    widget.addTestResult(testName(test), "pass");
-                    logAction("PASS : " + test + " - Expected " + expectedStatus + " and got " + xhr.status);
-                }
-            };
-        };
+    function timestamp() {
+        var date = new Date();
+        var t = 
+              date.getHours() 
+            + ":" + date.getMinutes() 
+            + ":" + date.getSeconds() 
+            + ":" + ("000" + date.getMilliseconds()).toString().slice(-3);
+        return t;
     };
 
-   function reporter(widget, name) {
+    function reporter(widget, name) {
         return function(data) {
             console.log(data);
             widget.testCase(niceName(name));
             Object.keys(data).forEach(
                 function(test) {
                     result = data[test];
-                    widget.addTestResult(result.url, result.status);
+                    widget.addTestResult(result.url, (result.data.expected ? 'pass' : 'fail'));
                 }
             );
             widget.publish();
@@ -157,11 +144,11 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         this.addTestResult = function(test, result) {
             var list = this.widget.children("ul.leaders");
             list.html(list.html()
-                + "<li>"
-                + "<span class='result'>"
+                + "<li class='test-item'>"
+                + "<span class='name'>"
                 + niceName(test) 
                 + "</span>"
-                + "<span class='result + " + result + "'>"
+                + "<span class='result " + result + "'>"
                 + result
                 + "</span>"
                 + "</li>");
@@ -172,17 +159,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             console.log(this.content);
         };
     };
-
-/*
-    function assert(outcome, description ) {
-        var li = document.createElement('li');
-        li.className = outcome ? 'pass' : 'fail';
-        li.appendChild( document.createTextNode( description ) );
-        output.appendChild(li);
-    };
-*/
-
-
 
     function getFields(url) {
 

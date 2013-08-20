@@ -10,7 +10,7 @@ resources:
 
     log_in: 
       desc: "Creates a session and allows use of all other api methods"
-      uri: /login
+      url: /login
       arguments: 
         - username
         - password
@@ -26,7 +26,7 @@ resources:
 
     check_password_reset: 
       desc: "May be used to check if a code supplied by the end user is correct"
-      uri: /passwordreset
+      url: /passwordreset
       arguments: 
         - code
       method: get
@@ -34,13 +34,13 @@ resources:
 
     log_out: 
       desc: "Destroys the session, the session cookie will no longer be valid"
-      uri: /logout
+      url: /logout
       method: post
       response: 204
 
     reset_password: 
       desc: "Starts password reset process and sends the confirmation e-mail to the end user"
-      uri: /passwordreset
+      url: /passwordreset
       arguments: 
         - username
         - ip
@@ -49,7 +49,7 @@ resources:
 
     set_password: 
       desc: "change user password"
-      uri: /passwordreset
+      url: /passwordreset
       arguments: 
         - code
         - password
@@ -60,7 +60,7 @@ resources:
 
     user_information: 
       desc: "Returns information about the user"
-      uri: "/users/{username}"
+      url: "/users/{username}"
       method: get
       response: 200
       schema: 

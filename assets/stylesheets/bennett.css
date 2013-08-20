@@ -40,6 +40,13 @@ h2 {
     font-family: 'Jolly Lodger', cursive;
 }
 
+/**
+ *  Generic
+**/
+
+.bold {
+    font-weight: bold;
+}
 
 /**
  *      Log Tab Messages
@@ -51,6 +58,11 @@ h2 {
 
 .log-action .timestamp {
     color: #A52E01;
+}
+
+.log-action * {
+    padding: 2px 5px;
+    margin: 2px 5px;
 }
 
 .log-action .message {
