@@ -1,0 +1,25 @@
+{
+  "name": "bennett",
+  "preferGlobal": true,
+  "version": "0.0.1",
+  "author": "Julian Browne",
+  "description": "Test manager for REST API verification",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/julianbrowne/bennett.git"
+  },
+  "keywords": [
+    "rest",
+    "api",
+    "test",
+    "verification"
+  ],
+  "dependencies" : {
+    "jquery"    :  "2.0.3",
+    "jquery-ui" :  "1.10.3",
+    "gridster"  :  "2.0.3",
+    "js-yaml"   :  "2.1.0",
+    "pigybank"  :  "0.0.1"
+  },
+  "license": "OSL-3.0",
+}
