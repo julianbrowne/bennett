@@ -6,7 +6,7 @@
 
 get_user:
   desc: "Get user details"
-  url: /user/42
+  url: "/user/{userid}"
   method: get
   response: 200
   schema:
@@ -14,9 +14,15 @@ get_user:
       "username": { "type": "string" }
     }
 
-get_nonexistent_user:
+fail_to_get_user:
   desc: "404 test"
-  url: /userz/42
+  url: "/userz/{userid}"
   method: get
   response: 200
 
+update_user:
+  desc: "Update user"
+  url: "/users/{userid}"
+  method: post
+  response: 200
+  body: new_user

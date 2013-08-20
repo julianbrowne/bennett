@@ -1,0 +1,90 @@
+#
+#	 AlertMe V5 API Specification
+#
+
+---
+
+resources: 
+
+  session: 
+
+    log_in: 
+      desc: "Creates a session and allows use of all other api methods"
+      url: /login
+      arguments: 
+        - username
+        - password
+        - caller
+      encoding: html
+      method: post
+      response: 200
+      schema:
+          {
+             "hubIds": { "type": "array" },
+             "ApiSession": { "type": "string" }
+          }
+
+    check_password_reset: 
+      desc: "May be used to check if a code supplied by the end user is correct"
+      url: /passwordreset
+      arguments: 
+        - code
+      method: get
+      response: 200
+
+    log_out: 
+      desc: "Destroys the session, the session cookie will no longer be valid"
+      url: /logout
+      method: post
+      response: 204
+
+    reset_password: 
+      desc: "Starts password reset process and sends the confirmation e-mail to the end user"
+      url: /passwordreset
+      arguments: 
+        - username
+        - ip
+      method: post
+      response: 201
+
+    set_password: 
+      desc: "change user password"
+      url: /passwordreset
+      arguments: 
+        - code
+        - password
+      method: put
+      response: 201
+
+  users: 
+
+    user_information: 
+      desc: "Returns information about the user"
+      url: "/users/{username}"
+      method: get
+      response: 200
+      schema: 
+          {
+             "title": "user",
+             "type": "object",
+             "properties": {
+                "username":    { "type": "string" },
+                "firstname":   { "type": "string" },
+                "lastname":    { "type": "string" },
+                "address":     { "type": "string" },
+                "pin":         { "type": "string" },
+                "city":        { "type": "string" },
+                "county":      { "type": "string" },
+                "postcode":    { "type": "string" },
+                "country":     { "type": "string" },
+                "answer":      { "type": "string" },
+                "userlevel":   { "type": "string" },
+                "dob":         { "type": "string" },
+                "currency":    { "type": "string" },
+                "language":    { "type": "string" },
+                "temperature": { "type": "string" },
+                "phone":       { "type": "string" },
+                "email":       { "type": "string" },
+                "mobile":      { "type": "string" },
+             }
+          }

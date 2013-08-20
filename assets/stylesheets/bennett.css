@@ -69,6 +69,17 @@ h2 {
     color: #000000;
 }
 
+/**
+ * Test Results
+**/
+
+.test-set {
+    color: #000000;
+    background: #FFFFFF;
+    border: 2px solid #000000;
+    border-radius: 15px;
+}
+
 ul {
     list-style: none;
 }
@@ -104,12 +115,6 @@ ul.leaders span + span {
 li p {
     margin: 5px;
     font-size: 16px;
-}
-
-li.pass {
-    color: #000000;
-    background: #FFFFFF;
-    border: 2px solid #00CC66;
 }
 
 span.pass {

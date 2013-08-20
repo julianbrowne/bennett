@@ -13,5 +13,12 @@ multi_get:
    - get_user
    - get_user
 
-no_user:
-   - get_nonexistent_user
+user_fail:
+   - fail_to_get_user
+
+pass_then_fail:
+   - get_user
+   - fail_to_get_user
+
+change_user_details:
+   - update_user

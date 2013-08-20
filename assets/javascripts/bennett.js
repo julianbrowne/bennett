@@ -60,20 +60,42 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         b.ignore404 = true;
 
         testdriver.cases[testCase].forEach(
-            function(test) {
+            function(test) { 
                 logAction("Test : " + test);
                 var testDetails = eval("testdriver.api." + test);
 
-                if(testDetails !== undefined) {
+                if(testDetails !== undefined) { 
+
                     logAction("Desc : " + testDetails.desc);
-                    b.addCall(testDetails.url, { 
+
+                    var config = { 
                         method: testDetails.method, 
                         name: test,
                         expect: testDetails.response
-                    });
+                    };
+
+                    // interpolate uri-template
+
+                    if(testDetails.url.search(/{.*?}/) !== -1) { 
+                        var template = UriTemplate.parse(testDetails.url);
+                        config.template = testDetails.url;
+                        testDetails.url = template.expand(testdriver.fixtures);
+                    }
+
+                    // add post/put body
+
+                    if(testDetails.method === 'post' || testDetails.method === 'put') { 
+                        if(testDetails.body!==undefined) { 
+                            config.body = testdriver.fixtures[testDetails.body];
+                        }
+                    }
+
+                    b.addCall(testDetails.url, config);
+
                     logAction("URL  : " + testDetails.url);
+
                 }
-                else {
+                else { 
                     logAction("***  : No test details found for " + test);
                 }
             }
@@ -118,7 +140,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             Object.keys(data).forEach(
                 function(test) {
                     result = data[test];
-                    widget.addTestResult(result.url, (result.data.expected ? 'pass' : 'fail'));
+                    widget.addTestResult(result, (result.data.expected ? 'pass' : 'fail'));
                 }
             );
             widget.publish();
@@ -138,15 +160,15 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
         this.testCase = function(testCase) {
             this.testCase = testCase;
-            this.widget = gridster.add_widget("<li class='pass'>" + '<div class="test-name">' + this.testCase + "</div>" + this.content + "</li>", 1, 2);
+            this.widget = gridster.add_widget("<li class='test-set'>" + '<div class="test-name">' + this.testCase + "</div>" + this.content + "</li>", 1, 2);
         };
 
-        this.addTestResult = function(test, result) {
+        this.addTestResult = function(testData, result) {
             var list = this.widget.children("ul.leaders");
             list.html(list.html()
-                + "<li class='test-item'>"
+                + "<li class='test-item' title='" + testData.data.method + " to " + testData.url + " : expected " + testData.data.expect + " got " + testData.status + "'>"
                 + "<span class='name'>"
-                + niceName(test) 
+                + niceName(testData.data.name) 
                 + "</span>"
                 + "<span class='result " + result + "'>"
                 + result

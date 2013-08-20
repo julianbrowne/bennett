@@ -1,0 +1,30 @@
+n<html>
+<head>
+	<title>Bennett Test</title>
+
+	<link rel="stylesheet" media="all" href="../assets/stylesheets/bennett.css" />
+	<link rel="stylesheet" media="all" href="../assets/jquery-ui-1.10.3/css/le-frog/jquery-ui-1.10.3.custom.css" />
+	<link rel="stylesheet" media="all" href="../assets/stylesheets/prettify.css" />
+	<link href='http://fonts.googleapis.com/css?family=Jolly+Lodger' rel='stylesheet' type='text/css'>
+
+	<script src="../assets/javascripts/jquery-2.0.3.js"></script>
+	<script src="../assets/javascripts/uritemplate.js"></script>
+</head>
+<body>
+	<h1 class="bennett">Bennett: REST API - URI Template Self-Test Page</h1>
+
+	<div id="results">
+		<pre><code class="prettyprint"></code></pre>
+	</div>
+
+	<script type="text/javascript">
+
+		var template = UriTemplate.parse('/users/{id}');
+
+	    $("pre code").html(template.expand({id: 42}));
+	    prettyPrint();
+
+	</script>
+
+</body>
+</html>

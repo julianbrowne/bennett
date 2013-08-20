@@ -4,6 +4,9 @@
 
 ---
 
-root: "http://127.0.0.1:9292/"
+root: "http://127.0.0.1:9292"
 
 userid: 42
+
+new_user:
+    name: "fred"

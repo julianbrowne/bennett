@@ -64,11 +64,12 @@ Which essentially indicates the test **log\_in\_and\_out\_test** comprises runni
 
 All dependencies are packaged, but they are:
 
-*	JQuery v2.0.3 (DOM manipulation)
-*	JQuery UI v1.10.3 (Tabs)
-*	Gridster v0.1.0 (Jenkins-like test status grid layout)
-*	JS-Yaml v2.1.0 (for reading and parsing the config files)
-*	Piggybank V0.0.1 (managing ajax calls synchronously)
+*	JQuery      v2.0.3  (DOM manipulation)
+*	JQuery UI   v1.10.3 (Tabs)
+*	Gridster    v0.1.0  (Jenkins-like test status grid layout)
+*	JS-Yaml     v2.1.0  (for reading and parsing the config files)
+*	Piggybank   V0.0.1  (managing ajax calls synchronously)
+* Uritemplate v0.3.4  (mashing uri templates and fixture data)
 
 ### Installation
 
