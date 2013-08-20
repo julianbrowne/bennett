@@ -25,11 +25,12 @@
 
 		manager.timeout = 5000;
 
-		manager.ignore404 = true;
+		//manager.ignore404 = true;
+		manager.ignoreErrors = true;
 
 		manager.addCall('/test/piggybank.html');
-		manager.addCall('/fff.html', "post");
-		manager.addCall('/index.html', "put");
+		manager.addCall('/fff.html',   { method: "post", name: "fred"  });
+		manager.addCall('/index.html', { method: "put",  expect: 200 });
 
 		// make calls in order but async (i.e. continues on error)
 		// manager.makeCalls().done(publish);

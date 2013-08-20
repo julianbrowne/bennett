@@ -4,7 +4,14 @@
 
 ---
 
+single_get:
+   - get_user
+
 multi_get:
    - get_user
-   - get_nonexistent_user
    - get_user
+   - get_user
+   - get_user
+
+no_user:
+   - get_nonexistent_user

@@ -3,57 +3,64 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
     var testdriver  = this;
     this.logELement = "#test-log";
-    this.config     = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc));
     this.fixtures   = null;
     this.api        = null;
     this.cases      = null;
+    this.gridster   = null;
 
-    logAction("Bennett tester instantiated")
+    logAction("Bennett tester instantiated");
 
-    this.config.done(
+    this.config = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc));
+
+    this.config.then(
         function(dataResult, specResult, testResult) {
 
         var dataObj = dataResult[2];
         var specObj = specResult[2];
         var testObj = testResult[2];
 
-        testdriver.fixtures = jsyaml.load(dataObj.responseText);
-        testdriver.api      = jsyaml.load(specObj.responseText);
-        testdriver.cases    = jsyaml.load(testObj.responseText);
+        try {
+            testdriver.fixtures = jsyaml.load(dataObj.responseText);
+            testdriver.api      = jsyaml.load(specObj.responseText);
+            testdriver.cases    = jsyaml.load(testObj.responseText);
+        } catch(err) {
+            alert("Invalid YAML files");
+            throw "YAML Error " + err;
+        }
 
         logAction("Using server " + testdriver.fixtures.root);
+        logAction("Setting up grid");
 
-        gridster = $(".gridster ul")
+        testdriver.gridster = $(".gridster ul")
             .gridster({
                 widget_margins: [10, 10],
                 widget_base_dimensions: [215, 100]
             }).data('gridster');
+        }
+    );
 
-        Object.keys(testdriver.cases).forEach( function(testCase) { 
-            if(testdriver.cases.hasOwnProperty(testCase)) { 
-                logAction("Case : " + niceName(testCase), true);
-                var widget = new Widget(gridster);
-                widget.testCase(testCase);
-                var tests = $.when(testCycle(testCase, widget));
-                tests.done( 
-                    function() { 
-                        logAction("Test case " + niceName(testCase) + " complete")
-                        widget.publish();
+    this.runTests = function() {
+        testdriver.config.then(
+            function() {
+                Object.keys(testdriver.cases).forEach( function(testCase) { 
+                    if(testdriver.cases.hasOwnProperty(testCase)) { 
+                        logAction("Case : " + niceName(testCase), true);
+                        testCycle(testCase);
                     }
-                );
+                })
             }
-        });
-    });
+        );
+    };
 
-    function testCycle(testCase, widget) { 
+    function testCycle(testCase) { 
 
-        var bank = new Piggybank("http://127.0.0.1:9292");
+        var b = new Piggybank(testdriver.fixtures.root);
+        var w = new Widget(testdriver.gridster);
 
-        bank.ignore404 = true;
+        b.ignore404 = true;
 
         testdriver.cases[testCase].forEach(
             function(test) {
-                test = test;
                 logAction("Test : " + test);
                 var testDetails = eval("testdriver.api." + test);
 
@@ -61,19 +68,18 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     logAction("Desc : " + testDetails.desc);
                     var uri = testDetails.uri;
                     var method = testDetails.method;
-                    bank.addCall(testDetails.uri, testDetails.method);
+                    b.addCall(testDetails.uri, testDetails.method);
 
                     logAction("Url  : " + uri);
-                    var assert = assertment(widget, test);
+                    //var assert = assertment(widget, test);
                 }
                 else {
-                    widget.addTestResult(testName(test), "fail"); // skipped?
                     logAction("***  : No test details found for " + test);
                 }
             }
         );
 
-        bank.makeCallsSynchronously().done(function(results) { console.log(results); });
+        b.makeCallsSynchronously().done(reporter(w, testCase));
 
     };
 
@@ -118,6 +124,20 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         };
     };
 
+   function reporter(widget, name) {
+        return function(data) {
+            console.log(data);
+            widget.testCase(niceName(name));
+            Object.keys(data).forEach(
+                function(test) {
+                    result = data[test];
+                    widget.addTestResult(result.url, result.status);
+                }
+            );
+            widget.publish();
+        }
+    };
+
     function Widget(gridster) {
 
         this.testCase = "";
@@ -148,8 +168,8 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         };
 
         this.publish = function() {
-            //this.addContent("</ul>");
-            //console.log(this.content);
+            this.addContent("</ul>");
+            console.log(this.content);
         };
     };
 

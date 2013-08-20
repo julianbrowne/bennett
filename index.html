@@ -49,7 +49,9 @@
 			//var specUrl = "/spec/spec.yml";
 			//var testUrl = "/spec/test.yml";
 
-			var tester = new Bennett(dataUrl, specUrl, testUrl);
+			var harness = new Bennett(dataUrl, specUrl, testUrl);
+
+			harness.runTests();
 
 		});
 	</script>
