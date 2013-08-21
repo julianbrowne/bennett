@@ -1,85 +1,134 @@
 
 ##Bennett
 
-A simple REST API test framework, designed to be (nearly) 100% data-driven.
-
-> Bennett is thoughtware only right now - don't even try to use yet.  
-> But do comment on anything that doesn't make sense
+Bennet is a simple pure javascript data-driven REST API verification tool. You describe the behavioural characteristics of an API, provide some sample test data and the combination of API calls that make up each test case and Bennett does the rest.
 
 ###Design
 
-Bennett is designed to auto-generate and run Jasmine tests from three YAML files:
+Bennet reads three YAML files and creates three javascript object structures (api definition, fixture data, test cases). Bennet then iterates through the test cases applying the required API definition and fixture data to each.
 
--	An API specification which details agreed characteristics of behaviour   
--	Some sample test data (login names etc)   
--	A method, or flow, for running generated tests   
+For example, if the test case was to log in and then log out, then Bennett reads the log in definition, applies the username and password to the defined API uri template, makes the call, checks the response against what's expected, then does the same with the log out call.
+
+Calls are made synchronously using the [piggybank](https://github.com/julianbrowne/piggybank) javascript library and the result set is collated and displayed on screen using [gridster](https://github.com/ducksboard/gridster.js).
 
 ![screen-shot](https://raw.github.com/julianbrowne/bennett/master/assets/images/bennett.png)
 
-###Example
+### Configuration
+
+#### API Definition
+
+All Bennett configuration is defined using YAML files of the form
+
+	container:
+	
+		sub_container:
+		
+			api_name:
+				api_feature: value
+				api_feature: value
+			
+			api_name:
+				api_feature: value
+				api_feature: value
+			
+		sub_container:
+		
+				...
+
+The container/sub-container keys are optional and may be arbitrarily deep, though they're useful for classifing large API domains.
 
 A simple API spec might look like this:
 
-	log_in: 
-      desc: "Creates a logged in session"
-      uri: /myapp/login
-      arguments: 
-        - username
-        - password
-      method: post
-      response: 201
-      schema:
-          {
-             "sessionId": { "type": "string" }
-          }
+	update_user:
+  		desc: "Update user resource with a POST"
+  		url: "/users/{userid}"
+  		method: post
+  		response: 200
+  		body: user_details
 
-    log_out: 
-      desc: "Destroys a logged in session"
-      uri: /myapp/session/{sessionId}
-      method: delete
-      response: 204
+**update\_user**: This name this API must be referred to by in other files  
+**desc**: The user friendly tag that will be used to record the results of calls to this API  
+**url**: The URI, or URI template, that defines this URI's endpoint  
+**method**: The HTTP verb used for this call ("get", "post", "put", "delete")  
+**response**: The expected response from this API call  
+**body**: A reference to the fixture data needed for this API call in the HTTP request body  
 
-An API endpoint is specified by a YAML section containing a description of the API (for later rendering to the user), a URI or URI template for the API call, some argument expected by the API (if POSTing), a method (get, put, post, delete, etc), the expected response where the API call has succeeded (200, 201, etc), and finally a JSON schema description of a valid response (optional). As JSON is valid YAML JSON schemas can be entered in to the YAML config files without modification.
+Other keys valid here are:
 
-Test data for this API specification would then be:
+**schema**:  
+**arguments**:  
+**encoding**:  
 
-	root: "http://example.com/apiroot"
-	username: "bob"
-	password: "bobs_secret_password"
+#### Data Definition
 
-And the test flow is:
+Any data requirements defined in the API config file by body, parameters or URI templates, must be catered for in the test data. The example above requires a userid for the endpoint call "/users/{userid}" and some data for the request body defined in the spec as "user\_details".
 
-	log_in_and_out_test:
-	   - log_in
-	   - log_out
+	root: "http://127.0.0.1"
+	userid: 42
+	user_details:
+    	name: "fred"
 
-	next_test:
-		- do_something
-		- do_the_next_thing
-		- and_so_on
+**root:** The root/stub address of the API that all API calls will be appended to. In this case Bennett will be calling "http://127.0.0.1/users/{userid}"  
+**userid:** The value to interpolate into the URI template, making the actual call now "http://127.0.0.1/users/42". Bennett uses [URI Template JS](https://github.com/fxa/uritemplate-js) for this making it fully [RFC6570](http://tools.ietf.org/html/rfc6570) compliant.
 
-Which essentially indicates the test **log\_in\_and\_out\_test** comprises running **log\_in** followed by **log\_out**
+#### Test Cases
 
-### Ingredients
+With an API spec and some data to enrich it the last piece of the puzzle is some test cases to exercise the API in meaningful ways.
 
-All dependencies are packaged, but they are:
+Test cases look like this:
 
-*	JQuery      v2.0.3  (DOM manipulation)
-*	JQuery UI   v1.10.3 (Tabs)
-*	Gridster    v0.1.0  (Jenkins-like test status grid layout)
-*	JS-Yaml     v2.1.0  (for reading and parsing the config files)
-*	Piggybank   V0.0.1  (managing ajax calls synchronously)
-* Uritemplate v0.3.4  (mashing uri templates and fixture data)
+	test_case_name:
+		- api_call
+		- api_call
+		- api_call
+	
+	test_case_name:
+		- api_call
+		- api_call
+		- api_call
 
-### Installation
+Test cases are executed in order with each API call waiting for the last one to complete before it begins.
+
+### Install and Run
+
+#### Dependencies
+
+All dependencies are included but they are:
+
+*	JQuery      v2.0.3  (DOM manipulation)  
+*	JQuery UI   v1.10.3 (Tabs)  
+*	Gridster    v0.1.0  (Jenkins-like test status grid layout)  
+*	JS-Yaml     v2.1.0  (for reading and parsing the config files)  
+*	Piggybank   V0.0.1  (managing ajax calls synchronously)  
+*	Uritemplate v0.3.4  (mashing uri templates and fixture data)  
+
+#### Installation
 
 	git clone https://github.com/julianbrowne/bennett.git
 	
-Then put bennett directory behind a decent HTTP server such as Apache.
+#### Running
 
-e.g.
+Simply put the bennett install directory behind a decent HTTP server such as Apache with a config like:
 
 	<VirtualHost 127.0.0.1:80>
     	DocumentRoot /path/to/bennett
 	</VirtualHost>
+
+#### Start Testing
+
+The index.html file in the Bennett root directory sets up and runs the tests. The lines to change look something like this:
+
+	var dataUrl = "/spec/selftest/data.yml";
+	var specUrl = "/spec/selftest/api.yml";
+	var testUrl = "/spec/selftest/tests.yml";
+
+	var harness = new Bennett(dataUrl, specUrl, testUrl);
+
+	harness.runTests();
+
+To get started Bennett requires that the three data files are created, then defined (by their URL location, not file system) and passed to a new Bennett() object;
+
+To initiate the test cycle call runTests() on the created object.
+
+Refreshing the web page that points to index.html will re-run the tests.
 
