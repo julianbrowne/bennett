@@ -1,0 +1,88 @@
+<html>
+<head>
+    <title>Kitchen Sync Test</title>
+    <script src="../assets/javascripts/jquery-2.0.3.js"></script>
+</head>
+<body>
+    <h1 class="bennett">Kitchen Sync Example</h1>
+
+    <div id="results"></div>
+
+    <script type="text/javascript">
+
+/*
+        var o1 = function(str) { setTimeout(function() { $("#results").append(str + " - been called!!<br/>"); }, 500); };
+
+        //o1();
+
+        d = $.Deferred();
+        d.promise(o1);
+        d.resolve("abc");
+
+        o1.then(o1).then(o1); //.done();
+*/
+
+        var queue = [];
+
+        queue.push(function() { setTimeout(function() { $("#results").append("one<br/>")   },4000); });   // slowest
+        queue.push(function() { setTimeout(function() { $("#results").append("two<br/>")   },3000); });
+        queue.push(function() { setTimeout(function() { $("#results").append("three<br/>") },2000); });
+        queue.push(function() { setTimeout(function() { $("#results").append("four<br/>")  },1000); });   // quickest 
+
+        // fires functions in order but because they're async they complete in reverse order
+
+        /*
+        queue.forEach(
+            function(f) {
+                f.call();
+            }
+        );
+        */
+
+        // fires functions in order and because they're sync they complete in queue order
+
+        var q = new Kitchen(queue);
+
+        q.run(0, $.Deferred());
+
+        function Kitchen(queue) {
+
+            var kitchen = this;
+            this.queue = queue;
+            this.start = null;
+
+            this.run = function(index, deferred, results) { 
+
+                if(results === undefined)
+                    this.start = $.Deferred();
+
+                if(index === this.queue.length) { 
+                    this.start.resolve();
+                }
+                else { 
+                    deferred.then(
+                        function() { 
+                            $.when(kitchen.queue[index]()).then( 
+                                function(data) { 
+                                    var next = $.Deferred();
+                                    kitchen.run(++index, next, data);
+                                    next.resolve();
+                                }
+                            )
+                        }
+                    );
+                    deferred.resolve();
+                }
+                return kitchen.start.promise();
+            };
+
+            this.makePromise = function(func) { 
+                var d = $.Deferred();
+                d.promise(func.call());
+                return d;
+            };
+
+        }
+    </script>
+</body>
+</html>

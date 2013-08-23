@@ -4,21 +4,41 @@
 
 ---
 
-single_get:
-   - get_user
+login_and_logout_user:
+   - session.login
+   - session.logout
+
+get_basic_details:
+   - session.login
+   - user.get_user
+   - session.logout
+
+basic_user_search:
+   - session.login
+   - user.search
+   - session.logout
+
+update_user_data:
+   - session.login
+   - user.update
+   - session.logout
+
+reset_password:
+   - session.password_reset
+   - session.password_reset_check
+   - session.set_new_password
 
 multi_get:
-   - get_user
-   - get_user
-   - get_user
-   - get_user
+   - session.login
+   - user.get_user
+   - user.get_user
+   - user.get_user
+   - user.get_user
 
 user_fail:
-   - fail_to_get_user
+   - test.expect_fail
 
-pass_then_fail:
-   - get_user
-   - fail_to_get_user
-
-change_user_details:
-   - update_user
+invalid_session_fail:
+   - session.login
+   - session.logout
+   - user.get_user

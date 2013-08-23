@@ -4,9 +4,18 @@
 
 ---
 
-root: "http://127.0.0.1:9292"
+root: "http://127.0.0.1:9191/api"
 
 userid: 42
 
-new_user:
-    name: "fred"
+user_details:
+    username: "fred"
+    password: "secret"
+
+password_details:
+    code: 1234
+    password: "newsecret"
+
+search:
+    query: "fred"
+

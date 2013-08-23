@@ -7,6 +7,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.api        = null;
     this.cases      = null;
     this.gridster   = null;
+    this.testInProgress = false;
 
     logAction("Bennett tester instantiated");
 
@@ -34,20 +35,24 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         testdriver.gridster = $(".gridster ul")
             .gridster({
                 widget_margins: [10, 10],
-                widget_base_dimensions: [215, 100]
+                widget_base_dimensions: [300, 100]
             }).data('gridster');
+
+        $("#test-name").html(testdriver.api.general["test_name"]);
+
         }
     );
 
-    this.runTests = function() {
-        testdriver.config.then(
-            function() {
-                Object.keys(testdriver.cases).forEach( function(testCase) { 
-                    if(testdriver.cases.hasOwnProperty(testCase)) { 
-                        logAction("Case : " + niceName(testCase), true);
-                        testCycle(testCase);
-                    }
-                })
+    this.runTests = function() { 
+        testdriver.config.then( 
+            function() { 
+                var testCaseNames = Object.keys(testdriver.cases)
+                for(var i=0; i < testCaseNames.length; i++) { 
+                    var testCaseName = testCaseNames[i];
+                    var testCase = testdriver.cases[testCaseName];
+                    logAction("Case : " + niceName(testCaseName), { class: "bold" });
+                    testCycle(testCaseName);
+                }
             }
         );
     };
@@ -57,68 +62,130 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         var b = new Piggybank(testdriver.fixtures.root);
         var w = new Widget(testdriver.gridster);
 
+        testdriver.fixtures.bennett = b.memory;
         b.ignore404 = true;
+        b.logger = function(message) { logAction(message); }
 
-        testdriver.cases[testCase].forEach(
-            function(test) { 
-                logAction("Test : " + test);
-                var testDetails = eval("testdriver.api." + test);
+        console.log("commencing test cycle");
 
-                if(testDetails !== undefined) { 
+        testdriver.cases[testCase].forEach( 
+            function(apiName) { 
+                var apiData = eval("testdriver.api." + apiName);
 
-                    logAction("Desc : " + testDetails.desc);
-
+                if(apiData !== undefined) { 
                     var config = { 
-                        method: testDetails.method, 
-                        name: test,
-                        expect: testDetails.response
+                        method: apiData.method, 
+                        name: apiName,
+                        cookies: {},
+                        expect: apiData.response
                     };
+
+                    if(apiData.encoding !== undefined) { 
+                        config.encoding = apiData.encoding;
+                    }
+
+                    if(apiData.remember !== undefined) { 
+                        //var location = eval("testdriver.fixtures.bennett." + apiName + "={};");
+                        config.remember = apiData.remember; //"testdriver.fixtures.bennett." + apiName;
+                    }
+
+                    if(apiData.cookies !== undefined) { 
+                        Object.keys(apiData.cookies).forEach( 
+                            function(cookie) { 
+                                config.cookies[cookie] = parseType(apiData.cookies[cookie]);
+                            }
+                        );
+                    }
 
                     // interpolate uri-template
 
-                    if(testDetails.url.search(/{.*?}/) !== -1) { 
-                        var template = UriTemplate.parse(testDetails.url);
-                        config.template = testDetails.url;
-                        testDetails.url = template.expand(testdriver.fixtures);
+                    if(apiData.url.search(/{.*?}/) !== -1) { 
+                        var template = UriTemplate.parse(apiData.url);
+                        config.template = apiData.url;
+                        if(apiData.dataroot !== undefined) {
+                            var dataSource = eval("testdriver.fixtures." + apiData.dataroot);
+                        }
+                        else {
+                            var dataSource = testdriver.fixtures;
+                        }
+                        apiData.url = template.expand(dataSource);
                     }
 
                     // add post/put body
 
-                    if(testDetails.method === 'post' || testDetails.method === 'put') { 
-                        if(testDetails.body!==undefined) { 
-                            config.body = testdriver.fixtures[testDetails.body];
+                    if(apiData.body!==undefined) { 
+                        var dataSource = eval("testdriver.fixtures." + apiData.body);
+                        // if target is a string/int etc then make a piggybank object
+                        if(typeof(dataSource) !== "object") { 
+                            var body = { };
+                            var name = lastElementInObjPath(apiData.body);
+                            body[name] = dataSource;
                         }
+                        else {
+                            var body = dataSource;
+                        }
+                        config.body = body;
                     }
 
-                    b.addCall(testDetails.url, config);
+                    b.addCall(apiData.url, config);
 
-                    logAction("URL  : " + testDetails.url);
-
+                    logAction("Test : " + apiName);
+                    logAction("Desc : " + apiData.desc);
+/*
+                    logAction("Conf : url  => " + apiData.url);
+                    logAction("Conf : meth => " + config.method);
+                    logAction("Conf : body => " + JSON.stringify(config.body));
+                    logAction("Conf : resp => " + JSON.stringify(config.expect));
+                    logAction("Conf : code => " + JSON.stringify(config.encoding));
+                    logAction("Conf : rmem => " + JSON.stringify(config.remember));
+                    logAction("Conf : cook => " + JSON.stringify(config.cookies));
+*/
                 }
                 else { 
-                    logAction("***  : No test details found for " + test);
+                    logAction("***  : No test details found for " + apiName);
+                    throw "No api data found for " + apiName + "defined in " + testCase;
                 }
             }
         );
 
-        b.makeCallsSynchronously().done(reporter(w, testCase));
+        checkTestInProgress();
+
+        function checkTestInProgress() {
+            console.log("checking flag");
+            if(testdriver.testInProgress === true) {
+                console.log("... test in progress");
+                setTimeout(checkTestInProgress, 1000);
+            }
+            else {
+                console.log("an we're in");
+                testdriver.testInProgress = true;
+                b.makeCallsSynchronously().done(reporter(w, testCase));
+            }
+        };
 
     };
 
-/*
-    function makeCall() {
-        return $.get(url)
-            .done(function(data, status, xhr) { logAction("Called " + url + ", got status " + xhr.status); })
-            .fail(function(e) { logAction(e); });
+    function parseType(string) { 
+        try {
+            var value = JSON.parse(string);
+        }
+        catch(err) {
+            try {
+                var value = eval(string);
+            }
+            catch(err) {
+                var value = string.toString();
+            }
+        }
+        return value;
     };
-*/
 
-    function logAction(message, bold) {
-        var bold = bold === undefined ? false : true;
+    function logAction(message, options) {
+        var options = options || {};
         $("#test-log").append(
               "<li class='log-action'>" 
                 + "<span class='timestamp'>" + timestamp() + "</span>" 
-                + "<span class='message " + (bold ? "bold" : "") + "'>" + message + "</span>" 
+                + "<span class='message " + (options.class ? options.class : "") + "'>" + message + "</span>" 
             + "</li>"
         );
     };
@@ -135,7 +202,8 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
     function reporter(widget, name) {
         return function(data) {
-            console.log(data);
+            console.log("reporting started, clearing flag");
+            testdriver.testInProgress = false;
             widget.testCase(niceName(name));
             Object.keys(data).forEach(
                 function(test) {
@@ -146,6 +214,12 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             widget.publish();
         }
     };
+
+    function lastElementInObjPath(objPath) {
+        var parts  = objPath.split('.');
+        var length = parts.length;
+        return parts[length-1];
+    }
 
     function Widget(gridster) {
 
@@ -165,10 +239,11 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
         this.addTestResult = function(testData, result) {
             var list = this.widget.children("ul.leaders");
+            var testName = lastElementInObjPath(testData.data.name);
             list.html(list.html()
                 + "<li class='test-item' title='" + testData.data.method + " to " + testData.url + " : expected " + testData.data.expect + " got " + testData.status + "'>"
                 + "<span class='name'>"
-                + niceName(testData.data.name) 
+                + niceName(testName) 
                 + "</span>"
                 + "<span class='result " + result + "'>"
                 + result
@@ -178,7 +253,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
         this.publish = function() {
             this.addContent("</ul>");
-            console.log(this.content);
         };
     };
 
@@ -203,12 +277,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
       return dff.promise();
     };
-
-    var fieldPromise = getFields('http://something');
-
-    fieldPromise.done(function(result){
-      console.log(JSON.stringify(result)); 
-    });
 
     function getDataFrom(url) {
         logAction("Loading data from " + url);

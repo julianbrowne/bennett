@@ -8,6 +8,7 @@
 	<link href='http://fonts.googleapis.com/css?family=Jolly+Lodger' rel='stylesheet' type='text/css'>
 
 	<script src="../assets/javascripts/jquery-2.0.3.js"></script>
+	<script src="../assets/javascripts/jquery.cookie.js"></script>
 	<script src="../assets/javascripts/prettify.js"></script>
 	<script src="../assets/javascripts/piggybank/piggybank.js"></script>
 </head>
@@ -20,21 +21,59 @@
 
 	<script type="text/javascript">
 
-		var manager = new Piggybank("http://127.0.0.1:8105");
+		var manager = new Piggybank("http://127.0.0.1:9191/api");
 
-		manager.timeout = 5000;
-
+		//manager.timeout = 5000;
 		//manager.ignore404 = true;
-		manager.ignoreErrors = true;
+		//manager.ignoreErrors = true;
+		manager.logger = function(message) { $("#results").append(message); }
 
-		manager.addCall('/test/piggybank.html');
-		manager.addCall('/fff.html',   { method: "post", body: { cheese: "cheddar" }, name: "fred"  });
-		manager.addCall('/index.html', { method: "put",  expect: 200 });
+		manager.addCall('/login', {
+			method: "post", 
+			encoding: 'form', 
+			remember: "session", 
+			body: { username: "fred", password: "x" }, 
+			name: "login fred"
+		});
 
-		// make calls in order but async (i.e. continues on error)
+		manager.addCall('/users/fred', {
+			method: "get", 
+			cookies: { ApiSession: { recall: "session.ApiSession" } }, 
+			name: "get user details"
+		});
+
+		manager.addCall('/users/all/search', {
+			method: "get", 
+			body: { query: "fred" }, 
+			encoding: 'form', 
+			cookies: { ApiSession: { recall: "session.ApiSession" } }, 
+			name: "search users"
+		});
+
+		manager.addCall('/passwordreset', {
+			method: "post", 
+			encoding: 'form', 
+			body: { username: "fred" }, 
+			cookies: { ApiSession: { recall: "session.ApiSession" } }, 
+			name: "password reset"
+		});
+
+		manager.addCall('/passwordreset', { 
+			method: "get", 
+			encoding: 'form', 
+			body: { code: "1234" }, 
+			cookies: { ApiSession: { recall: "session.ApiSession" } }, 
+			name: "reset check"
+		});
+
+		manager.addCall('/logout', { 
+			method: "post", 
+			cookies: { ApiSession: { recall: "session.ApiSession" } }, 
+			name: "logout fred" 
+		});
+
 		// manager.makeCalls().done(publish);
 
-		// make calls in order and async (stops on error)
 		manager.makeCallsSynchronously().done(publish);
 
 		function publish(data) {
@@ -44,6 +83,5 @@
 		};
 
 	</script>
-
 </body>
 </html>

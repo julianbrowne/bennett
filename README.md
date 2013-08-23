@@ -55,9 +55,57 @@ A simple API spec might look like this:
 
 Other keys valid here are:
 
-**schema**:  
-**arguments**:  
-**encoding**:  
+**schema**:   JSON schema that defines the expected return data  
+**encoding**: Encoding to use for post and put request body data. By default these are just sent as json objects, but to simulate a form being posted, for example, this should be set to 'form'  
+**headers**:  HTTP headers to be send with the request
+**remember**: Name tag applied to returned data which can be accessed by subsequent calls. e.g.
+
+	log_in:
+		url: /session
+		method: post
+		body: user_details
+		remember: session
+		headers:
+			client: client_app_name
+		schema: { "ApiSession": { "type": "string" } }
+		response: 201
+
+	get_account_details:
+		url: /user/{user_details.username}
+		method: get
+		headers:
+			client: client_app_name
+			ApiSession: session.APiSession
+		response: 200  
+
+Data required to run this:  
+
+	user_details:
+		username: "fred"
+		password: "freds_secret"
+
+	client_app_name: "Bennett API Verifier"
+
+On calling the log\_in api the HTTP payload will be:  
+
+	POST /session
+	client: "Bennett API Verifier"
+
+The returned data should look something like this:  
+
+	{ "ApiSession": "ABC123XYZ" }
+
+Which will be verified against the response code (201), the JSON schema, and then stored for later calls to access as:  
+
+	session.ApiSession: "ABC123XYZ"
+
+So the second call will be:
+
+	GET /user/fred
+	client: "Bennett API Verifier"
+	ApiSession: "ABC123XYZ"
+
+Which will be verified against the response code (200)	
 
 #### Data Definition
 
@@ -95,12 +143,13 @@ Test cases are executed in order with each API call waiting for the last one to 
 
 All dependencies are included but they are:
 
-*	JQuery      v2.0.3  (DOM manipulation)  
-*	JQuery UI   v1.10.3 (Tabs)  
-*	Gridster    v0.1.0  (Jenkins-like test status grid layout)  
-*	JS-Yaml     v2.1.0  (for reading and parsing the config files)  
-*	Piggybank   V0.0.1  (managing ajax calls synchronously)  
-*	Uritemplate v0.3.4  (mashing uri templates and fixture data)  
+*	JQuery        v2.0.3  (DOM manipulation)  
+*	JQuery UI     v1.10.3 (Tabs)  
+*	JQuery Cookie v1.3.1  (Manages cookies)
+*	Gridster      v0.1.0  (Jenkins-like test status grid layout)  
+*	JS-Yaml       v2.1.0  (for reading and parsing the config files)  
+*	Piggybank     v0.0.1  (managing ajax calls synchronously)  
+*	Uritemplate   v0.3.4  (mashing uri templates and fixture data)  
 
 #### Installation
 

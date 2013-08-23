@@ -98,7 +98,7 @@ ul.leaders li:before {
     float: left;
     width: 0;
     white-space: nowrap;
-    content: ". . . . . . . . . . . . . . . . . . . . ";
+    content: ". . . . . . . . . . . . . . . . . . . . . . . . .";
 }
 
 ul.leaders span:first-child {
@@ -110,6 +110,14 @@ ul.leaders span + span {
     float: right;
     padding-left: 5px;
     padding-right: 5px;
+}
+
+/**
+ *  Code samples
+**/
+
+pre code {
+    font-size: 1.25em;
 }
 
 li p {

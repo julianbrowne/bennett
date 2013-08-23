@@ -4,25 +4,113 @@
 
 ---
 
-get_user:
-  desc: "Get user details"
-  url: "/user/{userid}"
-  method: get
-  response: 200
-  schema:
-    {
-      "username": { "type": "string" }
-    }
+general:
+  test_name: "AlertMe Fake API"
 
-fail_to_get_user:
-  desc: "404 test"
-  url: "/userz/{userid}"
-  method: get
-  response: 200
+session:
 
-update_user:
-  desc: "Update user"
-  url: "/users/{userid}"
-  method: post
-  response: 200
-  body: new_user
+  login:
+    desc: "Login and start user session"
+    url: "/login"
+    method: "post"
+    encoding: "form"
+    response: 201
+    body: user_details
+    remember: "login"
+
+  logout:
+    desc: "End user session"
+    url: "/logout"
+    method: "post"
+    response: 200
+    cookies:
+      ApiSession: "({ recall: 'login.ApiSession' })"
+
+  password_reset:
+    desc: "Reset user password"
+    url: "/passwordreset"
+    method: "post"
+    response: 201
+    encoding: "form"
+    body: user_details.username
+    cookies:
+      ApiSession: "({ recall: 'login.ApiSession' })"
+
+  password_reset_check:
+    desc: "Check password reset"
+    url: "/passwordreset"
+    method: "get"
+    response: 200
+    encoding: "form"
+    body: password_details.code
+    cookies:
+      ApiSession: "({ recall: 'login.ApiSession' })"
+
+  set_new_password:
+    desc: "Set new password"
+    url: "/passwordreset"
+    method: "put"
+    response: 201
+    encoding: "form"
+    body: password_details
+    cookies:
+      ApiSession: "({ recall: 'login.ApiSession' })"
+
+user:
+
+  get_user:
+    desc: "Get user details"
+    url: "/users/{username}"
+    dataroot: user_details
+    method: "get"
+    response: 200
+    cookies:
+      ApiSession: "({ recall: 'login.ApiSession' })"
+    schema: >
+      {
+        "username":    { "type": "string" },
+        "firstname":   { "type": "string" },
+        "lastname":    { "type": "string" },
+        "address":     { "type": "string" },
+        "pin":         { "type": "string" },
+        "city":        { "type": "string" },
+        "county":      { "type": "string" },
+        "postcode":    { "type": "string" },
+        "country":     { "type": "string" },
+        "answer":      { "type": "string" },
+        "userlevel":   { "type": "string" },
+        "dob":         { "type": "string" },
+        "currency":    { "type": "string" },
+        "language":    { "type": "string" },
+        "temperature": { "type": "string" },
+        "phone":       { "type": "string" },
+        "email":       { "type": "string" },
+        "mobile":      { "type": "string" }
+      }
+
+  search:
+    desc: "Search users"
+    url: "/users/all/search"
+    body: search.query
+    encoding: "form"
+    method: "get"
+    response: 200
+    cookies:
+      ApiSession: "({ recall: 'login.ApiSession' })"
+
+  update:
+    desc: "Update user details"
+    url: "/users/{username}"
+    dataroot: user_details
+    method: "post"
+    response: 200
+    cookies:
+      ApiSession: "({ recall: 'login.ApiSession' })"
+
+test:
+  expect_fail:
+    desc: "404 test"
+    url: "/nosuchapi/{username}"
+    dataroot: user_details
+    method: "get"
+    response: 200

@@ -9,15 +9,13 @@ resources:
   session: 
 
     log_in: 
-      desc: "Creates a session and allows use of all other api methods"
+      desc: "Create a user session"
       url: /login
-      arguments: 
-        - username
-        - password
-        - caller
-      encoding: html
+      body: user_details
+      encoding: "form"
       method: post
       response: 200
+      remember: session
       schema:
           {
              "hubIds": { "type": "array" },
