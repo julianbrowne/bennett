@@ -1,13 +1,12 @@
 
 var Bennett = function(dataSrc, specSrc, testSrc) {
 
-    var testdriver  = this;
-    this.logELement = "#test-log";
+    var bennett     = this;
     this.fixtures   = null;
     this.api        = null;
     this.cases      = null;
     this.gridster   = null;
-    this.testInProgress = false;
+    this.inProgress = false;
 
     logAction("Bennett tester instantiated");
 
@@ -16,40 +15,53 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.config.then(
         function(dataResult, specResult, testResult) {
 
-        var dataObj = dataResult[2];
-        var specObj = specResult[2];
-        var testObj = testResult[2];
+            var dataObj = dataResult[2];
+            var specObj = specResult[2];
+            var testObj = testResult[2];
 
-        try {
-            testdriver.fixtures = jsyaml.load(dataObj.responseText);
-            testdriver.api      = jsyaml.load(specObj.responseText);
-            testdriver.cases    = jsyaml.load(testObj.responseText);
-        } catch(err) {
-            alert("Invalid YAML files");
-            throw "YAML Error " + err;
-        }
+            try {
+                bennett.fixtures = jsyaml.load(dataObj.responseText);
+                bennett.api      = jsyaml.load(specObj.responseText);
+                bennett.cases    = jsyaml.load(testObj.responseText);
+            }
+            catch(e) {
+                throw new Exception("YAML", "Load error - " + e);
+            }
 
-        logAction("Using server " + testdriver.fixtures.root);
-        logAction("Setting up grid");
+            logAction("Using server " + bennett.fixtures.root);
+            logAction("Setting up grid");
 
-        testdriver.gridster = $(".gridster ul")
-            .gridster({
-                widget_margins: [10, 10],
-                widget_base_dimensions: [300, 100]
-            }).data('gridster');
+            bennett.gridster = $(".gridster ul")
+                .gridster({
+                    widget_margins: [10, 10],
+                    widget_base_dimensions: [300, 100]
+                }).data('gridster');
 
-        $("#test-name").html(testdriver.api.general["test_name"]);
+            $("#test-name").html(bennett.api.general["test_name"]);
 
+            $.get(bennett.fixtures.root).fail(
+                function(xhr, textStatus, errorString) { 
+                    if(xhr.status === 500 || textStatus === 'timeout') {
+                        throw new Exception("INIT", "Couldn't find a server at " + bennett.fixtures.root);
+                    }
+                }
+            );
         }
     );
 
+    function Exception(category, message) { 
+        this.category = category;
+        this.message  = message;
+        logAction("*** ERROR : " + category + " / " + message, { class : "bold error" });
+    };
+
     this.runTests = function() { 
-        testdriver.config.then( 
+        bennett.config.then( 
             function() { 
-                var testCaseNames = Object.keys(testdriver.cases)
+                var testCaseNames = Object.keys(bennett.cases)
                 for(var i=0; i < testCaseNames.length; i++) { 
                     var testCaseName = testCaseNames[i];
-                    var testCase = testdriver.cases[testCaseName];
+                    var testCase = bennett.cases[testCaseName];
                     logAction("Case : " + niceName(testCaseName), { class: "bold" });
                     testCycle(testCaseName);
                 }
@@ -59,18 +71,17 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
     function testCycle(testCase) { 
 
-        var b = new Piggybank(testdriver.fixtures.root);
-        var w = new Widget(testdriver.gridster);
+        var b = new Piggybank(bennett.fixtures.root);
+        var w = new Widget(bennett.gridster);
 
-        testdriver.fixtures.bennett = b.memory;
+        bennett.fixtures.bennett = b.memory;
         b.ignore404 = true;
-        b.logger = function(message) { logAction(message); }
+        b.stopOnSurprise = true;
+        b.logger = function(message) { logAction("piggybank : " + message, { class: "piggy" }); }
 
-        console.log("commencing test cycle");
-
-        testdriver.cases[testCase].forEach( 
+        bennett.cases[testCase].forEach( 
             function(apiName) { 
-                var apiData = eval("testdriver.api." + apiName);
+                var apiData = eval("bennett.api." + apiName);
 
                 if(apiData !== undefined) { 
                     var config = { 
@@ -85,8 +96,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     }
 
                     if(apiData.remember !== undefined) { 
-                        //var location = eval("testdriver.fixtures.bennett." + apiName + "={};");
-                        config.remember = apiData.remember; //"testdriver.fixtures.bennett." + apiName;
+                        config.remember = apiData.remember;
                     }
 
                     if(apiData.cookies !== undefined) { 
@@ -103,10 +113,10 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                         var template = UriTemplate.parse(apiData.url);
                         config.template = apiData.url;
                         if(apiData.dataroot !== undefined) {
-                            var dataSource = eval("testdriver.fixtures." + apiData.dataroot);
+                            var dataSource = eval("bennett.fixtures." + apiData.dataroot);
                         }
                         else {
-                            var dataSource = testdriver.fixtures;
+                            var dataSource = bennett.fixtures;
                         }
                         apiData.url = template.expand(dataSource);
                     }
@@ -114,7 +124,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     // add post/put body
 
                     if(apiData.body!==undefined) { 
-                        var dataSource = eval("testdriver.fixtures." + apiData.body);
+                        var dataSource = eval("bennett.fixtures." + apiData.body);
                         // if target is a string/int etc then make a piggybank object
                         if(typeof(dataSource) !== "object") { 
                             var body = { };
@@ -129,17 +139,8 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
                     b.addCall(apiData.url, config);
 
-                    logAction("Test : " + apiName);
-                    logAction("Desc : " + apiData.desc);
-/*
-                    logAction("Conf : url  => " + apiData.url);
-                    logAction("Conf : meth => " + config.method);
-                    logAction("Conf : body => " + JSON.stringify(config.body));
-                    logAction("Conf : resp => " + JSON.stringify(config.expect));
-                    logAction("Conf : code => " + JSON.stringify(config.encoding));
-                    logAction("Conf : rmem => " + JSON.stringify(config.remember));
-                    logAction("Conf : cook => " + JSON.stringify(config.cookies));
-*/
+                    logAction("Step : " + lastElementInPath(apiName) + "(" + apiData.desc + ")");
+                    logAction("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + config.method.toString().toUpperCase() + " " + apiData.url + ", expecting " + config.expect);
                 }
                 else { 
                     logAction("***  : No test details found for " + apiName);
@@ -151,14 +152,11 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         checkTestInProgress();
 
         function checkTestInProgress() {
-            console.log("checking flag");
-            if(testdriver.testInProgress === true) {
-                console.log("... test in progress");
+            if(bennett.inProgress === true) { 
                 setTimeout(checkTestInProgress, 1000);
             }
             else {
-                console.log("an we're in");
-                testdriver.testInProgress = true;
+                bennett.inProgress = true;
                 b.makeCallsSynchronously().done(reporter(w, testCase));
             }
         };
@@ -202,8 +200,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
     function reporter(widget, name) {
         return function(data) {
-            console.log("reporting started, clearing flag");
-            testdriver.testInProgress = false;
+            bennett.inProgress = false;
             widget.testCase(niceName(name));
             Object.keys(data).forEach(
                 function(test) {
@@ -285,8 +282,8 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             .fail(function(e) { logAction(e); });
     };
 
-    function testName(fulltestPath) {
-        var elements = fulltestPath.toString().split('.');
+    function lastElementInPath(fullPath) {
+        var elements = fullPath.toString().split('.');
         return elements[elements.length - 1];
     };
 

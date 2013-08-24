@@ -33,8 +33,6 @@ session:
     response: 201
     encoding: "form"
     body: user_details.username
-    cookies:
-      ApiSession: "({ recall: 'login.ApiSession' })"
 
   password_reset_check:
     desc: "Check password reset"
@@ -43,8 +41,6 @@ session:
     response: 200
     encoding: "form"
     body: password_details.code
-    cookies:
-      ApiSession: "({ recall: 'login.ApiSession' })"
 
   set_new_password:
     desc: "Set new password"
@@ -53,8 +49,6 @@ session:
     response: 201
     encoding: "form"
     body: password_details
-    cookies:
-      ApiSession: "({ recall: 'login.ApiSession' })"
 
 user:
 

@@ -48,6 +48,14 @@ h2 {
     font-weight: bold;
 }
 
+.error {
+    color: red;
+}
+
+.piggy {
+    color: #CC0099;
+}
+
 /**
  *      Log Tab Messages
 **/
@@ -66,7 +74,7 @@ h2 {
 }
 
 .log-action .message {
-    color: #000000;
+
 }
 
 /**
