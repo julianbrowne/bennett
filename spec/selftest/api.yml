@@ -17,6 +17,23 @@ session:
     response: 201
     body: user_details
     remember: "login"
+    schema: >
+        {
+            "title": "Login Session Schema",
+            "type": "object",
+            "properties": {
+                "hubIds": {
+                    "type": "array"
+                },
+                "ApiSession": {
+                    "type": "string"
+                }
+            }
+            "required": [
+                "hubIds",
+                "ApiSession"
+            ]
+        }
 
   logout:
     desc: "End user session"

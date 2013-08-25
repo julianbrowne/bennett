@@ -9,11 +9,12 @@
 
 	<script src="../assets/javascripts/jquery-2.0.3.js"></script>
 	<script src="../assets/javascripts/jquery.cookie.js"></script>
+	<script src="../assets/javascripts/tv4-1.0.7/tv4.js"></script>
 	<script src="../assets/javascripts/prettify.js"></script>
-	<script src="../assets/javascripts/piggybank/piggybank.js"></script>
+	<script src="../assets/javascripts/piggybank-0.0.1/piggybank.js"></script>
 </head>
 <body>
-	<h1 class="bennett">Bennett: REST API - Piggybank Self-Test Page</h1>
+	<h1 class="bennett">Bennett: Piggybank Self-Test</h1>
 
 	<div id="results">
 		<pre><code class="prettyprint"></code></pre>
@@ -28,10 +29,25 @@
 		//manager.ignoreErrors = true;
 		manager.logger = function(message) { $("#results").append(message); }
 
-		manager.addCall('/login', {
+		manager.addCall('/login', { 
 			method: "post", 
 			encoding: 'form', 
 			remember: "session", 
+			schema: { 
+				type: "object",
+				properties: { 
+					"hubIds": { 
+					    "type": "array"
+					},
+					"ApiSession": { 
+					    "type": "string"
+					}
+				},
+				"required": [ 
+					"hubIds",
+					"ApiSession"
+				]
+			},
 			body: { username: "fred", password: "x" }, 
 			name: "login fred"
 		});

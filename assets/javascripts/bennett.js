@@ -13,13 +13,13 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.config = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc));
 
     this.config.then(
-        function(dataResult, specResult, testResult) {
+        function(dataResult, specResult, testResult) { 
 
             var dataObj = dataResult[2];
             var specObj = specResult[2];
             var testObj = testResult[2];
 
-            try {
+            try { 
                 bennett.fixtures = jsyaml.load(dataObj.responseText);
                 bennett.api      = jsyaml.load(specObj.responseText);
                 bennett.cases    = jsyaml.load(testObj.responseText);
@@ -99,6 +99,10 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                         config.remember = apiData.remember;
                     }
 
+                    if(apiData.schema != undefined) { 
+                        config.schema = parseType(apiData.schema);
+                    }
+
                     if(apiData.cookies !== undefined) { 
                         Object.keys(apiData.cookies).forEach( 
                             function(cookie) { 
@@ -112,7 +116,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     if(apiData.url.search(/{.*?}/) !== -1) { 
                         var template = UriTemplate.parse(apiData.url);
                         config.template = apiData.url;
-                        if(apiData.dataroot !== undefined) {
+                        if(apiData.dataroot !== undefined) { 
                             var dataSource = eval("bennett.fixtures." + apiData.dataroot);
                         }
                         else {
