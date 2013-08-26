@@ -82,6 +82,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         bennett.cases[testCase].forEach( 
             function(apiName) { 
                 var apiData = eval("bennett.api." + apiName);
+                logAction(lastElementInPath(apiName) + " (" + apiData.desc + ")");
 
                 if(apiData !== undefined) { 
                     var config = { 
@@ -106,6 +107,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     if(apiData.cookies !== undefined) { 
                         Object.keys(apiData.cookies).forEach( 
                             function(cookie) { 
+                                logAction("Setting cookie " + cookie + " to " + apiData.cookies[cookie]);
                                 config.cookies[cookie] = parseType(apiData.cookies[cookie]);
                             }
                         );
@@ -142,9 +144,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     }
 
                     b.addCall(apiData.url, config);
-
-                    logAction("Step : " + lastElementInPath(apiName) + "(" + apiData.desc + ")");
-                    logAction("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + config.method.toString().toUpperCase() + " " + apiData.url + ", expecting " + config.expect);
+                    logAction(config.method.toString().toUpperCase() + " " + apiData.url + ", expecting " + config.expect);
                 }
                 else { 
                     logAction("***  : No test details found for " + apiName);
@@ -202,21 +202,33 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         return t;
     };
 
-    function reporter(widget, name) {
-        return function(data) {
+    function reporter(widget, name) { 
+        return function(data) { 
             bennett.inProgress = false;
             widget.testCase(niceName(name));
             Object.keys(data).forEach(
-                function(test) {
+                function(test) { 
                     result = data[test];
-                    widget.addTestResult(result, (result.data.expected ? 'pass' : 'fail'));
+                    widget.addTestResult(result, testPassOrFail(result));
                 }
             );
             widget.publish();
         }
     };
 
-    function lastElementInObjPath(objPath) {
+    function testPassOrFail(result) { 
+        var returnCodeResult = result.data.expected ? true : false;
+        if(result.data.schemaCheck !== undefined) { 
+            var schemaCheckResult = result.data.schemaCheck.valid ? true : false;
+            if(schemaCheckResult === true && returnCodeResult === true)
+                return true;
+            else
+                return false;
+        }
+        return returnCodeResult;
+    }
+
+    function lastElementInObjPath(objPath) { 
         var parts  = objPath.split('.');
         var length = parts.length;
         return parts[length-1];
@@ -239,6 +251,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         };
 
         this.addTestResult = function(testData, result) {
+            var resultText = (result === true ) ? 'pass' : 'fail';
             var list = this.widget.children("ul.leaders");
             var testName = lastElementInObjPath(testData.data.name);
             list.html(list.html()
@@ -246,8 +259,8 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 + "<span class='name'>"
                 + niceName(testName) 
                 + "</span>"
-                + "<span class='result " + result + "'>"
-                + result
+                + "<span class='result " + resultText + "'>"
+                + resultText
                 + "</span>"
                 + "</li>");
         };
