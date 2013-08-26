@@ -1,87 +1,87 @@
 <html>
 <head>
-	<title>Bennett</title>
+    <title>Bennett</title>
 
-	<!-- Bennett Styling -->
+    <!-- Bennett Styling -->
     <link rel="stylesheet" media="all" href="assets/stylesheets/bennett.css" />
     <link rel="stylesheet" media="all" href="assets/jquery-ui-1.10.3/css/le-frog/jquery-ui-1.10.3.custom.css" />
     <link rel="stylesheet" media="all" href="assets/fonts/jolly-lodger.css" />
 
     <!-- Bennett JS -->
     <script src="assets/javascripts/jquery-2.0.3.js"></script>
-	<script src="assets/jquery-ui-1.10.3/js/jquery-ui-1.10.3.custom.js"></script>
-	<script src="assets/javascripts/js-yaml-2.1.0.js"></script>
-	<script src="assets/javascripts/gridster-0.1.0.js"></script>
-	<script src="assets/javascripts/uritemplate-0.3.4.js"></script>
-	<script src="assets/javascripts/bennett.js"></script>
+    <script src="assets/jquery-ui-1.10.3/js/jquery-ui-1.10.3.custom.js"></script>
+    <script src="assets/javascripts/js-yaml-2.1.0.js"></script>
+    <script src="assets/javascripts/gridster-0.1.0.js"></script>
+    <script src="assets/javascripts/uritemplate-0.3.4.js"></script>
+    <script src="assets/javascripts/bennett.js"></script>
 
     <!-- Piggybank JS -->
-	<script src="assets/javascripts/piggybank-0.0.1/jquery.cookie.js"></script>
-	<script src="assets/javascripts/piggybank-0.0.1/tv4.js"></script>
-	<script src="assets/javascripts/piggybank-0.0.1/piggybank.js"></script>
+    <script src="assets/javascripts/piggybank-0.0.1/jquery.cookie.js"></script>
+    <script src="assets/javascripts/piggybank-0.0.1/tv4.js"></script>
+    <script src="assets/javascripts/piggybank-0.0.1/piggybank.js"></script>
 
-	<!-- Test dependencies -->
+    <!-- Test dependencies -->
     <link rel="stylesheet" media="all" href="test/assets/stylesheets/prettify.css" />
-	<link rel="stylesheet" type="text/css" href="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/jasmine.css">
+    <link rel="stylesheet" type="text/css" href="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/jasmine.css">
 
-	<script type="text/javascript" src="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/jasmine.js"></script>
-	<script type="text/javascript" src="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/jasmine-html.js"></script>
-	<script type="text/javascript" src="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/mock-ajax.js"></script>
-	<script src="test/assets/javascripts/prettify.js"></script>
+    <script type="text/javascript" src="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/jasmine.js"></script>
+    <script type="text/javascript" src="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/jasmine-html.js"></script>
+    <script type="text/javascript" src="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/mock-ajax.js"></script>
+    <script src="test/assets/javascripts/prettify.js"></script>
 
-	<!-- include spec files here... -->
-	<script type="text/javascript" src="test/spec/specHelper.js"></script>
-	<script type="text/javascript" src="test/spec/bennettSpec.js"></script>
-	<script type="text/javascript" src="test/spec/piggybankSpec.js"></script>
+    <!-- include spec files here... -->
+    <script type="text/javascript" src="test/spec/specHelper.js"></script>
+    <script type="text/javascript" src="test/spec/bennettSpec.js"></script>
+    <script type="text/javascript" src="test/spec/piggybankSpec.js"></script>
 
 </head>
 <body>
-	<h1 class="bennett">Bennett: REST API Verifier</h1>
-	<div id="tabs">
-		<ul>
-			<li><a href="#tab1" class="bennett">Results</a></li>
-			<li><a href="#tab2" class="bennett">Test Log</a></li>
-			<li><a href="test/index.html" class="bennett">Self-Tests</a></li>
-		</ul>
-		<div id="tab1" class="gridster">
-			<h2 id="test-name">Test Results</h2>
-			<ul></ul>
-		</div>
-		<div id="tab2">
-			<h2 id="test-name">Test Log</h2>
-			<ul id="test-log">
-			</ul>
-		</div>
-	</div>
+    <h1 class="bennett">Bennett: REST API Verifier</h1>
+    <div id="tabs">
+        <ul>
+            <li><a href="#tab1" class="bennett">Results</a></li>
+            <li><a href="#tab2" class="bennett">Test Log</a></li>
+            <li><a href="test/index.html" class="bennett">Self-Tests</a></li>
+        </ul>
+        <div id="tab1" class="gridster">
+            <h2 id="test-name">Test Results</h2>
+            <ul></ul>
+        </div>
+        <div id="tab2">
+            <h2 id="test-name">Test Log</h2>
+            <ul id="test-log">
+            </ul>
+        </div>
+    </div>
 
-	<script type="text/javascript">
-		$(function() {
+    <script type="text/javascript">
+        $(function() {
 
-			$("#tabs").tabs({
-				beforeLoad: function( event, ui ) { 
-					if (ui.tab.data("loaded")) { 
-						event.preventDefault();
-						return;
-					}
-					ui.jqXHR.success(function() { 
-						ui.tab.data("loaded", true);
-					});
-				}
-			});
+            $("#tabs").tabs({
+                beforeLoad: function( event, ui ) { 
+                    if (ui.tab.data("loaded")) { 
+                        event.preventDefault();
+                        return;
+                    }
+                    ui.jqXHR.success(function() { 
+                        ui.tab.data("loaded", true);
+                    });
+                }
+            });
 
-			var dataUrl = "test/spec/data/fixtures.yml";
-			var specUrl = "test/spec/data/api.yml";
-			var testUrl = "test/spec/data/tests.yml";
+            var dataUrl = "test/spec/data/fixtures.yml";
+            var specUrl = "test/spec/data/api.yml";
+            var testUrl = "test/spec/data/tests.yml";
 
-			//var dataUrl = "/spec/data.yml";
-			//var specUrl = "/spec/spec.yml";
-			//var testUrl = "/spec/test.yml";
+            //var dataUrl = "/spec/data.yml";
+            //var specUrl = "/spec/spec.yml";
+            //var testUrl = "/spec/test.yml";
 
-			var harness = new Bennett(dataUrl, specUrl, testUrl);
+            var harness = new Bennett(dataUrl, specUrl, testUrl);
 
-			harness.runTests();
+            harness.runTests();
 
-		});
-	</script>
+        });
+    </script>
 </body>
 </html>
