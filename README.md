@@ -1,9 +1,21 @@
 
 ##Bennett
 
-Bennet is a simple pure javascript data-driven REST API verification tool. You describe the behavioural characteristics of an API, provide some sample test data and the combination of API calls that make up each test case and Bennett does the rest.
+Bennet is a simple javascript data-driven REST API verification tool. You describe the behavioural characteristics of an API, provide some sample test data and the combination of API calls that make up each test case and Bennett does the rest.
 
-###Design
+### Dependencies
+
+All dependencies are included but they are:
+
+*	JQuery        v2.0.3  (DOM manipulation)  
+*	JQuery UI     v1.10.3 (Tabs)  
+*	JQuery Cookie v1.3.1  (Manages cookies)  
+*	Gridster      v0.1.0  (Jenkins-like test status grid layout)  
+*	JS-Yaml       v2.1.0  (for reading and parsing the config files)  
+*	Piggybank     v0.0.1  (managing ajax calls synchronously)  
+*	Uritemplate   v0.3.4  (mashing uri templates and fixture data)  
+
+### Design
 
 Bennet reads three YAML files and creates three javascript object structures (api definition, fixture data, test cases). Bennet then iterates through the test cases applying the required API definition and fixture data to each.
 
@@ -138,18 +150,6 @@ Test cases look like this:
 Test cases are executed in order with each API call waiting for the last one to complete before it begins.
 
 ### Install and Run
-
-#### Dependencies
-
-All dependencies are included but they are:
-
-*	JQuery        v2.0.3  (DOM manipulation)  
-*	JQuery UI     v1.10.3 (Tabs)  
-*	JQuery Cookie v1.3.1  (Manages cookies)
-*	Gridster      v0.1.0  (Jenkins-like test status grid layout)  
-*	JS-Yaml       v2.1.0  (for reading and parsing the config files)  
-*	Piggybank     v0.0.1  (managing ajax calls synchronously)  
-*	Uritemplate   v0.3.4  (mashing uri templates and fixture data)  
 
 #### Installation
 
