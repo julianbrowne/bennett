@@ -54,7 +54,9 @@
 
 		manager.addCall('/users/fred', {
 			method: "get", 
-			cookies: { ApiSession: { recall: "session.ApiSession" } }, 
+			cookies: {
+				ApiSession: { recall: "session.ApiSession" }
+			}, 
 			name: "get user details"
 		});
 
@@ -62,7 +64,9 @@
 			method: "get", 
 			body: { query: "fred" }, 
 			encoding: 'form', 
-			cookies: { ApiSession: { recall: "session.ApiSession" } }, 
+			cookies: { 
+				ApiSession: { recall: "session.ApiSession" }
+			}, 
 			name: "search users"
 		});
 
@@ -70,7 +74,9 @@
 			method: "post", 
 			encoding: 'form', 
 			body: { username: "fred" }, 
-			cookies: { ApiSession: { recall: "session.ApiSession" } }, 
+			cookies: {
+				ApiSession: { recall: "session.ApiSession" }
+			}, 
 			name: "password reset"
 		});
 
@@ -78,13 +84,17 @@
 			method: "get", 
 			encoding: 'form', 
 			body: { code: "1234" }, 
-			cookies: { ApiSession: { recall: "session.ApiSession" } }, 
+			cookies: {
+				ApiSession: { recall: "session.ApiSession" }
+			}, 
 			name: "reset check"
 		});
 
 		manager.addCall('/logout', { 
 			method: "post", 
-			cookies: { ApiSession: { recall: "session.ApiSession" } }, 
+			cookies: {
+				ApiSession: { recall: "session.ApiSession" }
+			}, 
 			name: "logout fred" 
 		});
 
