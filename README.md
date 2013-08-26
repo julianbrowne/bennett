@@ -9,7 +9,6 @@ All dependencies are included but they are:
 
 *	JQuery        v2.0.3  (DOM manipulation)  
 *	JQuery UI     v1.10.3 (Tabs)  
-*	JQuery Cookie v1.3.1  (Manages cookies)  
 *	Gridster      v0.1.0  (Jenkins-like test status grid layout)  
 *	JS-Yaml       v2.1.0  (for reading and parsing the config files)  
 *	Piggybank     v0.0.1  (managing ajax calls synchronously)  
