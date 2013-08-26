@@ -15,11 +15,23 @@
     "verification"
   ],
   "dependencies" : {
-    "jquery"    :  "2.0.3",
-    "jquery-ui" :  "1.10.3",
-    "gridster"  :  "2.0.3",
-    "js-yaml"   :  "2.1.0",
-    "pigybank"  :  "0.0.1"
+    "jquery"       : "2.0.3",
+    "jquery-ui"    : "1.10.3",
+    "gridster"     : "2.0.3",
+    "js-yaml"      : "2.1.0",
+    "uri-template" : "0.3.4",
+    "piggybank"    : "0.0.1"
   },
+  "devDependencies": {
+    "prettify" :  "4.0.0"
+  },
+  "bundledDependencies": [
+    "jquery",
+    "jquery-ui",
+    "gridster",
+    "js-yaml",
+    "uri-template",
+    "piggybank"
+  ], 
   "license": "OSL-3.0",
 }
