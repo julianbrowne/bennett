@@ -5,7 +5,7 @@
 ---
 
 general:
-  test_name: "AlertMe Fake API"
+  test_name: "Self-Test Fake API"
 
 session:
 

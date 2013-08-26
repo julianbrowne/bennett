@@ -1,5 +1,5 @@
 
-##Bennett
+## Bennett
 
 Bennet is a simple javascript data-driven REST API verification tool. You describe the behavioural characteristics of an API, provide some sample test data and the combination of API calls that make up each test case and Bennett does the rest.
 
@@ -22,7 +22,7 @@ For example, if the test case was to log in and then log out, then Bennett reads
 
 Calls are made synchronously using the [piggybank](https://github.com/julianbrowne/piggybank) javascript library and the result set is collated and displayed on screen using [gridster](https://github.com/ducksboard/gridster.js).
 
-![screen-shot](https://raw.github.com/julianbrowne/bennett/master/assets/images/bennett.png)
+![screen-shot](https://raw.github.com/julianbrowne/bennett/master/assets/images/screen-shot.png)
 
 ### Configuration
 

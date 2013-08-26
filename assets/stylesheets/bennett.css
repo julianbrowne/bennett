@@ -227,3 +227,15 @@ li.fail {
     -o-transition: all 0s !important;
     transition: all 0s !important;
 }
+
+
+/**
+ *  Self-Tests
+**/
+
+#jasmine-self-test-results {
+    background: #FFFFFF;
+}
+
+
+
