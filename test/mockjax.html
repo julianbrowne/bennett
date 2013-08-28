@@ -1,0 +1,40 @@
+<html>
+<head>
+    <title>MockJax</title>
+    <script src="../assets/javascripts/jquery-2.0.3.js"></script>
+    <script src="assets/javascripts/mockjax.js"></script>
+</head>
+<body>
+    <h1 class="bennett">MockJax Self-Test</h1>
+
+    <div id="results"></div>
+
+    <script type="text/javascript">
+
+        $(function() { 
+
+
+            $.mockjax({ 
+                url: '/restful/fortune',
+                responseTime: 750,
+                responseText: {
+                    status: 'success',
+                    fortune: 'Are you a turtle?'
+                }
+            });
+
+            $.getJSON('/restful/fortune', function(response) { 
+                console.log(response);
+                if ( response.status == 'success') { 
+                    $('#results').html( 'Your fortune is: ' + response.fortune );
+                }
+                else { 
+                    $('#results').html( 'Things do not look good, no fortune was told' );
+                }
+            });
+
+        });
+
+    </script>
+</body>
+</html>

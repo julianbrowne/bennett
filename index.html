@@ -27,6 +27,7 @@
     <script type="text/javascript" src="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/jasmine.js"></script>
     <script type="text/javascript" src="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/jasmine-html.js"></script>
     <script type="text/javascript" src="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/mock-ajax.js"></script>
+    <script type="text/javascript" src="test/assets/javascripts/mockjax.js"></script>
     <script src="test/assets/javascripts/prettify.js"></script>
 
     <!-- include spec files here... -->
@@ -45,6 +46,7 @@
         </ul>
         <div id="tab1" class="gridster">
             <h2 id="test-name">Test Results</h2>
+            <div id="start-tests">start</div>
             <ul></ul>
         </div>
         <div id="tab2">
@@ -69,17 +71,14 @@
                 }
             });
 
-            var dataUrl = "test/spec/data/fixtures.yml";
-            var specUrl = "test/spec/data/api.yml";
-            var testUrl = "test/spec/data/tests.yml";
-
-            //var dataUrl = "/spec/data.yml";
-            //var specUrl = "/spec/spec.yml";
-            //var testUrl = "/spec/test.yml";
-
-            var harness = new Bennett(dataUrl, specUrl, testUrl);
-
-            harness.runTests();
+            $("#start-tests").click(function(e) { 
+                $("#start-tests").hide();
+                var dataUrl = "test/spec/data/fixtures.yml";
+                var specUrl = "test/spec/data/api.yml";
+                var testUrl = "test/spec/data/tests.yml";
+                var harness = new Bennett(dataUrl, specUrl, testUrl);
+                harness.runTests();
+            });
 
         });
     </script>

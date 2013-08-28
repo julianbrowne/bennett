@@ -4,9 +4,9 @@
 
 	<link rel="stylesheet" media="all" href="../assets/stylesheets/bennett.css" />
 	<link rel="stylesheet" media="all" href="../assets/jquery-ui-1.10.3/css/le-frog/jquery-ui-1.10.3.custom.css" />
-	<link rel="stylesheet" media="all" href="../assets/stylesheets/prettify.css" />
+	<link rel="stylesheet" media="all" href="assets/stylesheets/prettify.css" />
 	<link href='http://fonts.googleapis.com/css?family=Jolly+Lodger' rel='stylesheet' type='text/css'>
-	<script src="../assets/javascripts/prettify.js"></script>
+	<script src="assets/javascripts/prettify.js"></script>
 
 	<script src="../assets/javascripts/piggybank-0.0.1/jquery.js"></script>
 	<script src="../assets/javascripts/piggybank-0.0.1/jquery.cookie.js"></script>
@@ -22,6 +22,8 @@
 	</div>
 
 	<script type="text/javascript">
+
+	$(function(){
 
 		var manager = new Piggybank("http://127.0.0.1:9191/api");
 
@@ -44,7 +46,7 @@
 					    "type": "string"
 					}
 				},
-				"required": [ 
+				required: [ 
 					"hubIds",
 					"ApiSession"
 				]
@@ -108,6 +110,7 @@
 			$("#results pre code").append("\n\r\n\r");
 			prettyPrint();
 		};
+	});
 
 	</script>
 </body>

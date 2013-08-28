@@ -149,6 +149,20 @@ li.fail {
     border: 2px solid #FF3333;
 }
 
+#start-tests {
+    font-size: 20px;
+    line-height: 20px;
+    width: 100px;
+    height: 20px;
+    background: #7CB849;
+    color: #942000;
+    text-align: center;
+    border-radius: 10px;
+    margin: 10px auto;
+    border: 1px solid #FFFFFF;
+    cursor: pointer;
+}
+
 .gridster {
     width: 80%;
     margin: 0 auto;
