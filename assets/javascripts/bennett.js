@@ -13,11 +13,11 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.config = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc));
 
     this.config.then(
-        function(dataResult, specResult, testResult) { 
+        function(data, specs, scenarios) { 
 
-            var dataObj = dataResult[2];
-            var specObj = specResult[2];
-            var testObj = testResult[2];
+            var dataObj = data[2];
+            var specObj = specs[2];
+            var testObj = scenarios[2];
 
             try { 
                 bennett.fixtures = jsyaml.load(dataObj.responseText);
@@ -80,8 +80,20 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         b.logger = function(message) { logAction("piggybank : " + message, { class: "piggy" }); }
 
         bennett.cases[testCase].forEach( 
-            function(apiName) { 
+            function(scenarioApiCall) { 
+                if(typeof(scenarioApiCall) === 'object') { 
+                    var apiName = Object.keys(scenarioApiCall)[0];
+                    var scenarioOverrides = scenarioApiCall[apiName];
+                }
+                else { 
+                    var apiName = scenarioApiCall;
+                    var scenarioOverrides = {};
+                }
                 var apiData = eval("bennett.api." + apiName);
+                console.log(apiData);
+                apiData = $.extend({}, apiData, scenarioOverrides);
+                console.log(apiData);
+
                 logAction(lastElementInPath(apiName) + " (" + apiData.desc + ")");
 
                 if(apiData !== undefined) { 

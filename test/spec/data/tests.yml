@@ -41,4 +41,6 @@ user_fail:
 invalid_session_fail:
    - session.login
    - session.logout
-   - user.get_user
+   - user.get_user:
+      response: 400
+      desc: "should fail due to invalid session"

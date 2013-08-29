@@ -130,27 +130,40 @@ Any data requirements defined in the API config file by body, parameters or URI 
 **root:** The root/stub address of the API that all API calls will be appended to. In this case Bennett will be calling "http://127.0.0.1/users/{userid}"  
 **userid:** The value to interpolate into the URI template, making the actual call now "http://127.0.0.1/users/42". Bennett uses [URI Template JS](https://github.com/fxa/uritemplate-js) for this making it fully [RFC6570](http://tools.ietf.org/html/rfc6570) compliant.
 
-#### Test Cases
+#### Test Scenarios
 
-With an API spec and some data to enrich it the last piece of the puzzle is some test cases to exercise the API in meaningful ways.
+With an API spec and some data to enrich it the last piece of the puzzle is some test scenrios (journeys) to exercise the API in meaningful ways.
 
-Test cases look like this:
+Scenarios look like this:
 
-	test_case_name:
+	scenario_name:
 		- api_call
 		- api_call
 		- api_call
 	
-	test_case_name:
+	scenario_name:
 		- api_call
 		- api_call
 		- api_call
 
-Test cases are executed in order with each API call waiting for the last one to complete before it begins.
+Test cases are executed in order with each API call waiting for the last one to complete before it begins.  
+
+References to API calls may optionally contain overrides for parts of the API specification. This is to allow for "expected failures" where an unhappy-path needs to be tested but it doesn't make sense to call an expected failure an actual failure. For example, a GET for a known user at /users/42 might be expected to return a 200 and some data whereas the same GET for /users/99 might be expected to return a 404. All API settings are valid inside scenarios like this:
+
+	scenario_name:
+		- api_call
+		- api_call:
+			return: 404
+			desc: "expect to get not found response"
+		- api_call
 
 ### Install and Run
 
+	TODOC
+
 #### Installation
+
+	TODOC
 
 	git clone https://github.com/julianbrowne/bennett.git
 	
