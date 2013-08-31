@@ -175,6 +175,14 @@ li.fail {
     box-shadow: 0 0 5px rgba(0,0,0,0.3);
 }
 
+li.gs_w.pass {
+    background: #33FF99;
+}
+
+li.gs_w.fail {
+    background: #D84040;
+}
+
 .gridster .player {
     -webkit-box-shadow: 3px 3px 5px rgba(0,0,0,0.3);
     box-shadow: 3px 3px 5px rgba(0,0,0,0.3);

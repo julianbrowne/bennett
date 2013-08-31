@@ -219,8 +219,14 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         return function(data) { 
             bennett.inProgress = false;
             widget.testCase(niceName(name));
-            for(var i=0; i < data['summary'].tests; i++) {
+            for(var i=0; i < data['summary'].tests; i++) { 
                 widget.addTestResult(data[i], testPassOrFail(data[i]));
+            }
+            if(data['summary'].passed === true) {
+                widget.passAll();
+            }
+            else {
+                widget.failAll();
             }
             widget.publish();
         }
@@ -274,6 +280,14 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 + resultText
                 + "</span>"
                 + "</li>");
+        };
+
+        this.passAll = function() {
+            this.widget.addClass("pass");
+        };
+
+        this.failAll = function() {
+            this.widget.addClass("fail");
         };
 
         this.publish = function() {
