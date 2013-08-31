@@ -118,6 +118,34 @@ user:
     cookies:
       ApiSession: "({ recall: 'login.ApiSession' })"
 
+  read_settings:
+    desc: "Fetch user settings"
+    url: "/users/{username}/settings/{setting}"
+    dataroot: user_details
+    method: "get"
+    response: 200
+    cookies:
+      ApiSession: "({ recall: 'login.ApiSession' })"
+
+  update_settings:
+    desc: "Update user settings"
+    url: "/users/{username}/settings/{setting}"
+    dataroot: user_details
+    body: change_data.setting
+    method: post
+    response: 200
+    cookies:
+      ApiSession: "({ recall: 'login.ApiSession' })"
+
+  weather:
+    desc: "User weather"
+    url: "/users/{username}/weather"
+    dataroot: user_details
+    method: get
+    response: 200
+    cookies:
+      ApiSession: "({ recall: 'login.ApiSession' })"
+
 test:
   expect_fail:
     desc: "404 test"

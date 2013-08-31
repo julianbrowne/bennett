@@ -34,7 +34,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             bennett.gridster = $(".gridster ul")
                 .gridster({
                     widget_margins: [10, 10],
-                    widget_base_dimensions: [300, 100]
+                    widget_base_dimensions: [300, 80]
                 }).data('gridster');
 
             $("#test-name").html(bennett.api.general["test_name"]);
@@ -71,13 +71,14 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
     function testCycle(testCase) { 
 
-        var b = new Piggybank(bennett.fixtures.root);
+        var b = new Piggybank(bennett.fixtures.root, {
+            ignore404: true,
+            stopOnSurprise: true,
+            logger: function(message) { logAction("piggybank : " + message, { class: "piggy" }); }
+        });
         var w = new Widget(bennett.gridster);
 
         bennett.fixtures.bennett = b.memory;
-        b.ignore404 = true;
-        b.stopOnSurprise = true;
-        b.logger = function(message) { logAction("piggybank : " + message, { class: "piggy" }); }
 
         bennett.cases[testCase].forEach( 
             function(scenarioApiCall) { 
@@ -218,17 +219,15 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         return function(data) { 
             bennett.inProgress = false;
             widget.testCase(niceName(name));
-            Object.keys(data).forEach(
-                function(test) { 
-                    result = data[test];
-                    widget.addTestResult(result, testPassOrFail(result));
-                }
-            );
+            for(var i=0; i < data['summary'].tests; i++) {
+                widget.addTestResult(data[i], testPassOrFail(data[i]));
+            }
             widget.publish();
         }
     };
 
     function testPassOrFail(result) { 
+       //  console.log(result);
         var returnCodeResult = result.data.expected ? true : false;
         if(result.data.schemaCheck !== undefined) { 
             var schemaCheckResult = result.data.schemaCheck.valid ? true : false;

@@ -18,6 +18,16 @@ basic_user_search:
    - user.search
    - session.logout
 
+read_user_settings:
+   - session.login
+   - user.read_settings
+   - session.logout
+
+update_user_settings:
+   - session.login
+   - user.update_settings
+   - session.logout
+
 update_user_data:
    - session.login
    - user.update
@@ -38,9 +48,14 @@ multi_get:
 user_fail:
    - test.expect_fail
 
-invalid_session_fail:
+invalid_session:
    - session.login
    - session.logout
    - user.get_user:
       response: 400
       desc: "should fail due to invalid session"
+
+weather:
+   - session.login
+   - user.weather
+   - session.logout

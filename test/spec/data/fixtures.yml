@@ -11,6 +11,10 @@ userid: 42
 user_details:
     username: "fred"
     password: "secret"
+    setting: "name"
+
+change_data:
+    setting: "jeff"
 
 password_details:
     code: 1234
