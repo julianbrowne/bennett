@@ -334,7 +334,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
             $(document).on("click", "#" + testLineItemId, 
                 function() {
-                    //console.log("clicked")
                     $("#" + testLineItemDetailId).dialog("open");
                 }
             );
@@ -353,28 +352,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         };
     };
 
-    function getFields(url) {
-
-      var ajaxPromise = $.get(url);
-
-      var dff = $.Deferred();
-
-      ajaxPromise.then(function(data) {
-
-        var result = {
-          'field1' : field1,
-          'field2' : field2
-        };
-
-        dff.resolve(result);
-
-      }, function() {
-        dff.reject( );
-      });
-
-      return dff.promise();
-    };
-
     function getDataFrom(url) {
         logAction("Loading data from " + url);
         return $.get(url)
@@ -388,7 +365,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     };
 
     function niceName(str) {
-
         function capitalise(lowercaseString) {
             var capitalisedString = "";
             var words = lowercaseString.split(" ");
@@ -399,7 +375,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             return capitalisedString.slice(0,-1);
         };
         return capitalise(str.toString().replace(/_/g," "));
-
     };
 
 };
