@@ -16,7 +16,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.config.then(
         function(data, specs, scenarios, app) { 
 
-
             var dataObj = data[2];
             var specObj = specs[2];
             var testObj = scenarios[2];
@@ -43,7 +42,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 }).data('gridster');
 
             $(window).resize(function () { 
-                // todo: redraw gridster 
+                // TODO: redraw gridster 
                 // or switch to floating divs and
                 // remove gridster ..
             });
@@ -105,8 +104,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 apiData = $.extend({}, apiData, scenarioOverrides);
 
                 logAction(lastElementInPath(apiName) + " (" + apiData.desc + ")");
-
-                // console.log(apiData);
 
                 if(apiData !== undefined) { 
                     var apiConfigData = { 
@@ -285,7 +282,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         return parts[length-1];
     }
 
-    function Widget(gridster) {
+    function Widget(gridster) { 
 
         this.testCase = "";
         this.content = "<ul class='leaders'></ul>";
@@ -312,60 +309,78 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             var listItem       = $("<li>",   { id: testLineItemId, class: "test-item" });
             var testNameSpan   = $("<span>", { class: "name" }).html(niceName(testName));
             var testResultSpan = $("<span>", { class: "result " + resultText }).html(resultText);
-            var testDetailDiv  = $("<div>",  { id: testLineItemDetailId, class: "test-item-explanation" });
 
             list.append(listItem);
             $("#" + testLineItemId)
                 .append(testNameSpan)
                 .append(testResultSpan);
 
+            var testDetailDiv  = $("<div>", { 
+                id: testLineItemDetailId,
+                class: "test-item-explanation",
+                title: niceName(testName)
+            });
+
             list.append(testDetailDiv);
-            $("#" + testLineItemDetailId)
-                .append("<p>" + testData.callData.method + " to " + testData.url + "</p>")
-                .append("<p>Expected " + testData.expectation.response + "</p>")
-                .append("<p>Got " + testData.outcome.response.received + "</p>")
-                .append("<p>Time taken " + testData.outcome.timer.latency + " ms</p>");
+            addDetail("<p>HTTP " + testData.callData.method.toString().toUpperCase() + " to " + testData.url + "</p>")
+
+            if(testData.expectation.response !== undefined) { 
+                addDetail("<p>Expected " + testData.expectation.response + "</p>");
+            }
+
+            addDetail("<p>Got " + testData.outcome.response.received + "</p>")
+
+            if(testData.expectation.latency !== undefined) { 
+               addDetail("<p>Max time " + testData.expectation.latency + " ms</p>")
+            }
+
+            addDetail("<p>Time taken " + testData.outcome.timer.latency + " ms</p>");
 
             $("#" + testLineItemDetailId).dialog({ 
                 modal: true,
+                width: "50%",
                 position: { my: "top center", at: "top center", of: window },
                 autoOpen: false
             });
 
             $(document).on("click", "#" + testLineItemId, 
-                function() {
+                function() { 
                     $("#" + testLineItemDetailId).dialog("open");
                 }
             );
+
+            function addDetail(text) { 
+                $("#" + testLineItemDetailId).append(text);
+            };
         };
 
         this.passAll = function() { 
             this.widget.addClass("pass", 2000);
         };
 
-        this.failAll = function() {
+        this.failAll = function() { 
             this.widget.addClass("fail", 2000);
         };
 
-        this.publish = function() {
+        this.publish = function() { 
             this.addContent("</ul>");
         };
     };
 
-    function getDataFrom(url) {
+    function getDataFrom(url) { 
         logAction("Loading data from " + url);
         return $.get(url)
             .done(function(data, status, xhr) { logAction("Called " + url + ", got status " + xhr.status); })
             .fail(function(e) { logAction(e); });
     };
 
-    function lastElementInPath(fullPath) {
+    function lastElementInPath(fullPath) { 
         var elements = fullPath.toString().split('.');
         return elements[elements.length - 1];
     };
 
-    function niceName(str) {
-        function capitalise(lowercaseString) {
+    function niceName(str) { 
+        function capitalise(lowercaseString) { 
             var capitalisedString = "";
             var words = lowercaseString.split(" ");
             words.forEach(function(word) {
