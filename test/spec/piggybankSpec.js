@@ -179,7 +179,10 @@ describe("Piggybank", function() {
         method: config.method, 
         name: config.name,
         body: config.body,
-        schema: config.schema,
+        expectation: {
+          response: config.status,
+          schema: config.schema
+        },
         remember: config.remember,
         encoding: config.encoding
       });
@@ -198,20 +201,21 @@ describe("Piggybank", function() {
     });
 
     it("should have 200 response in callback", function() { 
-      expect(resultData[0].status).toEqual(config.status);
+      console.log(resultData[0]);
+      expect(resultData[0].outcome.response.received).toEqual(config.status);
     });
 
     it("should see original name in callback", function() { 
-      expect(resultData[0].data.name).toEqual(config.name);
+      expect(resultData[0].callData.name).toEqual(config.name);
     });
 
     it("should build correctly encoded body", function() { 
-      expect(resultData[0].data.encoding).toEqual(config.encoding);
-      expect(resultData[0].data.body).toEqual("id=" + config.body.id);
+      expect(resultData[0].callData.encoding).toEqual(config.encoding);
+      expect(resultData[0].callData.body).toEqual("id=" + config.body.id);
     });
 
     it("should validate correct json against schema", function() { 
-      expect(resultData[0].data.schemaCheck.valid).toEqual(true);
+      expect(resultData[0].outcome.schema.expectationMet).toEqual(true);
     });
 
   });

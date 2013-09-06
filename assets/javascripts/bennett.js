@@ -101,7 +101,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     var apiName = scenarioApiCall;
                     var scenarioOverrides = {};
                 }
-                var apiData = eval("bennett.api." + apiName);
+                var apiData = resolve(bennett.api, apiName);
                 apiData = $.extend({}, apiData, scenarioOverrides);
 
                 logAction(lastElementInPath(apiName) + " (" + apiData.desc + ")");
@@ -151,7 +151,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                         var template = UriTemplate.parse(apiData.url);
                         apiConfigData.template = apiData.url;
                         if(apiData.dataroot !== undefined) { 
-                            var dataSource = eval("bennett.fixtures." + apiData.dataroot);
+                            var dataSource = resolve(bennett.fixtures, apiData.dataroot);
                         }
                         else {
                             var dataSource = bennett.fixtures;
@@ -162,7 +162,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     // add post/put body
 
                     if(apiData.body!==undefined) { 
-                        var dataSource = eval("bennett.fixtures." + apiData.body);
+                        var dataSource = resolve(bennett.fixtures, apiData.body);
                         // if target is a string/int etc then make a piggybank object
                         if(typeof(dataSource) !== "object") { 
                             var body = { };
@@ -212,6 +212,21 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             }
         }
         return value;
+    };
+
+    function resolve(base, path) { 
+        var levels = path.split(".");
+        var result = base;
+        for(var i=0; i<levels.length; i++) { 
+            var level = levels[i];
+            if(result[level]!==undefined) { 
+                result = result[level];
+            }
+            else { 
+                return null;
+            }
+        }
+        return result;
     };
 
     function logAction(message, options) {
@@ -275,7 +290,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         this.testCase = "";
         this.content = "<ul class='leaders'></ul>";
 
-        this.addContent = function(content) {
+        this.addContent = function(content) { 
             this.content = this.widget.html();
             this.content += content;
             this.widget.html(this.content);
@@ -293,18 +308,23 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             var id = (bennett.testId++);
             var testLineItemId = "test-summary-" + id;
             var testLineItemDetailId = "test-detail-" + id;
-            list.html(list.html()
-                + "<li id='" + testLineItemId + "' class='test-item'>"
-                + "<span class='name'>" + niceName(testName) + "</span>"
-                + "<span class='result " + resultText + "'>" + resultText + "</span>"
-                + "</li>"
-                + "<div id='" + testLineItemDetailId + "' class='test-item-explanation'>" 
-                + testData.callData.method + " to " + testData.url + "<br/>"
-                + "Expected " + testData.expectation.response + "<br/>"
-                + "Got " + testData.outcome.response + "<br/>"
-                + "Time taken " + testData.outcome.timer.latency + " ms"
-                + "</div>"
-            );
+
+            var listItem       = $("<li>",   { id: testLineItemId, class: "test-item" });
+            var testNameSpan   = $("<span>", { class: "name" }).html(niceName(testName));
+            var testResultSpan = $("<span>", { class: "result " + resultText }).html(resultText);
+            var testDetailDiv  = $("<div>",  { id: testLineItemDetailId, class: "test-item-explanation" });
+
+            list.append(listItem);
+            $("#" + testLineItemId)
+                .append(testNameSpan)
+                .append(testResultSpan);
+
+            list.append(testDetailDiv);
+            $("#" + testLineItemDetailId)
+                .append("<p>" + testData.callData.method + " to " + testData.url + "</p>")
+                .append("<p>Expected " + testData.expectation.response + "</p>")
+                .append("<p>Got " + testData.outcome.response.received + "</p>")
+                .append("<p>Time taken " + testData.outcome.timer.latency + " ms</p>");
 
             $("#" + testLineItemDetailId).dialog({ 
                 modal: true,
@@ -312,18 +332,12 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 autoOpen: false
             });
 
-            //console.log("#" + testLineItemId);
-            //console.log("#" + testLineItemDetailId);
-
-            //$("#" + testLineItemId).html("---");
-
             $(document).on("click", "#" + testLineItemId, 
                 function() {
                     //console.log("clicked")
                     $("#" + testLineItemDetailId).dialog("open");
                 }
-            ); 
-
+            );
         };
 
         this.passAll = function() { 

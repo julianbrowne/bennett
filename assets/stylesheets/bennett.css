@@ -121,6 +121,19 @@ ul.leaders span + span {
 }
 
 /**
+ *  Test Detail Dialog
+**/
+
+.test-item-explanation {
+
+}
+
+.test-item-explanation p {
+    margin: 2px;
+    padding: 0;
+}
+
+/**
  *  Code samples
 **/
 
