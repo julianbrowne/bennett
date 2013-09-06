@@ -7,24 +7,29 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.cases      = null;
     this.gridster   = null;
     this.inProgress = false;
+    this.testId    = 0;
 
     logAction("Bennett tester instantiated");
 
-    this.config = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc));
+    this.config = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc), getDataFrom("conf/bennett.yml"));
 
     this.config.then(
-        function(data, specs, scenarios) { 
+        function(data, specs, scenarios, app) { 
+
 
             var dataObj = data[2];
             var specObj = specs[2];
             var testObj = scenarios[2];
+            var confObj = app[2];
 
             try { 
                 bennett.fixtures = jsyaml.load(dataObj.responseText);
                 bennett.api      = jsyaml.load(specObj.responseText);
                 bennett.cases    = jsyaml.load(testObj.responseText);
+                bennett.config   = jsyaml.load(confObj.responseText);
             }
             catch(e) {
+                console.log(e);
                 throw new Exception("YAML", "Load error - " + e);
             }
 
@@ -36,6 +41,12 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     widget_margins: [10, 10],
                     widget_base_dimensions: [300, 80]
                 }).data('gridster');
+
+            $(window).resize(function () { 
+                // todo: redraw gridster 
+                // or switch to floating divs and
+                // remove gridster ..
+            });
 
             $("#test-name").html(bennett.api.general["test_name"]);
 
@@ -71,9 +82,9 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
     function testCycle(testCase) { 
 
-        var b = new Piggybank(bennett.fixtures.root, {
-            ignore404: true,
-            stopOnSurprise: true,
+        var b = new Piggybank(bennett.fixtures.root, { 
+            //ignore404: true,
+            //stopOnSurprise: true,
             logger: function(message) { logAction("piggybank : " + message, { class: "piggy" }); }
         });
         var w = new Widget(bennett.gridster);
@@ -91,37 +102,45 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     var scenarioOverrides = {};
                 }
                 var apiData = eval("bennett.api." + apiName);
-                console.log(apiData);
                 apiData = $.extend({}, apiData, scenarioOverrides);
-                console.log(apiData);
 
                 logAction(lastElementInPath(apiName) + " (" + apiData.desc + ")");
 
+                // console.log(apiData);
+
                 if(apiData !== undefined) { 
-                    var config = { 
+                    var apiConfigData = { 
                         method: apiData.method, 
                         name: apiName,
                         cookies: {},
-                        expect: apiData.response
+                        expectation: {}
                     };
 
-                    if(apiData.encoding !== undefined) { 
-                        config.encoding = apiData.encoding;
-                    }
-
-                    if(apiData.remember !== undefined) { 
-                        config.remember = apiData.remember;
+                    if(apiData.response !== undefined) { 
+                        apiConfigData.expectation.response = apiData.response;
                     }
 
                     if(apiData.schema != undefined) { 
-                        config.schema = parseType(apiData.schema);
+                        apiConfigData.expectation.schema = parseType(apiData.schema);
+                    }
+
+                    if(apiData.latency != undefined) { 
+                        apiConfigData.expectation.latency = apiData.latency;
+                    }
+
+                    if(apiData.encoding !== undefined) { 
+                        apiConfigData.encoding = apiData.encoding;
+                    }
+
+                    if(apiData.remember !== undefined) { 
+                        apiConfigData.remember = apiData.remember;
                     }
 
                     if(apiData.cookies !== undefined) { 
                         Object.keys(apiData.cookies).forEach( 
                             function(cookie) { 
                                 logAction("Setting cookie " + cookie + " to " + apiData.cookies[cookie]);
-                                config.cookies[cookie] = parseType(apiData.cookies[cookie]);
+                                apiConfigData.cookies[cookie] = parseType(apiData.cookies[cookie]);
                             }
                         );
                     }
@@ -130,7 +149,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
                     if(apiData.url.search(/{.*?}/) !== -1) { 
                         var template = UriTemplate.parse(apiData.url);
-                        config.template = apiData.url;
+                        apiConfigData.template = apiData.url;
                         if(apiData.dataroot !== undefined) { 
                             var dataSource = eval("bennett.fixtures." + apiData.dataroot);
                         }
@@ -153,11 +172,11 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                         else {
                             var body = dataSource;
                         }
-                        config.body = body;
+                        apiConfigData.body = body;
                     }
 
-                    b.addCall(apiData.url, config);
-                    logAction(config.method.toString().toUpperCase() + " " + apiData.url + ", expecting " + config.expect);
+                    b.addCall(apiData.url, apiConfigData);
+                    logAction(apiConfigData.method.toString().toUpperCase() + " " + apiData.url + ", expecting " + apiConfigData.expect);
                 }
                 else { 
                     logAction("***  : No test details found for " + apiName);
@@ -233,16 +252,16 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     };
 
     function testPassOrFail(result) { 
-       //  console.log(result);
-        var returnCodeResult = result.data.expected ? true : false;
-        if(result.data.schemaCheck !== undefined) { 
-            var schemaCheckResult = result.data.schemaCheck.valid ? true : false;
-            if(schemaCheckResult === true && returnCodeResult === true)
-                return true;
-            else
-                return false;
+        if(bennett.config.pass.response && result.outcome.response !== undefined && !result.outcome.response.expectationMet) {
+            return false;
         }
-        return returnCodeResult;
+        if(bennett.config.pass.schema && result.outcome.schema !== undefined && !result.outcome.schema.expectationMet) {
+            return false;
+        }
+        if(bennett.config.pass.latency && result.outcome.latency !== undefined && !result.outcome.timer.expectationMet) {
+            return false;
+        }
+        return true;
     }
 
     function lastElementInObjPath(objPath) { 
@@ -262,32 +281,57 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             this.widget.html(this.content);
         };
 
-        this.testCase = function(testCase) {
+        this.testCase = function(testCase) { 
             this.testCase = testCase;
             this.widget = gridster.add_widget("<li class='test-set'>" + '<div class="test-name">' + this.testCase + "</div>" + this.content + "</li>", 1, 2);
         };
 
-        this.addTestResult = function(testData, result) {
+        this.addTestResult = function(testData, result) { 
             var resultText = (result === true ) ? 'pass' : 'fail';
             var list = this.widget.children("ul.leaders");
-            var testName = lastElementInObjPath(testData.data.name);
+            var testName = lastElementInObjPath(testData.callData.name);
+            var id = (bennett.testId++);
+            var testLineItemId = "test-summary-" + id;
+            var testLineItemDetailId = "test-detail-" + id;
             list.html(list.html()
-                + "<li class='test-item' title='" + testData.data.method + " to " + testData.url + " : expected " + testData.data.expect + " got " + testData.status + "'>"
-                + "<span class='name'>"
-                + niceName(testName) 
-                + "</span>"
-                + "<span class='result " + resultText + "'>"
-                + resultText
-                + "</span>"
-                + "</li>");
+                + "<li id='" + testLineItemId + "' class='test-item'>"
+                + "<span class='name'>" + niceName(testName) + "</span>"
+                + "<span class='result " + resultText + "'>" + resultText + "</span>"
+                + "</li>"
+                + "<div id='" + testLineItemDetailId + "' class='test-item-explanation'>" 
+                + testData.callData.method + " to " + testData.url + "<br/>"
+                + "Expected " + testData.expectation.response + "<br/>"
+                + "Got " + testData.outcome.response + "<br/>"
+                + "Time taken " + testData.outcome.timer.latency + " ms"
+                + "</div>"
+            );
+
+            $("#" + testLineItemDetailId).dialog({ 
+                modal: true,
+                position: { my: "top center", at: "top center", of: window },
+                autoOpen: false
+            });
+
+            //console.log("#" + testLineItemId);
+            //console.log("#" + testLineItemDetailId);
+
+            //$("#" + testLineItemId).html("---");
+
+            $(document).on("click", "#" + testLineItemId, 
+                function() {
+                    //console.log("clicked")
+                    $("#" + testLineItemDetailId).dialog("open");
+                }
+            ); 
+
         };
 
-        this.passAll = function() {
-            this.widget.addClass("pass");
+        this.passAll = function() { 
+            this.widget.addClass("pass", 2000);
         };
 
         this.failAll = function() {
-            this.widget.addClass("fail");
+            this.widget.addClass("fail", 2000);
         };
 
         this.publish = function() {

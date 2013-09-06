@@ -1,2 +1,8 @@
---- bennett app-only config
+# Bennett app-only config
 
+---
+
+pass:
+    response: true
+    schema:   true
+    latency:  true

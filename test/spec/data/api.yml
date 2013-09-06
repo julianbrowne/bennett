@@ -5,7 +5,7 @@
 ---
 
 general:
-  test_name: "Self-Test Fake API"
+  test_name: "My Fake API"
 
 session:
 
@@ -17,6 +17,7 @@ session:
     response: 201
     body: user_details
     remember: "login"
+    latency: 500
     schema: >
         {
             "title": "Login Session Schema",

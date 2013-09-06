@@ -41,29 +41,34 @@
 			method: "post", 
 			encoding: 'form', 
 			remember: "session", 
-			expect: 201,
-			schema: { 
-				type: "object",
-				properties: { 
-					"hubIds": { 
-					    "type": "array"
-					},
-					"ApiSession": { 
-					    "type": "string"
-					}
-				},
-				required: [ 
-					"hubIds",
-					"ApiSession"
-				]
-			},
 			body: { username: "fred", password: "x" }, 
-			name: "login fred"
+			name: "login fred",
+			expectation : {
+				response: 200,
+				latency: 500,
+				schema: { 
+					type: "object",
+					properties: { 
+						"hubIds": { 
+						    "type": "array"
+						},
+						"ApiSession": { 
+						    "type": "string"
+						}
+					},
+					required: [ 
+						"hubIds",
+						"ApiSession"
+					]
+				},
+			}
 		});
 
-		manager.addCall('/users/fred', {
+		manager.addCall('/users/fred', { 
 			method: "get", 
-			expect: 200,
+			expectation : {
+				response: 200
+			},
 			cookies: {
 				ApiSession: { recall: "session.ApiSession" }
 			}, 
@@ -73,7 +78,9 @@
 		manager.addCall('/users/all/search', {
 			method: "get", 
 			body: { query: "fred" }, 
-			expect: 200,
+			expectation : {
+				response: 200
+			},
 			encoding: 'form', 
 			cookies: { 
 				ApiSession: { recall: "session.ApiSession" }
@@ -83,7 +90,9 @@
 
 		manager.addCall('/passwordreset', {
 			method: "post", 
-			expect: 200,
+			expectation : {
+				response: 200
+			},
 			encoding: 'form', 
 			body: { username: "fred" }, 
 			cookies: {
@@ -95,7 +104,9 @@
 		manager.addCall('/passwordreset', { 
 			method: "get", 
 			encoding: 'form', 
-			expect: 200,
+			expectation : {
+				response: 200
+			},
 			body: { code: "1234" }, 
 			cookies: {
 				ApiSession: { recall: "session.ApiSession" }
@@ -105,7 +116,9 @@
 
 		manager.addCall('/logout', { 
 			method: "post", 
-			expect: 200,
+			expectation : {
+				response: 200
+			},
 			cookies: {
 				ApiSession: { recall: "session.ApiSession" }
 			}, 

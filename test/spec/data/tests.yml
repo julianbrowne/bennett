@@ -23,9 +23,11 @@ read_user_settings:
    - user.read_settings
    - session.logout
 
-update_user_settings:
+update_user_and_get_some_settings:
    - session.login
    - user.update_settings
+   - user.read_settings
+   - user.get_user
    - session.logout
 
 update_user_data:
