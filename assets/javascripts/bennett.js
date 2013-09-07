@@ -212,6 +212,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     };
 
     function resolve(base, path) { 
+        if(base === undefined) return undefined;
         var levels = path.split(".");
         var result = base;
         for(var i=0; i<levels.length; i++) { 
@@ -220,7 +221,8 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 result = result[level];
             }
             else { 
-                return null;
+                console.log("Unable to resolve " + path);
+                return undefined;
             }
         }
         return result;
