@@ -1,3 +1,6 @@
+/**
+ *  Bennett API Verifier
+**/
 
 var Bennett = function(dataSrc, specSrc, testSrc) {
 
@@ -10,6 +13,11 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.testId    = 0;
 
     logAction("Bennett tester instantiated");
+
+    var grid = new Grid("#test-results");
+    grid.widgetDefaults.width = 350;
+    grid.widgetDefaults.height = 150;
+    // grid.autoHeight = true;
 
     this.config = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc), getDataFrom("conf/bennett.yml"));
 
@@ -35,16 +43,8 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             logAction("Using server " + bennett.fixtures.root);
             logAction("Setting up grid");
 
-            bennett.gridster = $(".gridster ul")
-                .gridster({
-                    widget_margins: [10, 10],
-                    widget_base_dimensions: [300, 80]
-                }).data('gridster');
-
             $(window).resize(function () { 
-                // TODO: redraw gridster 
-                // or switch to floating divs and
-                // remove gridster ..
+                // nowt yet
             });
 
             $("#test-name").html(bennett.api.general["test_name"]);
@@ -86,7 +86,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             //stopOnSurprise: true,
             logger: function(message) { logAction("piggybank : " + message, { class: "piggy" }); }
         });
-        var w = new Widget(bennett.gridster);
+
 
         bennett.fixtures.bennett = b.memory;
 
@@ -184,13 +184,16 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
         checkTestInProgress();
 
-        function checkTestInProgress() {
+        function checkTestInProgress() { 
             if(bennett.inProgress === true) { 
                 setTimeout(checkTestInProgress, 1000);
             }
-            else {
+            else { 
+                var widget = new grid.Widget(niceName(name));
+                widget.addClass("scenario");
+                //widget.autoStretch = true;
                 bennett.inProgress = true;
-                b.makeCallsSynchronously().done(reporter(w, testCase));
+                b.makeCallsSynchronously().done(reporter(widget, testCase));
             }
         };
 
@@ -200,11 +203,11 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         try {
             var value = JSON.parse(string);
         }
-        catch(err) {
-            try {
+        catch(err) { 
+            try { 
                 var value = eval(string);
             }
-            catch(err) {
+            catch(err) { 
                 var value = string.toString();
             }
         }
@@ -228,7 +231,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         return result;
     };
 
-    function logAction(message, options) {
+    function logAction(message, options) { 
         var options = options || {};
         $("#test-log").append(
               "<li class='log-action'>" 
@@ -238,7 +241,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         );
     };
 
-    function timestamp() {
+    function timestamp() { 
         var date = new Date();
         var t = 
               date.getHours() 
@@ -250,19 +253,49 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
     function reporter(widget, name) { 
         return function(data) { 
+
             bennett.inProgress = false;
-            widget.testCase(niceName(name));
+
             for(var i=0; i < data['summary'].tests; i++) { 
-                widget.addTestResult(data[i], testPassOrFail(data[i]));
+                var pf = testPassOrFail(data[i]);
+                var resultText = (pf === true ) ? 'pass' : 'fail';
+                var line = widget.addKeyValue(data[i].callData.name, resultText, { class: "test-name" }, { class: resultText });
+                var detail = addDetailDialog(widget.index, widget.lines, data[i]);
+                $(line).on("click", function() { detail.dialog("open"); } );
             }
-            if(data['summary'].passed === true) {
-                widget.passAll();
+
+            if(data['summary'].passed === true) { 
+                widget.addClass("pass");
             }
-            else {
-                widget.failAll();
+            else { 
+                widget.addClass("fail");
             }
-            widget.publish();
+
         }
+    };
+
+    function addDetailDialog(scenarioId, testId, data) { 
+        var testDetailId = "widget-detail-" + scenarioId + "-" + testId;
+        var testDetailSelector = "#" + testDetailId;
+        var testDetailDiv  = $("<div>", { id: testDetailId, class: "detail", title: data.callData.name });
+        $("body").append(testDetailDiv);
+        addDetail("<p>HTTP " + data.callData.method.toString().toUpperCase() + " to " + data.url + "</p>")
+        if(data.expectation.response !== undefined) { 
+            addDetail("<p>Expected " + data.expectation.response + "</p>");
+        }
+        addDetail("<p>Got " + data.outcome.response.received + "</p>")
+        if(data.expectation.latency !== undefined) { 
+           addDetail("<p>Max time " + data.expectation.latency + " ms</p>")
+        }
+        addDetail("<p>Time taken " + data.outcome.timer.latency + " ms</p>");
+        $(testDetailSelector).dialog({ 
+            modal: true,
+            width: "50%",
+            position: { my: "top center", at: "top center", of: window },
+            autoOpen: false
+        });
+        return $(testDetailSelector);
+        function addDetail(text) { $(testDetailSelector).append(text); };
     };
 
     function testPassOrFail(result) { 
@@ -276,97 +309,12 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             return false;
         }
         return true;
-    }
+    };
 
     function lastElementInObjPath(objPath) { 
         var parts  = objPath.split('.');
         var length = parts.length;
         return parts[length-1];
-    }
-
-    function Widget(gridster) { 
-
-        this.testCase = "";
-        this.content = "<ul class='leaders'></ul>";
-
-        this.addContent = function(content) { 
-            this.content = this.widget.html();
-            this.content += content;
-            this.widget.html(this.content);
-        };
-
-        this.testCase = function(testCase) { 
-            this.testCase = testCase;
-            this.widget = gridster.add_widget("<li class='test-set'>" + '<div class="test-name">' + this.testCase + "</div>" + this.content + "</li>", 1, 2);
-        };
-
-        this.addTestResult = function(testData, result) { 
-            var resultText = (result === true ) ? 'pass' : 'fail';
-            var list = this.widget.children("ul.leaders");
-            var testName = lastElementInObjPath(testData.callData.name);
-            var id = (bennett.testId++);
-            var testLineItemId = "test-summary-" + id;
-            var testLineItemDetailId = "test-detail-" + id;
-
-            var listItem       = $("<li>",   { id: testLineItemId, class: "test-item" });
-            var testNameSpan   = $("<span>", { class: "name" }).html(niceName(testName));
-            var testResultSpan = $("<span>", { class: "result " + resultText }).html(resultText);
-
-            list.append(listItem);
-            $("#" + testLineItemId)
-                .append(testNameSpan)
-                .append(testResultSpan);
-
-            var testDetailDiv  = $("<div>", { 
-                id: testLineItemDetailId,
-                class: "test-item-explanation",
-                title: niceName(testName)
-            });
-
-            list.append(testDetailDiv);
-            addDetail("<p>HTTP " + testData.callData.method.toString().toUpperCase() + " to " + testData.url + "</p>")
-
-            if(testData.expectation.response !== undefined) { 
-                addDetail("<p>Expected " + testData.expectation.response + "</p>");
-            }
-
-            addDetail("<p>Got " + testData.outcome.response.received + "</p>")
-
-            if(testData.expectation.latency !== undefined) { 
-               addDetail("<p>Max time " + testData.expectation.latency + " ms</p>")
-            }
-
-            addDetail("<p>Time taken " + testData.outcome.timer.latency + " ms</p>");
-
-            $("#" + testLineItemDetailId).dialog({ 
-                modal: true,
-                width: "50%",
-                position: { my: "top center", at: "top center", of: window },
-                autoOpen: false
-            });
-
-            $(document).on("click", "#" + testLineItemId, 
-                function() { 
-                    $("#" + testLineItemDetailId).dialog("open");
-                }
-            );
-
-            function addDetail(text) { 
-                $("#" + testLineItemDetailId).append(text);
-            };
-        };
-
-        this.passAll = function() { 
-            this.widget.addClass("pass", 2000);
-        };
-
-        this.failAll = function() { 
-            this.widget.addClass("fail", 2000);
-        };
-
-        this.publish = function() { 
-            this.addContent("</ul>");
-        };
     };
 
     function getDataFrom(url) { 

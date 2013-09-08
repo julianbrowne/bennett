@@ -2,25 +2,27 @@
 <head>
     <title>Bennett</title>
 
-    <!-- Bennett Styling -->
+    <!-- TheGrid -->
+    <script src="assets/thegrid/thegrid.js"></script>
+    <link rel="stylesheet" media="all" href="assets/thegrid/thegrid.css" />
+
+    <!-- Bennett -->
     <link rel="stylesheet" media="all" href="assets/stylesheets/bennett.css" />
     <link rel="stylesheet" media="all" href="assets/jquery-ui-1.10.3/css/le-frog/jquery-ui-1.10.3.custom.css" />
     <link rel="stylesheet" media="all" href="assets/fonts/jolly-lodger.css" />
-
-    <!-- Bennett JS -->
     <script src="assets/javascripts/jquery-2.0.3.js"></script>
     <script src="assets/jquery-ui-1.10.3/js/jquery-ui-1.10.3.custom.js"></script>
     <script src="assets/javascripts/js-yaml-2.1.0.js"></script>
-    <script src="assets/javascripts/gridster-0.1.0.js"></script>
+    <!--<script src="assets/javascripts/gridster-0.1.0.js"></script>-->
     <script src="assets/javascripts/uritemplate-0.3.4.js"></script>
     <script src="assets/javascripts/bennett.js"></script>
 
-    <!-- Piggybank JS -->
+    <!-- Piggybank -->
     <script src="assets/javascripts/piggybank-0.0.1/jquery.cookie.js"></script>
     <script src="assets/javascripts/piggybank-0.0.1/tv4.js"></script>
     <script src="assets/javascripts/piggybank-0.0.1/piggybank.js"></script>
 
-    <!-- Test dependencies -->
+    <!-- Test -->
     <link rel="stylesheet" media="all" href="test/assets/stylesheets/prettify-obsidian.css" />
     <link rel="stylesheet" type="text/css" href="test/assets/jasmine-1.3.1/lib/jasmine-1.3.1/jasmine.css">
 
@@ -42,10 +44,10 @@
             <li><a href="#tab2" class="bennett">Test Log</a></li>
             <li><a href="test/index.html" class="bennett">Self-Tests</a></li>
         </ul>
-        <div id="tab1" class="gridster">
+        <div id="tab1">
             <h2 id="test-name">Test Results</h2>
             <div id="start-tests">start</div>
-            <ul></ul>
+            <div id="test-results"></div>
         </div>
         <div id="tab2">
             <h2 id="test-name">Test Log</h2>

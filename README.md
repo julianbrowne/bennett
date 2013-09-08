@@ -9,7 +9,7 @@ All dependencies are included but they are:
 
 *	JQuery        v2.0.3  (DOM manipulation)  
 *	JQuery UI     v1.10.3 (Tabs)  
-*	Gridster      v0.1.0  (Jenkins-like test status grid layout)  
+*	TheGrid       v0.0.1  (Jenkins-like grid layout)  
 *	JS-Yaml       v2.1.0  (for reading and parsing the config files)  
 *	Piggybank     v0.0.1  (managing ajax calls synchronously)  
 *	Uritemplate   v0.3.4  (mashing uri templates and fixture data)  
@@ -20,7 +20,7 @@ Bennet reads three YAML files and creates three javascript object structures (ap
 
 For example, if the test case was to log in and then log out, then Bennett reads the log in definition, applies the username and password to the defined API uri template, makes the call, checks the response against what's expected, then does the same with the log out call.
 
-Calls are made synchronously using the [piggybank](https://github.com/julianbrowne/piggybank) javascript library and the result set is collated and displayed on screen using [gridster](https://github.com/ducksboard/gridster.js).
+Calls are made synchronously using the [piggybank](https://github.com/julianbrowne/piggybank) javascript library and the result set is collated and displayed on screen using [thegrid](https://github.com/julianbrowne/thegrid).
 
 ![screen-shot](https://raw.github.com/julianbrowne/bennett/master/assets/images/screen-shot.png)
 

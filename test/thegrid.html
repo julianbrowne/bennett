@@ -1,0 +1,57 @@
+<html>
+<head>
+    <title>The Grid Self-Test</title>
+
+    <script src="../assets/thegrid/thegrid.js"></script>
+    <link rel="stylesheet" media="all" href="../assets/thegrid/thegrid.css" />
+
+    <link rel="stylesheet" media="all" href="../assets/stylesheets/bennett.css" />
+    <link rel="stylesheet" media="all" href="../assets/fonts/jolly-lodger.css" />
+
+    <script src="../assets/javascripts/piggybank-0.0.1/jquery.js"></script>
+</head>
+<body>
+    <h1 class="bennett">Bennett: The Grid Self-Test</h1>
+
+    <div id="results">
+    </div>
+
+    <script type="text/javascript">
+
+    $(function(){
+
+        var grid = new Grid("#results");
+        grid.autoHeight = true;
+        grid.empty();
+
+        var w1 = new grid.Widget("widget 1");
+
+        var w2 = new grid.Widget("widget 2");
+        w2.autoStretch = true;
+
+        for(var i=0; i<10; i++) { 
+            w1.addKeyValue("key","value" + i);
+        }
+
+        //w1.height(300);
+
+        for(var i=0; i<25; i++) { 
+            w2.addKeyValue("somekey","somevalue-" + i);
+        }
+        w2.addKeyValue("login","pass", {}, { class: "pass" });
+
+        var w3 = new grid.Widget("widget 3");
+
+        w3.addKeyValue("a key","a value");
+        w3.addKeyValue("left","right");
+
+        w1.addLine("something");
+        w2.addLine("something");
+        w3.addLine("something");
+
+        var w4 = new grid.Widget("widget 4");
+    });
+
+    </script>
+</body>
+</html>
