@@ -44,23 +44,25 @@ h2 {
     color: red;
 }
 
-.piggy {
-    color: #CC0099;
-}
-
 /**
  *      Log Tab Messages
 **/
 
-.log-action {
+li.log-action {
     font-family: "Courier New", Courier, monospace;
+    list-style: none;
 }
 
-.log-action .timestamp {
+li.log-action .timestamp {
     color: #A52E01;
 }
 
-.log-action * {
+li.log-action .message.piggy {
+    color: #951B3C;
+    background: #D7FFB4;
+}
+
+li.log-action * {
     padding: 2px 5px;
     margin: 2px 5px;
 }
@@ -86,13 +88,13 @@ h2 {
 **/
 
 .scenario.pass { 
-    background: #33FF99;
-    border: 2px solid #22EE88;
+    background: #26CC69;
+    border: 2px solid #2FFF83;
 }
 
 .scenario.fail { 
-    background: #D84040;
-    border: 2px solid #C73030;
+    background: #C81D05;
+    border: 2px solid #FF3A3D;
 }
 
 .scenario.aborted { 
@@ -101,13 +103,30 @@ h2 {
 }
 
 .thegrid .widget .line .key.test-name {
+    background: #DADDDD;
     padding-left: 5px;
     padding-right: 5px;
+    font-size: 1em;
 }
 
 .thegrid .widget .line.warning {
     color: #FFFFFF;
     text-align: center;
+}
+
+.thegrid .widget ul.leaders span {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.thegrid .widget ul.leaders span.pass {
+    color: #FFFFFF;
+    background: #1A8E49;
+}
+
+.thegrid .widget ul.leaders span.fail {
+    color: #FFFFFF;
+    background: #670901;
 }
 
 /**
@@ -134,18 +153,6 @@ pre code {
 li p {
     margin: 5px;
     font-size: 16px;
-}
-
-.thegrid .widget ul.leaders span.pass {
-    color: #FFFFFF;
-    background: #00CC66;
-    padding-left: 5px;
-    padding-right: 5px;
-}
-
-.thegrid .widget ul.leaders span.fail {
-    color: #FFFFFF;
-    background: #FF3333;
 }
 
 li.fail {

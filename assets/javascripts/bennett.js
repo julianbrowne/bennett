@@ -83,11 +83,10 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     function testCycle(testCase) { 
 
         var b = new Piggybank(bennett.fixtures.root, { 
-            //ignore404: true,
-            //stopOnSurprise: true
+            //ignore404: true // do not treat 404 as a general error
         });
 
-        b.logger = function(message) { logAction("piggybank : " + message, { class: "piggy" }); };
+        b.logger = function(message) { logAction(message, { class: "piggy" }); };
         b.status = function(status) { bennett.lastScenarioPass = status; };
 
         bennett.fixtures.bennett = b.memory;
@@ -243,9 +242,9 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             }
             else { 
                 bennett.scenarioInProgress = true;
-                logAction("Commencing run");
-                logAction("Last scenario passed : " + bennett.lastScenarioPass);
-                logAction("Stop on failure : " + bennett.stopOnFailure);
+                //logAction("Commencing run");
+                //logAction("Last scenario passed : " + bennett.lastScenarioPass);
+                //logAction("Stop on failure : " + bennett.stopOnFailure);
                 var widget = new grid.Widget(niceName(testCase));
                 widget.addClass("scenario");
                 b.makeCallsSynchronously().done(reporter(widget, testCase));
@@ -296,12 +295,16 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         );
     };
 
+    /**
+     * Returns uniform width timestamp 00:00:00:000
+    **/
+
     function timestamp() { 
         var date = new Date();
         var t = 
-              date.getHours() 
-            + ":" + date.getMinutes() 
-            + ":" + date.getSeconds() 
+            ("00" + date.getHours()).toString().slice(-2)
+            + ":" + ("00"  + date.getMinutes()).toString().slice(-2)
+            + ":" + ("00"  + date.getSeconds()).toString().slice(-2) 
             + ":" + ("000" + date.getMilliseconds()).toString().slice(-3);
         return t;
     };
@@ -330,7 +333,8 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 if(data[i] === undefined) break;
                 var pf = testPassOrFail(data[i]);
                 var resultText = (pf === true ) ? 'pass' : 'fail';
-                var line = widget.addKeyValue(lastElementInPath(data[i].callData.name), resultText, { class: "test-name" }, { class: resultText });
+                var apiNameText = niceName(lastElementInPath(data[i].callData.name));
+                var line = widget.addKeyValue(apiNameText, resultText, { class: "test-name" }, { class: resultText });
                 var detail = addDetailDialog(widget.index, widget.lines, data[i]);
                 $(line).on("click", function() { detail.dialog("open"); } );
             }
