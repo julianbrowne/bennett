@@ -208,7 +208,7 @@ describe("Piggybank", function() {
     });
 
     it("should have 200 response in callback", function() { 
-      console.log(resultData[0]);
+      //console.log(resultData[0]);
       expect(resultData[0].outcome.response.received).toEqual(config.status);
     });
 
