@@ -166,6 +166,9 @@ describe("Piggybank", function() {
       body: { id: "42" }
     };
 
+    var flag = false; // should change to true
+    var message = null; // should contain last log message
+
     beforeEach(function() { 
 
       $.mockjax({ 
@@ -186,6 +189,10 @@ describe("Piggybank", function() {
         remember: config.remember,
         encoding: config.encoding
       });
+
+      piggy.status = function(s) { flag = s; };
+      piggy.logger = function(m) { message = m; };
+
       piggy.makeCallsSynchronously().done(function(data) { resultData = data; });
       waitsFor(
         function() { 
@@ -216,6 +223,14 @@ describe("Piggybank", function() {
 
     it("should validate correct json against schema", function() { 
       expect(resultData[0].outcome.schema.expectationMet).toEqual(true);
+    });
+
+    it("should have set status flag", function() { 
+      expect(flag).toEqual(true);
+    });
+
+    it("should have picked up log messages", function() { 
+      expect(message).not.toEqual(null);
     });
 
   });
