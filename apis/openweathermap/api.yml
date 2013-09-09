@@ -1,0 +1,68 @@
+
+
+find:
+    method: get
+    url: /find?lat={lat}&lon={lon}&cnt={count}
+    body: query
+    encoding: form
+    response: 200
+    remember: cities
+    latency: 2000
+    schema: >
+        {
+            "title": "Find Cities",
+            "type": "object",
+            "properties": {
+                "message": { "type": "string"  },
+                "cod":     { "type": "string"  },
+                "count":   { "type": "integer" },
+                "list":    { "type": "array"   }
+            }
+            "required": [
+                "message",
+                "cod",
+                "count",
+                "list"
+            ]
+        }
+
+weather:
+    method: get
+    url: /weather?q={city}
+    body: "({ recall: 'cities.list[0].name' })"
+    response: 200
+    latency: 2000
+    schema: >
+        {
+            "title": "City Weather",
+            "type": "object",
+            "properties": {
+                "coord":   { "type": "object"  },
+                "sys":     { "type": "object"  },
+                "weather": { "type": "array"   }
+                "base":    { "type": "string"  },
+                "main":    { "type": "object"  },
+                "wind":    { "type": "object"  },
+                "rain":    { "type": "object"  },
+                "clouds":  { "type": "object"  },
+                "dt":      { "type": "integer" },
+                "id":      { "type": "integer" },
+                "name":    { "type": "string"  },
+                "cod":     { "type": "integer" }
+            },
+            "required": [
+                "coord",
+                "sys",
+                "weather",
+                "base",
+                "main",
+                "wind",
+                "rain",
+                "clouds",
+                "dt",
+                "id",
+                "id",
+                "name",
+                "cod"
+            ]
+        }

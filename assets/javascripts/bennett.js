@@ -15,8 +15,8 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     logAction("Bennett tester instantiated");
 
     var grid = new Grid("#test-results");
-    grid.widgetDefaults.width = 350;
-    grid.widgetDefaults.height = 150;
+    grid.widgetDefaults.width = 340;
+    grid.widgetDefaults.height = 190;
     // grid.autoHeight = true;
 
     this.config = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc), getDataFrom("conf/bennett.yml"));
@@ -189,7 +189,8 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 setTimeout(checkTestInProgress, 1000);
             }
             else { 
-                var widget = new grid.Widget(niceName(name));
+                console.log(testCase);
+                var widget = new grid.Widget(niceName(testCase));
                 widget.addClass("scenario");
                 //widget.autoStretch = true;
                 bennett.inProgress = true;
@@ -259,7 +260,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             for(var i=0; i < data['summary'].tests; i++) { 
                 var pf = testPassOrFail(data[i]);
                 var resultText = (pf === true ) ? 'pass' : 'fail';
-                var line = widget.addKeyValue(data[i].callData.name, resultText, { class: "test-name" }, { class: resultText });
+                var line = widget.addKeyValue(lastElementInPath(data[i].callData.name), resultText, { class: "test-name" }, { class: resultText });
                 var detail = addDetailDialog(widget.index, widget.lines, data[i]);
                 $(line).on("click", function() { detail.dialog("open"); } );
             }

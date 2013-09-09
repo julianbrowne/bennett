@@ -73,9 +73,9 @@
 
             $("#start-tests").click(function(e) { 
                 $("#start-tests").hide();
-                var dataUrl = "test/spec/data/fixtures.yml";
-                var specUrl = "test/spec/data/api.yml";
-                var testUrl = "test/spec/data/tests.yml";
+                var dataUrl = "apis/openweathermap/data.yml";
+                var specUrl = "apis/openweathermap/api.yml";
+                var testUrl = "apis/openweathermap/scenarios.yml";
                 var harness = new Bennett(dataUrl, specUrl, testUrl);
                 harness.runTests();
             });

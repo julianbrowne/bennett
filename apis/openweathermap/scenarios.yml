@@ -1,0 +1,7 @@
+
+find_city:
+    - find
+
+get_weather:
+    - find
+    - weather
