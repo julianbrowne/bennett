@@ -9,7 +9,10 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.api        = null;
     this.cases      = null;
     this.gridster   = null;
-    this.inProgress = false;
+    this.scenarioInProgress = false;        // is there a test scenario in progress
+    this.lastScenarioPass = null;           // last run scenario result
+    this.stopOnFailure = true;              // stop if last run scenario failed
+    this.allScenariosDone = false;          // tripped when all scenarios complete (pass or fail)
     this.testId    = 0;
 
     logAction("Bennett tester instantiated");
@@ -40,8 +43,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 throw new Exception("YAML", "Load error - " + e);
             }
 
-            logAction("Using server " + bennett.fixtures.root);
-            logAction("Setting up grid");
+            logAction("Set-up: Using server " + bennett.fixtures.root);
 
             $(window).resize(function () { 
                 // nowt yet
@@ -72,7 +74,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 for(var i=0; i < testCaseNames.length; i++) { 
                     var testCaseName = testCaseNames[i];
                     var testCase = bennett.cases[testCaseName];
-                    logAction("Case : " + niceName(testCaseName), { class: "bold" });
                     testCycle(testCaseName);
                 }
             }
@@ -83,10 +84,11 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
         var b = new Piggybank(bennett.fixtures.root, { 
             //ignore404: true,
-            //stopOnSurprise: true,
-            logger: function(message) { logAction("piggybank : " + message, { class: "piggy" }); }
+            //stopOnSurprise: true
         });
 
+        b.logger = function(message) { logAction("piggybank : " + message, { class: "piggy" }); };
+        b.status = function(status) { bennett.lastScenarioPass = status; };
 
         bennett.fixtures.bennett = b.memory;
 
@@ -103,7 +105,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 var apiData = resolve(bennett.api, apiName);
                 apiData = $.extend({}, apiData, scenarioOverrides);
 
-                logAction(lastElementInPath(apiName) + " (" + apiData.desc + ")");
+                //logAction(lastElementInPath(apiName) + " (" + apiData.desc + ")");
 
                 if(apiData !== undefined) { 
                     var apiConfigData = { 
@@ -136,24 +138,38 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     if(apiData.cookies !== undefined) { 
                         Object.keys(apiData.cookies).forEach( 
                             function(cookie) { 
-                                logAction("Setting cookie " + cookie + " to " + apiData.cookies[cookie]);
+                                //logAction("Setting cookie " + cookie + " to " + apiData.cookies[cookie]);
                                 apiConfigData.cookies[cookie] = parseType(apiData.cookies[cookie]);
                             }
                         );
                     }
 
-                    // interpolate uri-template
+                    /**
+                     *  Interpolate uri-template
+                     *
+                     *  url: /blah/{this}/{that}
+                     *
+                     *  dataRoot is one of: 
+                     *     "nothing" => look through all fixtures            type: undefined
+                     *     some.obj.reference => look within sub fixtures    type: string
+                     *     recall object => look with session state          type: object
+                    **/
 
                     if(apiData.url.search(/{.*?}/) !== -1) { 
                         var template = UriTemplate.parse(apiData.url);
                         apiConfigData.template = apiData.url;
-                        if(apiData.dataroot !== undefined) { 
-                            var dataSource = resolve(bennett.fixtures, apiData.dataroot);
+                        if(apiData.dataroot === undefined) { 
+                            var d = bennett.fixtures;
                         }
                         else {
-                            var dataSource = bennett.fixtures;
+                            var urlDataSource = parseType(apiData.dataroot);
+                            if(typeof(urlDataSource) === 'string') {
+                                var d = resolve(bennett.fixtures, apiData.dataroot);
+                            }
+                            else
+                                var d = urlDataSource;
                         }
-                        apiData.url = template.expand(dataSource);
+                        apiData.url = template.expand(d);
                     }
 
                     // add post/put body
@@ -173,7 +189,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     }
 
                     b.addCall(apiData.url, apiConfigData);
-                    logAction(apiConfigData.method.toString().toUpperCase() + " " + apiData.url + ", expecting " + apiConfigData.expect);
+                    //logAction(apiConfigData.method.toString().toUpperCase() + " " + apiData.url + ", expecting " + apiConfigData.expect);
                 }
                 else { 
                     logAction("***  : No test details found for " + apiName);
@@ -184,16 +200,54 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
         checkTestInProgress();
 
+        /**
+         *  Check Test In Progress
+         *
+         *  Checks flag to see if there's a scenario already running
+         *  If there is then wait a second before checking again
+         *  If there isn't then set the flag and prep for this scenario
+         *
+        **/
+
         function checkTestInProgress() { 
-            if(bennett.inProgress === true) { 
+            if(bennett.scenarioInProgress === true) { 
                 setTimeout(checkTestInProgress, 1000);
             }
             else { 
-                console.log(testCase);
+                if(bennett.allScenariosDone) { 
+                    logAction("*** Aborting " + niceName(testCase) + " because all scenarios done flag is set");
+                    return;
+                }
+                prepNextTest(testCase);
+            }
+        };
+
+        /**
+         *  Prepare For Next Test (or quit)
+         *
+         *  Check if last scenario passed or failed. If it failed and we're stopping
+         *  on failure then indicate to all queued tests that it's time to quit.
+         *  Otherwise, line up the next test and commence API calls.
+         *
+        **/
+
+        function prepNextTest() { 
+            logAction("Scenario : " + niceName(testCase), { class: "bold" });
+            if(bennett.lastScenarioPass === false && bennett.stopOnFailure === true) {
+                bennett.allScenariosDone = true;
+                logAction("*** Aborting because last test failed");
                 var widget = new grid.Widget(niceName(testCase));
                 widget.addClass("scenario");
-                //widget.autoStretch = true;
-                bennett.inProgress = true;
+                widget.addLine("Aborted: Last Scenario Failed", "warning");
+                widget.addClass("aborted");
+            }
+            else { 
+                bennett.scenarioInProgress = true;
+                logAction("Commencing run");
+                logAction("Last scenario passed : " + bennett.lastScenarioPass);
+                logAction("Stop on failure : " + bennett.stopOnFailure);
+                var widget = new grid.Widget(niceName(testCase));
+                widget.addClass("scenario");
                 b.makeCallsSynchronously().done(reporter(widget, testCase));
             }
         };
@@ -201,7 +255,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     };
 
     function parseType(string) { 
-        try {
+        try { 
             var value = JSON.parse(string);
         }
         catch(err) { 
@@ -252,26 +306,35 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         return t;
     };
 
+    /**
+     *  Reporter
+     *
+     *  Returns function that can process return test data from Piggybank.
+     *  Sets class (colour) for secnario widget.
+     *  Alerts subsequent scnearios what the status (pass/fail) of this scenario was.
+     *  Iterates through results list recording results of each API call made.
+     *
+    **/
+
     function reporter(widget, name) { 
         return function(data) { 
-
-            bennett.inProgress = false;
-
-            for(var i=0; i < data['summary'].tests; i++) { 
-                var pf = testPassOrFail(data[i]);
-                var resultText = (pf === true ) ? 'pass' : 'fail';
-                var line = widget.addKeyValue(lastElementInPath(data[i].callData.name), resultText, { class: "test-name" }, { class: resultText });
-                var detail = addDetailDialog(widget.index, widget.lines, data[i]);
-                $(line).on("click", function() { detail.dialog("open"); } );
-            }
-
+            logAction("Callback for " + niceName(name) + " with result " + data['summary'].passed);
             if(data['summary'].passed === true) { 
                 widget.addClass("pass");
             }
             else { 
                 widget.addClass("fail");
             }
-
+            if(data === undefined) return;
+            for(var i=0; i < data['summary'].tests; i++) { 
+                if(data[i] === undefined) break;
+                var pf = testPassOrFail(data[i]);
+                var resultText = (pf === true ) ? 'pass' : 'fail';
+                var line = widget.addKeyValue(lastElementInPath(data[i].callData.name), resultText, { class: "test-name" }, { class: resultText });
+                var detail = addDetailDialog(widget.index, widget.lines, data[i]);
+                $(line).on("click", function() { detail.dialog("open"); } );
+            }
+            bennett.scenarioInProgress = false;
         }
     };
 
@@ -300,6 +363,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     };
 
     function testPassOrFail(result) { 
+        if(result === undefined) return false;
         if(bennett.config.pass.response && result.outcome.response !== undefined && !result.outcome.response.expectationMet) {
             return false;
         }
@@ -321,7 +385,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     function getDataFrom(url) { 
         logAction("Loading data from " + url);
         return $.get(url)
-            .done(function(data, status, xhr) { logAction("Called " + url + ", got status " + xhr.status); })
+            .done(function(data, status, xhr) { logAction("Load: Called " + url + ", got status " + xhr.status); })
             .fail(function(e) { logAction(e); });
     };
 

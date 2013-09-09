@@ -1,10 +1,12 @@
 
+general:
+  test_name: "Openweather API"
 
 find:
+    desc: "Find City"
     method: get
-    url: /find?lat={lat}&lon={lon}&cnt={count}
-    body: query
-    encoding: form
+    url: "/find?lat={latitude}&lon={longitude}&cnt={count}"
+    dataroot: query
     response: 200
     remember: cities
     latency: 2000
@@ -27,9 +29,10 @@ find:
         }
 
 weather:
+    desc: "Weather in City"
     method: get
-    url: /weather?q={city}
-    body: "({ recall: 'cities.list[0].name' })"
+    url: "/weather?q={city}"
+    dataroot: "({ recall: 'cities.list[0].name' })"
     response: 200
     latency: 2000
     schema: >

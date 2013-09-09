@@ -1,0 +1,11 @@
+
+# maps to "http://api.openweathermap.org/data/2.5"
+
+root: "http://127.0.0.1:9191/api/data/2.5" 
+
+# Find URI template data
+
+query:
+    latitude: 51.44489
+    longitude: -0.87539
+    count: 1

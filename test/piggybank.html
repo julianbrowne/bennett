@@ -3,14 +3,14 @@
 	<title>Piggybank Self-Test</title>
 
 	<link rel="stylesheet" media="all" href="../assets/stylesheets/bennett.css" />
-	<link rel="stylesheet" media="all" href="../assets/jquery-ui-1.10.3/css/le-frog/jquery-ui-1.10.3.custom.css" />
+	<link rel="stylesheet" media="all" href="../assets/jquery-ui/css/le-frog/jquery-ui-1.10.3.custom.css" />
 	<link rel="stylesheet" media="all" href="assets/stylesheets/prettify.css" />
     <link rel="stylesheet" media="all" href="../assets/fonts/jolly-lodger.css" />
 
-	<script src="../assets/javascripts/piggybank-0.0.1/jquery.js"></script>
-	<script src="../assets/javascripts/piggybank-0.0.1/jquery.cookie.js"></script>
-	<script src="../assets/javascripts/piggybank-0.0.1/tv4.js"></script>
-	<script src="../assets/javascripts/piggybank-0.0.1/piggybank.js"></script>
+	<script src="../assets/piggybank/jquery.js"></script>
+	<script src="../assets/piggybank/jquery.cookie.js"></script>
+	<script src="../assets/piggybank/tv4.js"></script>
+	<script src="../assets/piggybank/piggybank.js"></script>
 
 	<script src="assets/javascripts/prettify.js"></script>
 
@@ -27,14 +27,18 @@
 
 	$(function(){
 
-		var options = {
+		var stat = 0;
+
+		var options = { 
 			timeout: 5000,
 			ignore404: true,
-			ignoreErrors: true,
-			logger: function(message) { $("#results").append(message); }
+			ignoreErrors: true
 		};
 
 		var manager = new Piggybank("http://127.0.0.1:9191/api", options);
+
+		manager.logger = function(message) { $("#results").append(message); };
+		manager.status = function(status) { stat = status; console.log(stat); };
 
 		manager.addCall('/login', { 
 			method: "post", 

@@ -95,9 +95,19 @@ h2 {
     border: 2px solid #C73030;
 }
 
+.scenario.aborted { 
+    background: #C56218;
+    border: 2px solid #8D4712;
+}
+
 .thegrid .widget .line .key.test-name {
     padding-left: 5px;
     padding-right: 5px;
+}
+
+.thegrid .widget .line.warning {
+    color: #FFFFFF;
+    text-align: center;
 }
 
 /**

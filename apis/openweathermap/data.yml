@@ -1,7 +1,0 @@
-
-root: http://api.openweathermap.org/data/2.5
-
-query:
-    latitude: 51.44489
-    longitude: -0.87539
-    count: 1

@@ -8,19 +8,18 @@
 
     <!-- Bennett -->
     <link rel="stylesheet" media="all" href="assets/stylesheets/bennett.css" />
-    <link rel="stylesheet" media="all" href="assets/jquery-ui-1.10.3/css/le-frog/jquery-ui-1.10.3.custom.css" />
+    <link rel="stylesheet" media="all" href="assets/jquery-ui/css/le-frog/jquery-ui-1.10.3.custom.css" />
     <link rel="stylesheet" media="all" href="assets/fonts/jolly-lodger.css" />
     <script src="assets/javascripts/jquery-2.0.3.js"></script>
-    <script src="assets/jquery-ui-1.10.3/js/jquery-ui-1.10.3.custom.js"></script>
+    <script src="assets/jquery-ui/js/jquery-ui-1.10.3.custom.js"></script>
     <script src="assets/javascripts/js-yaml-2.1.0.js"></script>
-    <!--<script src="assets/javascripts/gridster-0.1.0.js"></script>-->
     <script src="assets/javascripts/uritemplate-0.3.4.js"></script>
     <script src="assets/javascripts/bennett.js"></script>
 
     <!-- Piggybank -->
-    <script src="assets/javascripts/piggybank-0.0.1/jquery.cookie.js"></script>
-    <script src="assets/javascripts/piggybank-0.0.1/tv4.js"></script>
-    <script src="assets/javascripts/piggybank-0.0.1/piggybank.js"></script>
+    <script src="assets/piggybank/jquery.cookie.js"></script>
+    <script src="assets/piggybank/tv4.js"></script>
+    <script src="assets/piggybank/piggybank.js"></script>
 
     <!-- Test -->
     <link rel="stylesheet" media="all" href="test/assets/stylesheets/prettify-obsidian.css" />
@@ -71,12 +70,32 @@
                 }
             });
 
+            var openweathermap = {
+                data: "data/openweathermap/data.yml",
+                api: "data/openweathermap/api.yml",
+                scenarios: "data/openweathermap/scenarios.yml"
+            };
+
+            var alertme = {
+                data: "data/alertme/data.yml",
+                api: "data/alertme/api.yml",
+                scenarios: "data/alertme/scenarios.yml"
+            };
+
+            var example = {
+                data: "data/example/data.yml",
+                api: "data/example/api.yml",
+                scenarios: "data/example/scenarios.yml"
+            };
+
             $("#start-tests").click(function(e) { 
                 $("#start-tests").hide();
-                var dataUrl = "apis/openweathermap/data.yml";
-                var specUrl = "apis/openweathermap/api.yml";
-                var testUrl = "apis/openweathermap/scenarios.yml";
-                var harness = new Bennett(dataUrl, specUrl, testUrl);
+                var config = alertme;
+                var data = config.data;
+                var api = config.api;
+                var scenarios = config.scenarios;
+                var harness = new Bennett(data, api, scenarios);
+                harness.stopOnFailure = false; // default to true: stops if last scenario fails
                 harness.runTests();
             });
 
