@@ -1,0 +1,16 @@
+
+general:
+  test_name: "Self Test API"
+
+one:
+    desc: "one"
+    method: get
+    url: "/one"
+    response: 200
+
+two:
+    desc: "two"
+    method: post
+    body: two
+    url: "/two"
+    response: 200

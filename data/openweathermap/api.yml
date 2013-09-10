@@ -6,7 +6,7 @@ find:
     desc: "Find City"
     method: get
     url: "/find?lat={latitude}&lon={longitude}&cnt={count}"
-    dataroot: query
+    urldata: query
     response: 200
     remember: cities
     latency: 2000
@@ -32,7 +32,7 @@ weather:
     desc: "Weather in City"
     method: get
     url: "/weather?q={city}"
-    dataroot: "({ recall: 'cities.list[0].name' })"
+    urldata: "({ recall: 'cities.list[0].name' })"
     response: 200
     latency: 2000
     schema: >

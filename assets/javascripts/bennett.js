@@ -7,7 +7,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     var bennett     = this;
     this.fixtures   = null;
     this.api        = null;
-    this.cases      = null;
+    this.scenarios  = null;
     this.gridster   = null;
     this.scenarioInProgress = false;        // is there a test scenario in progress
     this.lastScenarioPass = null;           // last run scenario result
@@ -33,14 +33,14 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             var confObj = app[2];
 
             try { 
-                bennett.fixtures = jsyaml.load(dataObj.responseText);
-                bennett.api      = jsyaml.load(specObj.responseText);
-                bennett.cases    = jsyaml.load(testObj.responseText);
-                bennett.config   = jsyaml.load(confObj.responseText);
+                bennett.fixtures  = jsyaml.load(dataObj.responseText);
+                bennett.api       = jsyaml.load(specObj.responseText);
+                bennett.scenarios = jsyaml.load(testObj.responseText);
+                bennett.config    = jsyaml.load(confObj.responseText);
             }
             catch(e) {
                 console.log(e);
-                throw new Exception("YAML", "Load error - " + e);
+                throw "YAML Load error - " + e;
             }
 
             logAction("Set-up: Using server " + bennett.fixtures.root);
@@ -49,12 +49,15 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 // nowt yet
             });
 
-            $("#test-name").html(bennett.api.general["test_name"]);
+            if(bennett.api.general !== undefined)
+                $("#test-name").html(bennett.api.general["test_name"]);
+            else
+                $("#test-name").html("Test Results");
 
             $.get(bennett.fixtures.root).fail(
                 function(xhr, textStatus, errorString) { 
                     if(xhr.status === 500 || textStatus === 'timeout') {
-                        throw new Exception("INIT", "Couldn't find a server at " + bennett.fixtures.root);
+                        throw "INIT: Couldn't find a server at " + bennett.fixtures.root ;
                     }
                 }
             );
@@ -70,17 +73,18 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.runTests = function() { 
         bennett.config.then( 
             function() { 
-                var testCaseNames = Object.keys(bennett.cases)
-                for(var i=0; i < testCaseNames.length; i++) { 
-                    var testCaseName = testCaseNames[i];
-                    var testCase = bennett.cases[testCaseName];
-                    testCycle(testCaseName);
+                var scenarios = Object.keys(bennett.scenarios)
+                for(var i=0; i < scenarios.length; i++) { 
+                    var scenarioName = scenarios[i];
+                    runScenario(scenarioName);
                 }
             }
         );
     };
 
-    function testCycle(testCase) { 
+    function runScenario(scenarioName) { 
+
+        var scenarioDisplayName = niceName(scenarioName);
 
         var b = new Piggybank(bennett.fixtures.root, { 
             //ignore404: true // do not treat 404 as a general error
@@ -91,14 +95,14 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
         bennett.fixtures.bennett = b.memory;
 
-        bennett.cases[testCase].forEach( 
-            function(scenarioApiCall) { 
-                if(typeof(scenarioApiCall) === 'object') { 
-                    var apiName = Object.keys(scenarioApiCall)[0];
-                    var scenarioOverrides = scenarioApiCall[apiName];
+        bennett.scenarios[scenarioName].forEach( 
+            function(scenarioData) { 
+                if(typeof(scenarioData) === 'object') { 
+                    var apiName = Object.keys(scenarioData)[0];
+                    var scenarioOverrides = scenarioData[apiName];
                 }
                 else { 
-                    var apiName = scenarioApiCall;
+                    var apiName = scenarioData;
                     var scenarioOverrides = {};
                 }
                 var apiData = resolve(bennett.api, apiName);
@@ -157,13 +161,13 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     if(apiData.url.search(/{.*?}/) !== -1) { 
                         var template = UriTemplate.parse(apiData.url);
                         apiConfigData.template = apiData.url;
-                        if(apiData.dataroot === undefined) { 
+                        if(apiData.urldata === undefined) { 
                             var d = bennett.fixtures;
                         }
                         else {
-                            var urlDataSource = parseType(apiData.dataroot);
+                            var urlDataSource = parseType(apiData.urldata);
                             if(typeof(urlDataSource) === 'string') {
-                                var d = resolve(bennett.fixtures, apiData.dataroot);
+                                var d = resolve(bennett.fixtures, apiData.urldata);
                             }
                             else
                                 var d = urlDataSource;
@@ -186,13 +190,11 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                         }
                         apiConfigData.body = body;
                     }
-
                     b.addCall(apiData.url, apiConfigData);
-                    //logAction(apiConfigData.method.toString().toUpperCase() + " " + apiData.url + ", expecting " + apiConfigData.expect);
                 }
                 else { 
                     logAction("***  : No test details found for " + apiName);
-                    throw "No api data found for " + apiName + "defined in " + testCase;
+                    throw "No api data found for " + apiName + "defined in " + scenarioName;
                 }
             }
         );
@@ -202,9 +204,9 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         /**
          *  Check Test In Progress
          *
-         *  Checks flag to see if there's a scenario already running
+         *  Checks flag to see if there's a scenarioName already running
          *  If there is then wait a second before checking again
-         *  If there isn't then set the flag and prep for this scenario
+         *  If there isn't then set the flag and prep for this scenarioName
          *
         **/
 
@@ -214,40 +216,37 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             }
             else { 
                 if(bennett.allScenariosDone) { 
-                    logAction("*** Aborting " + niceName(testCase) + " because all scenarios done flag is set");
+                    logAction("*** Aborting " + scenarioDisplayName + " because all scenarios done flag is set");
                     return;
                 }
-                prepNextTest(testCase);
+                prepNextTest(scenarioName);
             }
         };
 
         /**
          *  Prepare For Next Test (or quit)
          *
-         *  Check if last scenario passed or failed. If it failed and we're stopping
+         *  Check if last scenarioName passed or failed. If it failed and we're stopping
          *  on failure then indicate to all queued tests that it's time to quit.
          *  Otherwise, line up the next test and commence API calls.
          *
         **/
 
         function prepNextTest() { 
-            logAction("Scenario : " + niceName(testCase), { class: "bold" });
-            if(bennett.lastScenarioPass === false && bennett.stopOnFailure === true) {
+            logAction("Scenario : " + scenarioDisplayName, { class: "bold" });
+
+            var widget = new grid.Widget(scenarioDisplayName);
+            widget.addClass("scenario");
+
+            if(bennett.lastScenarioPass === false && bennett.stopOnFailure === true) { 
                 bennett.allScenariosDone = true;
                 logAction("*** Aborting because last test failed");
-                var widget = new grid.Widget(niceName(testCase));
-                widget.addClass("scenario");
                 widget.addLine("Aborted: Last Scenario Failed", "warning");
                 widget.addClass("aborted");
             }
             else { 
                 bennett.scenarioInProgress = true;
-                //logAction("Commencing run");
-                //logAction("Last scenario passed : " + bennett.lastScenarioPass);
-                //logAction("Stop on failure : " + bennett.stopOnFailure);
-                var widget = new grid.Widget(niceName(testCase));
-                widget.addClass("scenario");
-                b.makeCallsSynchronously().done(reporter(widget, testCase));
+                b.makeCallsSynchronously().done(reporter(widget, scenarioName));
             }
         };
 

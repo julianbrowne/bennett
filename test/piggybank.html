@@ -27,8 +27,6 @@
 
 	$(function(){
 
-		var stat = 0;
-
 		var options = { 
 			timeout: 5000,
 			ignore404: true,
@@ -37,8 +35,8 @@
 
 		var manager = new Piggybank("http://127.0.0.1:9191/api", options);
 
-		manager.logger = function(message) { $("#results").append(message); };
-		manager.status = function(status) { stat = status; console.log(stat); };
+		manager.logger = function(message) { $("#results").append(message + "</br>"); };
+		manager.status = function(status)  { $("#results").append(status  + "<br/>"); };
 
 		manager.addCall('/login', { 
 			method: "post", 
