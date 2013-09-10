@@ -5,6 +5,10 @@ one:
 two:
     - two
 
+one_override:
+    - one:
+        response: 201 # overide the 200
+
 one_two:
     - one
     - two

@@ -49,20 +49,44 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 // nowt yet
             });
 
+            if(bennett.fixtures.root === "testonly") { 
+                bennett.fixtures.root = location.protocol + location.hostname + ":" + location.port;
+                logAction("Test Mode: Set API root to " + bennett.fixtures.root);
+            }
+
+            xssCheck(bennett.fixtures.root);
+
             if(bennett.api.general !== undefined)
                 $("#test-name").html(bennett.api.general["test_name"]);
             else
                 $("#test-name").html("Test Results");
-
-            $.get(bennett.fixtures.root).fail(
-                function(xhr, textStatus, errorString) { 
-                    if(xhr.status === 500 || textStatus === 'timeout') {
-                        throw "INIT: Couldn't find a server at " + bennett.fixtures.root ;
-                    }
-                }
-            );
         }
     );
+
+    function xssCheck(target) { 
+        var anchor = document.createElement ('a');
+        anchor.href = target;
+        logAction("Performing XSS check");
+        ["hostname", "port", "protocol"].forEach(
+            function(part){
+                if(location[part]!==anchor[part]) {
+                    alert(
+                          "Error\n\nDue to cross-site browser rules you cannot call remote APIs\n\n"
+                        + "Cross-site means any different in domain, port or procotol between\n"
+                        + "this site ("
+                        + location.protocol + location.hostname + ":" + location.port
+                        + ") and your target API ("
+                        + anchor.protocol + anchor.hostname + ":" + anchor.port + ")\n\n"
+                        + "To make this work you'll need to use a proxy."
+                    );
+                    throw "XSS detected - aborting"
+                }
+                else {
+                    logAction("- " + part + " .. OK");
+                }
+            }
+        );
+    };
 
     function Exception(category, message) { 
         this.category = category;
@@ -107,8 +131,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 }
                 var apiData = resolve(bennett.api, apiName);
                 apiData = $.extend({}, apiData, scenarioOverrides);
-
-                //logAction(lastElementInPath(apiName) + " (" + apiData.desc + ")");
 
                 if(apiData !== undefined) { 
                     var apiConfigData = { 
@@ -185,7 +207,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                             var name = lastElementInObjPath(apiData.body);
                             body[name] = dataSource;
                         }
-                        else {
+                        else { 
                             var body = dataSource;
                         }
                         apiConfigData.body = body;

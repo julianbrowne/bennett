@@ -40,8 +40,11 @@ describe("Bennett", function() {
   });
 
   it("should have parsed all scenarios", function() { 
-      console.log(bennett);
-      expect(Object.keys(bennett.scenarios).length).toEqual(3);
+      expect(Object.keys(bennett.scenarios).length).toEqual(4);
+  });
+
+  it("should have detected response override", function() { 
+      expect(bennett.scenarios.one_override["0"].one.response).toEqual(201);
   });
 
   it("should expand URI templates", function() { 
