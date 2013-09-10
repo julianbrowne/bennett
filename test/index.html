@@ -1,22 +1,30 @@
 
 
-<h2 id="test-name">Bennett Self-Tests</h2>
+<h2>Self-Tests</h2>
+
+<div class="start-button" id="self-test">start</div>
 
 <div id="jasmine-self-test-results">
 </div>
 
 <script>
-    var jasmineEnv = jasmine.getEnv();
-    jasmineEnv.updateInterval = 1000;
+    $(function() { 
 
-    var htmlReporter = new jasmine.HtmlReporter();
-    jasmineEnv.addReporter(htmlReporter);
+        var jasmineEnv = jasmine.getEnv();
+        jasmineEnv.updateInterval = 1000;
 
-    jasmineEnv.specFilter = function(spec) { 
-        return htmlReporter.specFilter(spec);
-    };
+        var htmlReporter = new jasmine.HtmlReporter();
+        jasmineEnv.addReporter(htmlReporter);
 
-    jasmineEnv.execute();
+        jasmineEnv.specFilter = function(spec) { 
+            return htmlReporter.specFilter(spec);
+        };
 
-    $('.jasmine_reporter').appendTo("#jasmine-self-test-results");
+        $("#self-test").click(function(e) { 
+            $("#self-test").hide();
+            jasmineEnv.execute();
+            $('.jasmine_reporter').appendTo("#jasmine-self-test-results");
+        });
+
+    });
 </script>

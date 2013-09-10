@@ -46,11 +46,12 @@
         </ul>
         <div id="tab1">
             <h2 id="test-name">Test Results</h2>
-            <div id="start-tests">start</div>
+            <div class="start-button" id="start-tests">start</div>
             <div id="test-results"></div>
         </div>
         <div id="tab2">
             <h2>Test Log</h2>
+            <div class="start-button" id="clear-log">clear</div>
             <ul id="test-log">
             </ul>
         </div>
@@ -98,6 +99,10 @@
                 var harness = new Bennett(data, api, scenarios);
                 harness.stopOnFailure = false; // default to true: stops if last scenario fails
                 harness.runTests();
+            });
+
+            $("#clear-log").click(function(e) { 
+                $("#test-log").empty();
             });
 
         });
