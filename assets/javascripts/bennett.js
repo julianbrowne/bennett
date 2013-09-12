@@ -15,6 +15,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.allScenariosDone = false;          // tripped when all scenarios complete (pass or fail)
     this.testId = 0;
     this.grid = null;
+    this.testReport = {};                   // summary test report by scenario
 
     logAction("Bennett tester instantiated");
 
@@ -430,20 +431,15 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
     function reporter(widget, name) { 
         return function(data) { 
-            logAction("Callback for " + niceName(name) + " with result " + data['summary'].passed);
-            if(data['summary'].passed === true) { 
-                widget.addClass("pass");
-            }
-            else { 
-                widget.addClass("fail");
-            }
+            var scenarioResultText = (data['summary'].passed === true ? 'pass' : 'fail');
+            logAction("Callback for " + niceName(name) + " with result " + scenarioResultText);
+            widget.addClass(scenarioResultText);
             if(data === undefined) return;
             for(var i=0; i < data['summary'].tests; i++) { 
                 if(data[i] === undefined) break;
-                var pf = testPassOrFail(data[i]);
-                var resultText = (pf === true ) ? 'pass' : 'fail';
+                var apiResultText = (testPassOrFail(data[i]) === true ? 'pass' : 'fail');
                 var apiNameText = niceName(lastElementInPath(data[i].callData.name));
-                var line = widget.addKeyValue(apiNameText, resultText, { class: "test-name" }, { class: resultText });
+                var line = widget.addKeyValue(apiNameText, apiResultText, { class: "test-name" }, { class: apiResultText });
                 var detail = addDetailDialog(widget.index, widget.lines, data[i]);
                 $(line).on("click", function() { detail.dialog("open"); } );
             }
