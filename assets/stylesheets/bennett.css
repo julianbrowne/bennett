@@ -1,13 +1,27 @@
 
-body {
-    font-family: helvetica;
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
 }
 
-#test-log {
-    color: #000000;
-    background: #FFFFFF;
-    padding: 5px;
-    margin: 5px;
+body {
+    font-family: helvetica;
 }
 
 .test-name {
@@ -48,9 +62,16 @@ h2 {
  *      Log Tab Messages
 **/
 
+#test-log {
+    color: #000000;
+    background: #FFFFFF;
+    margin: 0;
+}
+
 li.log-action {
     font-family: "Courier New", Courier, monospace;
     list-style: none;
+    padding: 5px;
 }
 
 li.log-action .timestamp {
@@ -133,11 +154,11 @@ li.log-action * {
  *  Test Detail Dialog
 **/
 
-.test-item-explanation {
+.test-item-explanation { 
 
 }
 
-.test-item-explanation p {
+.test-item-explanation p { 
     margin: 2px;
     padding: 0;
 }
@@ -146,39 +167,45 @@ li.log-action * {
  *  Code samples
 **/
 
-pre code {
+pre code { 
     font-size: 1.25em;
 }
 
-li p {
+li p { 
     margin: 5px;
     font-size: 16px;
 }
 
-li.fail {
+li.fail { 
     color: #000000;
     background: #FFFFFF;
     border: 2px solid #FF3333;
 }
 
-.start-button {
-    font-size: 20px;
-    line-height: 20px;
+.bbutton { 
+    color: #FFFFFF;
+    background: #BC0F00;
+    border: 1px solid #FF2529;
+    font-size: 1.5em;
+    line-height: 40px;
     width: 100px;
-    height: 20px;
-    background: #7CB849;
-    color: #942000;
+    height: 40px;
     text-align: center;
     border-radius: 10px;
     margin: 10px auto;
-    border: 1px solid #FFFFFF;
     cursor: pointer;
+}
+
+.bbutton:hover { 
+    color: #000000;
+    background: #26CC69;
+    border: 1px solid #2FFF67;
 }
 
 /**
  *  Self-Tests
 **/
 
-#jasmine-self-test-results {
+#jasmine-self-test-results { 
     background: #FFFFFF;
 }

@@ -2,16 +2,59 @@ describe("Bennett", function() {
 
   var bennett;
 
-  beforeEach(function() { 
+  beforeAll(function() { 
+
+    var domain = location.protocol + location.hostname + ":" + location.port;
+    var responseTime = 300;
+
+    $.mockjax({ 
+        url: domain + "/one",
+        type: "get",
+        responseTime: responseTime,
+        status: 200
+    });
+
+    $.mockjax({ 
+        url: domain + "/one?gimme201",
+        type: "get",
+        responseTime: responseTime,
+        status: 201
+    });
+
+    $.mockjax({ 
+        url: domain + "/two",
+        type: "post",
+        responseTime: responseTime,
+        status: 201
+    });
+
+    $.mockjax({ 
+        url: domain + "/three",
+        type: "get",
+        responseText: '{ "name": "bennett", "type":  "test" }',
+        responseTime: responseTime,
+        status: 200
+    });
+
+    $.mockjax({ 
+        url: domain + "/four",
+        type: "post",
+        responseText: '{ "name": "bennett", "type":  "test" }',
+        responseTime: responseTime,
+        status: 201
+    });
+
     var data = "data/selftest/data.yml";
     var api  = "data/selftest/api.yml";
     var scn  = "data/selftest/scenarios.yml";
     bennett = new Bennett(data, api, scn);
+    bennett.targetElement("#none");
     waitsFor( 
       function() { return bennett.scenarios !== null; },
       "Bennet object creation timed out",
       10000
     );
+    bennett.runTests();
   });
 
   it("should be present", function() { 
@@ -40,11 +83,11 @@ describe("Bennett", function() {
   });
 
   it("should have parsed all scenarios", function() { 
-      expect(Object.keys(bennett.scenarios).length).toEqual(4);
+      expect(Object.keys(bennett.scenarios).length).toEqual(6);
   });
 
   it("should have detected response override", function() { 
-      expect(bennett.scenarios.one_override["0"].one.response).toEqual(201);
+      expect(bennett.scenarios.override_an_expected_response["0"].basic_get.response).toEqual(201);
   });
 
   it("should expand URI templates", function() { 

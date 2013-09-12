@@ -4,23 +4,26 @@
 
 var Bennett = function(dataSrc, specSrc, testSrc) {
 
-    var bennett     = this;
-    this.fixtures   = null;
-    this.api        = null;
-    this.scenarios  = null;
-    this.gridster   = null;
+    var bennett = this;
+    this.fixtures = null;
+    this.api = null;
+    this.scenarios = null;
+    this.gridster = null;
     this.scenarioInProgress = false;        // is there a test scenario in progress
     this.lastScenarioPass = null;           // last run scenario result
     this.stopOnFailure = true;              // stop if last run scenario failed
     this.allScenariosDone = false;          // tripped when all scenarios complete (pass or fail)
-    this.testId    = 0;
+    this.testId = 0;
+    this.grid = null;
 
     logAction("Bennett tester instantiated");
 
-    var grid = new Grid("#test-results");
-    grid.widgetDefaults.width = 340;
-    grid.widgetDefaults.height = 190;
-    // grid.autoHeight = true;
+    this.targetElement = function(element) {
+        bennett.grid = new Grid(element);
+        bennett.grid.widgetDefaults.width = 340;
+        bennett.grid.widgetDefaults.height = 190;
+        // bennett.grid.autoHeight = true;
+    };
 
     this.config = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc), getDataFrom("conf/bennett.yml"));
 
@@ -56,12 +59,37 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
             xssCheck(bennett.fixtures.root);
 
+            apiDataCheck(bennett.api);
+
             if(bennett.api.general !== undefined)
                 $("#test-name").html(bennett.api.general["test_name"]);
             else
                 $("#test-name").html("Test Results");
         }
     );
+
+    function apiDataCheck(apis) {
+
+        apis = [];
+
+        Object.keys(bennett.scenarios).forEach(
+            function(scenario) {
+                //console.log(scenario);
+                bennett.scenarios[scenario].forEach(
+                    function(api) {
+                        if(typeof(api) === 'string' && apis.indexOf(api) === -1) apis.push(api);
+                    }
+                );
+            }
+        );
+
+        for(var i=0; i < apis.length; i++) { 
+            var api = resolve(bennett.api, apis[i]);
+            if(api.url === undefined)
+                throw "No url defined for " + key + " " + (api.desc === undefined ? "'no description'" : "'" + api.desc + "'");
+        }
+
+    };
 
     function xssCheck(target) { 
         var anchor = document.createElement ('a');
@@ -133,6 +161,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 apiData = $.extend({}, apiData, scenarioOverrides);
 
                 if(apiData !== undefined) { 
+
                     var apiConfigData = { 
                         method: apiData.method, 
                         name: apiName,
@@ -160,11 +189,44 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                         apiConfigData.remember = apiData.remember;
                     }
 
+                    /**
+                     *  add cookies to request header
+                     *
+                     *  cookie is one of: 
+                     *      some.obj.reference => resolve within fixtures    type: string
+                     *      recall object => look with session state         type: object
+                     *      fixed data (integer string etc)
+                    **/
+
                     if(apiData.cookies !== undefined) { 
                         Object.keys(apiData.cookies).forEach( 
                             function(cookie) { 
-                                //logAction("Setting cookie " + cookie + " to " + apiData.cookies[cookie]);
-                                apiConfigData.cookies[cookie] = parseType(apiData.cookies[cookie]);
+                                // try looking in fixtures
+                                var source = resolve(bennett.fixtures, apiData.cookies[cookie]);
+                                if(source === undefined) { 
+                                    // try looking for recall tag
+                                    if(apiData.cookies[cookie].recall !== undefined) { 
+                                        apiConfigData.cookies[cookie] = { a: 10, 
+                                            recall: apiData.cookies[cookie].recall,
+                                            b: "xx"
+                                        };
+                                    }
+                                    else { 
+                                        // it's fixed data
+                                        apiConfigData.cookies[cookie] = apiData.cookies[cookie];
+                                    }
+                                }
+                                else { 
+                                    if(typeof(source) !== "object") { 
+                                        var key = lastElementInObjPath(cookie);
+                                        apiConfigData.cookies[key] = source;
+                                    }
+                                    else { 
+                                        // skip - it was an object in fixtures (invalid as cookie)
+                                        console.log("Warning: could not set cookie " + cookie);
+                                        //apiConfigData.cookies[cookie] = source;
+                                    }
+                                }
                             }
                         );
                     }
@@ -174,7 +236,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                      *
                      *  url: /blah/{this}/{that}
                      *
-                     *  dataRoot is one of: 
+                     *  urldata is one of: 
                      *     "nothing" => look through all fixtures            type: undefined
                      *     some.obj.reference => look within sub fixtures    type: string
                      *     recall object => look with session state          type: object
@@ -197,20 +259,35 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                         apiData.url = template.expand(d);
                     }
 
-                    // add post/put body
+                    /**
+                     *  add post put request body
+                     *
+                     *  body is one of: 
+                     *      fixed data (integer string etc)
+                     *      some.obj.reference => resolve within fixtures    type: string
+                     *      recall object => look with session state         type: object
+                    **/
 
                     if(apiData.body!==undefined) { 
-                        var dataSource = resolve(bennett.fixtures, apiData.body);
-                        // if target is a string/int etc then make a piggybank object
-                        if(typeof(dataSource) !== "object") { 
-                            var body = { };
-                            var name = lastElementInObjPath(apiData.body);
-                            body[name] = dataSource;
+                        var source = resolve(bennett.fixtures, apiData.body);
+                        if(source === undefined) { 
+                            if(apiData.body.recall !== undefined) { 
+                                var source = { recall: apiData.body.recall };
+                            }
+                            else { 
+                                throw "body data cannot be parsed";
+                            }
+                        }
+                        if(typeof(source) !== "object") { 
+                            var bodyData = { };
+                            var key = lastElementInObjPath(apiData.body);
+                            bodyData[key] = source;
                         }
                         else { 
-                            var body = dataSource;
+                            var bodyData = source;
                         }
-                        apiConfigData.body = body;
+                        //console.log(bodyData);
+                        apiConfigData.body = bodyData;
                     }
                     b.addCall(apiData.url, apiConfigData);
                 }
@@ -257,7 +334,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         function prepNextTest() { 
             logAction("Scenario : " + scenarioDisplayName, { class: "bold" });
 
-            var widget = new grid.Widget(scenarioDisplayName);
+            var widget = new bennett.grid.Widget(scenarioDisplayName);
             widget.addClass("scenario");
 
             if(bennett.lastScenarioPass === false && bennett.stopOnFailure === true) { 
@@ -289,8 +366,18 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         return value;
     };
 
+    /**
+     *  Resolve a deep sub object, referred to by a string, within another 
+     *  object. Returns undefined if anything does't fit.
+    **/
+
     function resolve(base, path) { 
+        //console.log("resolver");
+        //console.log(base);
+        //console.log(path);
         if(base === undefined) return undefined;
+        if(path === undefined) return undefined;
+        if(typeof(path)!=='string') return undefined;
         var levels = path.split(".");
         var result = base;
         for(var i=0; i<levels.length; i++) { 
@@ -299,10 +386,11 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 result = result[level];
             }
             else { 
-                console.log("Unable to resolve " + path);
+                console.log("Warning: unable to resolve " + path);
                 return undefined;
             }
         }
+        //console.log("resolved " + path);
         return result;
     };
 

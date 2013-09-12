@@ -1,6 +1,6 @@
 
 root: testonly
 
-two:
+some_data_about_a_and_b:
     a: 10
     b: 20

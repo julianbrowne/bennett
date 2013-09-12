@@ -2,15 +2,43 @@
 general:
   test_name: "Self Test API"
 
-one:
-    desc: "one"
+basic_get:
+    desc: "HTTP GET to /one, expecting 200"
     method: get
     url: "/one"
     response: 200
 
-two:
-    desc: "two"
-    method: post
-    body: two
+basic_post:
+    desc: "HTTP POST to /two, expecting 201"
     url: "/two"
-    response: 200
+    method: post
+    body: some_data_about_a_and_b
+    response: 201
+
+memory:
+
+    get_and_remember:
+        desc: "fetch some session data"
+        url: "/three"
+        method: get
+        remember: result1
+        response: 200
+
+    recall_and_post:
+        desc: "retreive some session_data"
+        url: "/four"
+        method: post
+        body:
+            recall: result1
+        response: 201
+
+    send_a_cookie:
+        desc: "recall session data for a cookie"
+        url: "/four"
+        method: get
+        cookies:
+            gingernut:
+                recall: result1
+            bourbon: "just a string"
+            jaffacake: some_data_about_a_and_b.a
+        response: 201

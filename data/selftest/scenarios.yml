@@ -1,14 +1,22 @@
 
-one:
-    - one
+make_a_simple_get:
+    - basic_get
 
-two:
-    - two
+make_a_simple_post:
+    - basic_post
 
-one_override:
-    - one:
+override_an_expected_response:
+    - basic_get:
+        url: "/one?gimme201"
         response: 201 # overide the 200
 
-one_two:
-    - one
-    - two
+get_followed_by_post:
+    - basic_get
+    - basic_post
+
+get_and_remember_result:
+    - memory.get_and_remember
+
+get_and_remember_result_and_recall:
+    - memory.get_and_remember
+    - memory.recall_and_post

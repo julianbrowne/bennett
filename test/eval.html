@@ -19,8 +19,9 @@
 <body>
     <h1 class="bennett">Bennett: Non-Eval Self-Test</h1>
 
+    <p>If strings are the same test passes</p>
+
     <div id="results">
-        <pre><code class="prettyprint"></code></pre>
     </div>
 
     <script type="text/javascript">
@@ -30,7 +31,7 @@
         var config = {
             one: {
                 two: {
-                    three: "a string"
+                    three: "this is a deeply buried string"
                 }
             }
         };
@@ -40,13 +41,8 @@
         var eval_string = eval("config." + path);
         var find_string = resolve(config, path);
 
-        $("#results pre code").append("using eval : " + eval_string);
-        $("#results pre code").append("\n\r\n\r");
-        prettyPrint();
-
-        $("#results pre code").append("using find : " + find_string);
-        $("#results pre code").append("\n\r\n\r");
-        prettyPrint();
+        $("#results").append("using eval : " + eval_string + "<br/>");
+        $("#results").append("using resolve : " + find_string + "<br/>");
 
         function resolve(base, path) { 
             if(base === undefined) return undefined;

@@ -45,7 +45,7 @@
 			body: { username: "fred", password: "x" }, 
 			name: "login fred",
 			expectation : {
-				response: 200,
+				response: 201,
 				latency: 500,
 				schema: { 
 					type: "object",
@@ -92,7 +92,7 @@
 		manager.addCall('/passwordreset', {
 			method: "post", 
 			expectation : {
-				response: 200
+				response: 201
 			},
 			encoding: 'form', 
 			body: { username: "fred" }, 
@@ -117,6 +117,9 @@
 
 		manager.addCall('/logout', { 
 			method: "post", 
+			body: {
+				recall: "session.ApiSession"
+			},
 			expectation : {
 				response: 200
 			},

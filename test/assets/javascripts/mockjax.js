@@ -526,6 +526,7 @@
                 var message = 'MOCK ' + requestSettings.type.toUpperCase() + ': ' + requestSettings.url;
                 var request = $.extend({}, requestSettings);
 
+/*
                 if (typeof console.log === 'function') {
                     console.log(message, request);
                 } else {
@@ -535,6 +536,7 @@
                         console.log(message);
                     }
                 }
+*/
             }
         },
         logging:      true,
