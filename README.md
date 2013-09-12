@@ -97,7 +97,7 @@ This can be found in the _index.html_ file in the root of the Bennett install di
 
 ## Cross-Site Rules
 
-Bennett runs in a browser and uses JQuery to make ajax calls to the API under test. This means [cross-site scripting](http://en.wikipedia.org/wiki/Cross-site_scripting) rules are in effect. Cross-site limitations stop a browser from extracting data from other sites that are not in the same domain as the originator (unless included in the page's source as loaded from the web server). A domain is made up of a protocol (http|https) a name (example.com) and a port (80:8080). Usually Bennett will be running on a different machine or port to that on which the API is hosted. To make Bennet work both Bennett and the API will need to be hosted behind a proxy that makes both appear to the browser as if they are within the same domain.
+Bennett runs in a browser and uses JQuery to make ajax calls to the API under test. This means [cross-site scripting](http://en.wikipedia.org/wiki/Cross-site_scripting) protection rules are in effect and specifically the [same-origin policy](http://en.wikipedia.org/wiki/Same_origin_policy). Same-origin limitations stop a browser from extracting data from other sites that are not in the same domain as the originator (unless included in the page's source as loaded from the web server). A domain is made up of a protocol (http|https) a name (example.com) and a port (80:8080). Usually Bennett will be running on a different machine or port to that on which the API is hosted. To make Bennet work both Bennett and the API will need to be hosted behind a proxy that makes both appear to the browser as if they are within the same domain.
 
 A simple option is to use [nginx](http://wiki.nginx.org/Main) with a configuration like this:
 
@@ -181,59 +181,171 @@ This maps an upstream API server (api.openweathermap.org) and an upstream web se
 
 ## Detailed Specification
 
+### Defining APIs
 
-	**---- TODO ----**
+#### Naming
 
-#### Defining APIs
+API names in the API spec file must be valid YAML keys. They can be a simple list:
 
-    login:
-        desc: "Login and start user session"
-        url: "/login"
-        method: "post"
-        encoding: "form"
-        response: 201
-        body: user_details
-        remember: "login"
-        latency: 500
-        schema: >
-            {
-                "title": "Login Session Schema",
-                "type": "object",
-                "properties": {
-                    "hubIds": {
-                        "type": "array"
-                    },
-                    "ApiSession": {
-                        "type": "string"
-                    }
-                }
-                "required": [
-                    "hubIds",
-                    "ApiSession"
-                ]
-            }
+	login:
+		api_key: api_setting
+		api_key: api_setting
+		
+	logout:
+		api_key: api_setting
+		api_key: api_setting
+
+Or nested:
+
+	container_name:
+		sub_container_name:
+			api_name:
+				api_key: api_setting
+				api_key: api_setting
 
 
-#### Dynamic Data
+Names should be camel case as they are translated to sentences in the display output for readability, so "my\_login\_api\_call" becomes "My Login Api Call"
 
-urldata
-body
-cookies
+#### API Keys    
 
-three options
-- fixed data
-- reference to fixture data
-- reference to session data
+Not all keys are valid in all circumstances. Here's a full list of API keys with their uses:
 
-**update\_user**: This name this API must be referred to by in other files  
-**desc**: The user friendly tag that will be used to record the results of calls to this API  
-**url**: The URI, or URI template, that defines this URI's endpoint  
-**method**: The HTTP verb used for this call ("get", "post", "put", "delete")  
-**response**: The expected response from this API call  
-**body**: A reference to the fixture data needed for this API call in the HTTP request body 
-**schema**:   JSON schema that defines the expected return data  
-**encoding**: Encoding to use for post and put request body data. By default these are just sent as json objects, but to simulate a form being posted, for example, this should be set to 'form'  
-**headers**:  HTTP headers to be send with the request
+	key			mandatory	description							type					example
+	---			---------	-----------							----					-------
+	desc		no			textual description					string					"Login and start user session"
+	url			yes			url of endpoint						string					"/session"
+	method		no			HTTP method (defaults to get) 		get|put|post|delete 	"post"
+	encoding	no			Style of body encoding to use   	form					"form"
+	headers		no			HTTP headers to be set				array of key-values		see below
+	response	yes			expected HTTP response code			integer					200
+	remember	no			session variable to store response	string					login_response
+	latency		no			time for API to return in ms		integer					500
+	schema		no			schema definition of response		json-schema				see below
+	body		no			source for body data				see below				see below
+	cookies		no			source for cookie data				array of key-values		see below
+	urldata		no			source for uri-template data		see below				see below
+
+Also, the API specification file supports one extra top-level key called "general" which stores global information about the API. Right now this only support one key-value which is the name of the API to display on the test results:
+
+	general:
+  		test_name: "V1 of my API etc"
+
+#### Headers
+
+TBD
+
+#### Schema
+
+If a pass-fail depends on the format of returned data, a JSON schema may be defined with the schema key:
+
+	schema: >
+ 	   {
+    	    "title": "Login Session Schema",
+    	    "type": "object",
+   		    "properties": {
+            	"session_id": {
+                	"type": "string"
+            	}
+        	}
+        	"required": [
+            	"session_id"
+        	]
+    	}
+
+(note the ">" after the key definition which indicates that what follows is a YAML [folded scalar](http://www.yaml.org/spec/1.2/spec.html#id2760844) value)   
+This expects a response of the form:
+
+	{ session_id: "abc123" }
+
+Anything else will fail the test.
+
+#### Dynamic Content - body, cookies and url data
+
+Bennett supports dynamic data (i.e. not explicitly defined in the API spec file) for three items:
+
+- cookies
+- The HTTP request post/put body
+- Populating URI templates (e.g. url: "/resource/{id\_goes\_here}/sub-resource/{another\_id\_goes\_here}").
+
+There are thee options for dynamic attributes:
+
+*	fixed data (i.e. not dynamic at all, just use literal value as passed)  
+*	fixture data (i.e. look in fixture file for matching object name)  
+*	recall some previously remembered session data  
+
+Cookies are set as an array of key-value pairs, whereas the request body and uri-template data is set as a single value. Here are some examples:
+
+**Cookies**:   
+
+	cookies:
+		cookie1: "some literal string"
+		cookie2: fixture_user_data.name
+		cookie3:
+			recall: session_data.age
+
+This sets three cookies (cookie1, cookie2, and cookie3). The first has the value "some literal string", the second causes bennett to look in the fixture data file for this:
+
+	fixture_user_data:
+		name: "bob"
+		age: 42
+
+And populates cookie2 with the value "bob"  
+
+The third looks in a previously remembered session data object called "session_data" for a key called "age", so if
+
+	get_user_details:
+		url: "/users/1234"
+		remember: session_data
+
+Had returned:
+
+	{ name: "bob", age: 42, type: "user" }
+
+Then session_data would contain three keys and therefore cookie3 would be set to 42.
+
+**Body**:   
+
+	body: "some text"
+	body: >
+		{ "name": "bob" }
+
+Are both literal assignments. With:
+
+	body: fixture_user_data.name
+
+and
+
+	body:
+		recall: session_data.age
+
+acting the same way as for cookies.
+
+Urls are populated in the same manner, though they must be defined with a [uri-template](http://tools.ietf.org/html/rfc6570) to trigger the population process. e.g.
+
+	get_user_details:
+		url: "/users/{name}"
+		urldata: fixture_user_data
+
+Will (based on the same fixture data above) populate the url to "/users/bob", similarly 
+
+	get_user_details:
+		url: "/users/{name}"
+		urldata:
+			recall: session_data.name
+
+will do the same. Literals for urldata keys are not supported as it makes not sense when:
+
+	get_user_details:
+		url: "/users/{name}"
+		urldata: { name: "bob" }
+		
+is more typing than:
+
+	get_user_details:
+		url: "/users/bob"
+
+#### Remember and Recall
+
 **remember**: Name tag applied to returned data which can be accessed by subsequent calls. e.g.
 
 	log_in:
@@ -243,7 +355,7 @@ three options
 		remember: session
 		headers:
 			client: client_app_name
-		schema: { "ApiSession": { "type": "string" } }
+		schema: { "sessionid": { "type": "string" } }
 		response: 201
 
 	get_account_details:
@@ -283,7 +395,7 @@ So the second call will be:
 
 Which will be verified against the response code (200)	
 
-#### Data Definition
+#### Fixture Data
 
 Any data requirements defined in the API config file by body, parameters or URI templates, must be catered for in the test data. The example above requires a userid for the endpoint call "/users/{userid}" and some data for the request body defined in the spec as "user\_details".
 
@@ -294,33 +406,3 @@ Any data requirements defined in the API config file by body, parameters or URI 
 
 **root:** The root/stub address of the API that all API calls will be appended to. In this case Bennett will be calling "http://127.0.0.1/users/{userid}"  
 **userid:** The value to interpolate into the URI template, making the actual call now "http://127.0.0.1/users/42". Bennett uses [URI Template JS](https://github.com/fxa/uritemplate-js) for this making it fully [RFC6570](http://tools.ietf.org/html/rfc6570) compliant.
-
-#### Test Scenarios
-
-With an API spec and some data to enrich it the last piece of the puzzle is some test scenrios (journeys) to exercise the API in meaningful ways.
-
-Scenarios look like this:
-
-	scenario_name:
-		- api_call
-		- api_call
-		- api_call
-	
-	scenario_name:
-		- api_call
-		- api_call
-		- api_call
-
-Test cases are executed in order with each API call waiting for the last one to complete before it begins.  
-
-References to API calls may optionally contain overrides for parts of the API specification. This is to allow for "expected failures" where an unhappy-path needs to be tested but it doesn't make sense to call an expected failure an actual failure. For example, a GET for a known user at /users/42 might be expected to return a 200 and some data whereas the same GET for /users/99 might be expected to return a 404. All API settings are valid inside scenarios like this:
-
-	scenario_name:
-		- api_call
-		- api_call:
-			return: 404
-			desc: "expect to get not found response"
-		- api_call
-
-	
-	
