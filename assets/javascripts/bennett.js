@@ -16,6 +16,11 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.testId = 0;
     this.grid = null;
     this.testReport = {};                   // summary test report by scenario
+    this.sources = { 
+        api: specSrc,
+        data: dataSrc,
+        scenarios: testSrc
+    };
 
     logAction("Bennett tester instantiated");
 
@@ -26,9 +31,9 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         // bennett.grid.autoHeight = true;
     };
 
-    this.config = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc), getDataFrom("conf/bennett.yml"));
+    this.dataLoad = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc), getDataFrom("conf/bennett.yml"));
 
-    this.config.then(
+    this.dataLoad.then(
         function(data, specs, scenarios, app) { 
 
             var dataObj = data[2];
@@ -75,7 +80,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
         Object.keys(bennett.scenarios).forEach(
             function(scenario) {
-                //console.log(scenario);
                 bennett.scenarios[scenario].forEach(
                     function(api) {
                         if(typeof(api) === 'string' && apis.indexOf(api) === -1) apis.push(api);
@@ -124,7 +128,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     };
 
     this.runTests = function() { 
-        bennett.config.then( 
+        bennett.dataLoad.then( 
             function() { 
                 var scenarios = Object.keys(bennett.scenarios)
                 for(var i=0; i < scenarios.length; i++) { 
@@ -225,7 +229,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                                     else { 
                                         // skip - it was an object in fixtures (invalid as cookie)
                                         console.log("Warning: could not set cookie " + cookie);
-                                        //apiConfigData.cookies[cookie] = source;
                                     }
                                 }
                             }
@@ -287,7 +290,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                         else { 
                             var bodyData = source;
                         }
-                        //console.log(bodyData);
                         apiConfigData.body = bodyData;
                     }
                     b.addCall(apiData.url, apiConfigData);
@@ -373,9 +375,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     **/
 
     function resolve(base, path) { 
-        //console.log("resolver");
-        //console.log(base);
-        //console.log(path);
         if(base === undefined) return undefined;
         if(path === undefined) return undefined;
         if(typeof(path)!=='string') return undefined;
@@ -391,7 +390,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 return undefined;
             }
         }
-        //console.log("resolved " + path);
         return result;
     };
 
@@ -515,5 +513,112 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         };
         return capitalise(str.toString().replace(/_/g," "));
     };
+
+    this.parseApiSpec = function(apiData, path, targetElement) { 
+        var apiSpec = resolve(apiData, path);
+        var output = $(targetElement).append( 
+              "<div class='section'>"
+            + "<h2>" 
+            + (apiSpec.method === undefined ? "- not defined -" : apiSpec.method.toUpperCase())
+            + "<span class='call'>"
+            + ( apiSpec.url || "- not defined -")
+            + "</span>"
+            + "</h2>"
+            + "<p>"
+            + ( apiSpec.desc || "- not defined -")
+            + "</p>"
+            + "</div>"
+        );
+        var section = output.children(".section").last();
+        if(apiSpec.arguments !== undefined) { 
+            section.append( 
+                  "<div class='args'>"
+                + "<h3>Arguments:</h3>"
+                + "<dl class='definition'>"
+                + "</dl>"
+                + "</div>"
+            );
+            var args = section.find("dl.definition");
+            Object.keys(apiSpec.arguments).forEach( 
+                function(argument) { 
+                    args.append( 
+                          "<dt>" + argument + "</dt>"
+                        + "<dd>" + apiSpec.arguments[argument] + "</dd>"
+                    );
+                }
+            );
+        }
+        if(apiSpec.schema !== undefined) { 
+            section.append( 
+                  "<div class='sample'>"
+                + "<h3>Response</h3>"
+                + "<p class='json'>"
+                + apiSpec.schema
+                + "</p>"
+                + "</div>"
+            );
+        }
+        if(apiSpec.notes !== undefined) { 
+            section.append("<p class='note'>" + apiSpec.notes + "</p>");
+        }
+        if(apiSpec.errors !== undefined) { 
+            section.append( 
+                  "<div class='errors'>"
+                + "<h3>Returned errors:</h3>"
+            );
+            Object.keys(apiSpec.errors).forEach( 
+                function(error) { 
+                    section.children(".errors")
+                        .last()
+                        .append(
+                              "<dl>"
+                            + "<dt>" 
+                            + apiSpec.errors[error].response 
+                            + " "
+                            + error.toUpperCase()
+                            + "</dt>"
+                            + "<dd>"
+                            + apiSpec.errors[error].desc
+                            + "</dd>"
+                            + "</dl>"
+                        );
+                }
+            );
+        }
+    }
+
+    this.documentApi = function(targetElement) { 
+        var apiResponse = $.when($.get(this.sources.api));
+        apiResponse.then(
+            function(apiRawData) { 
+                try { var apiData = jsyaml.load(apiRawData) } catch(e) { throw e; }
+                if(apiData.general.test_name !== undefined) $(targetElement).append("<h1>" + apiData.general.test_name + "</h2>");
+                Object.keys(apiData).forEach(function(key) { parser(key) });
+                function parser(key, path) { 
+                    if(key === "url") {
+                        bennett.parseApiSpec(apiData, path, targetElement);
+                    }
+                    else {
+                        if(path === undefined) { 
+                            var path = key;
+                            var target = apiData[key];
+                        }
+                        else { 
+                            var path = path + "." + key;
+                            var target = resolve(apiData, path);
+                        }
+
+                        if(typeof(target) === 'object') { 
+                            Object.keys(target).forEach( 
+                                function(key) { 
+                                    parser(key, path)
+                                }
+                            );
+                        }
+                    }
+                }
+            }
+        );
+    }
 
 };

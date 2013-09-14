@@ -1,65 +1,76 @@
 <html>
 <head>
     <title>The Grid Self-Test</title>
-    <link rel="stylesheet" media="all" href="../assets/stylesheets/bennett.css" />
-    <link rel="stylesheet" media="all" href="../assets/jquery-ui/css/le-frog/jquery-ui-1.10.3.custom.css" />
-    <link rel="stylesheet" media="all" href="../assets/fonts/jolly-lodger.css" />
     <link rel="stylesheet" media="all" href="../assets/thegrid/thegrid.css" />
-
-    <script src="../assets/piggybank/jquery.js"></script>
-    <script src="../assets/piggybank/jquery.cookie.js"></script>
-    <script src="../assets/piggybank/tv4.js"></script>
-    <script src="../assets/piggybank/piggybank.js"></script>
+    <script src="../assets/javascripts/jquery-2.0.3.js"></script>
     <script src="../assets/thegrid/thegrid.js"></script>
-
-    <!-- test assets -->
-    <link rel="stylesheet" media="all" href="assets/stylesheets/prettify.css" />
-
-    <script src="../assets/javascripts/uritemplate-0.3.4.js"></script>
-    <script src="assets/javascripts/prettify.js"></script>
 </head>
 <body>
-    <h1 class="bennett">Bennett: The Grid Self-Test</h1>
+    <h1>TheGrid Self-Test</h1>
 
-    <div id="results">
-    </div>
+    <div id="results1">some old text</div>
+    <div id="results2">some old text</div>
 
     <script type="text/javascript">
+        $(function(){
 
-    $(function(){
+            // make two grids
 
-        var grid = new Grid("#results");
-        grid.autoHeight = true;
-        grid.empty();
+            var grid1 = new Grid("#results1");
+            var grid2 = new Grid("#results2");
 
-        var w1 = new grid.Widget("widget 1");
+            // grid1 adjusts all widgets to the same height
+            grid1.autoHeight = true;
+            // clean contents out
+            grid1.empty();
 
-        var w2 = new grid.Widget("widget 2");
-        w2.autoStretch = true;
+            // add widgets to grid1
+            var g1w1 = new grid1.Widget("Grid 1 - Widget 1");
+            var g1w2 = new grid1.Widget("Grid 1 - Widget 2");
 
-        for(var i=0; i<10; i++) { 
-            w1.addKeyValue("key","value" + i);
-        }
+            // add widgets to grid2
+            var g2w1 = new grid2.Widget("Grid 2 - Widget 1");
+            var g2w2 = new grid2.Widget("Grid 2 - Widget 2");
+            var g2w3 = new grid2.Widget("Grid 2 - Widget 3");
 
-        //w1.height(300);
+            // set grid1 widget1 to autoadjust it's height
+            g1w1.autoStretch = true;
 
-        for(var i=0; i<25; i++) { 
-            w2.addKeyValue("somekey","somevalue-" + i);
-        }
-        w2.addKeyValue("login","pass", {}, { class: "pass" });
+            // fill up grid1 widget1 with lots of lines
+            // - it should increase its height automatically
+            for(var i=0; i<10; i++) { 
+                g1w1.addKeyValue("key-" + i,"value-" + i);
+            }
 
-        var w3 = new grid.Widget("widget 3");
+/*
+            //var grid2 = new Grid("#results2");
 
-        w3.addKeyValue("a key","a value");
-        w3.addKeyValue("left","right");
+            //w1.height(300);
 
-        w1.addLine("something");
-        w2.addLine("something");
-        w3.addLine("something");
+            //var w4 = new grid2.Widget("Grid 2 - widget 2");
 
-        var w4 = new grid.Widget("widget 4");
-    });
+            for(var i=0; i<25; i++) { 
+                g1w2.addKeyValue("somekey-" + i,"somevalue-" + i);
+            }
 
+            g1w2.addKeyValue("login","pass", {}, { class: "pass" });
+
+            //for(var i=0; i<30; i++) { 
+            //    g1w2.addKeyValue("somekey","somevalue-" + i);
+            //}
+
+            var g1w3 = new grid1.Widget("Grid 1 - Widget 3");
+
+            g1w3.addKeyValue("a key","a value");
+            g1w3.addKeyValue("left","right");
+
+            g1w1.addLine("something");
+            g1w2.addLine("something");
+            g1w3.addLine("something");
+
+            //var g2w1 = new grid1.Widget("Grid 1 - Widget 1");
+*/
+        });
     </script>
 </body>
 </html>

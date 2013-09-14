@@ -10,6 +10,7 @@
     <link rel="stylesheet" media="all" href="assets/stylesheets/bennett.css" />
     <link rel="stylesheet" media="all" href="assets/jquery-ui/css/le-frog/jquery-ui-1.10.3.custom.css" />
     <link rel="stylesheet" media="all" href="assets/fonts/jolly-lodger.css" />
+    <link rel="stylesheet" media="all" href="assets/stylesheets/api-doc.css" />
     <script src="assets/javascripts/jquery-2.0.3.js"></script>
     <script src="assets/jquery-ui/js/jquery-ui-1.10.3.custom.js"></script>
     <script src="assets/javascripts/js-yaml-2.1.0.js"></script>
@@ -43,6 +44,7 @@
             <li><a href="#tab1" class="bennett">Results</a></li>
             <li><a href="#tab2" class="bennett">Test Log</a></li>
             <li><a href="test/index.html" class="bennett">Self-Tests</a></li>
+            <li><a href="#tab3" class="bennett">Documentation</a></li>
             <li><a href="test/local.html" class="bennett">Scratch Pad</a></li>
         </ul>
         <div id="tab1">
@@ -56,12 +58,17 @@
             <ul id="test-log">
             </ul>
         </div>
+        <div id="tab3">
+            <h2>API Documentation</h2>
+            <div class="bbutton" id="build-doc">build</div>
+            <div id="api-doc" class="doc calls"></div>
+        </div>
     </div>
 
     <script type="text/javascript">
-        $(function() {
+        $(function() { 
 
-            $("#tabs").tabs({
+            $("#tabs").tabs({ 
                 beforeLoad: function( event, ui ) { 
                     if (ui.tab.data("loaded")) { 
                         event.preventDefault();
@@ -73,34 +80,43 @@
                 }
             });
 
-            var openweathermap = {
+            var openweathermap = { 
                 data: "data/openweathermap/data.yml",
                 api: "data/openweathermap/api.yml",
                 scenarios: "data/openweathermap/scenarios.yml"
             };
 
-            var alertme = {
+            var alertme = { 
                 data: "data/alertme/data.yml",
                 api: "data/alertme/api.yml",
                 scenarios: "data/alertme/scenarios.yml"
             };
 
-            var example = {
+            var example = { 
                 data: "data/example/data.yml",
                 api: "data/example/api.yml",
                 scenarios: "data/example/scenarios.yml"
             };
 
+            var config = alertme;
+
+            var data = config.data;
+            var api = config.api;
+            var scenarios = config.scenarios;
+
+            var harness = new Bennett(data, api, scenarios);
+
+            harness.stopOnFailure = false; // default to true: stops if last scenario fails
+            harness.targetElement("#test-results");
+
             $("#start-tests").click(function(e) { 
                 $("#start-tests").hide();
-                var config = alertme;
-                var data = config.data;
-                var api = config.api;
-                var scenarios = config.scenarios;
-                var harness = new Bennett(data, api, scenarios);
-                harness.stopOnFailure = false; // default to true: stops if last scenario fails
-                harness.targetElement("#test-results");
                 harness.runTests();
+            });
+
+            $("#build-doc").click(function(e) { 
+                $("#build-doc").hide();
+                harness.documentApi("#api-doc");
             });
 
             $("#clear-log").click(function(e) { 
