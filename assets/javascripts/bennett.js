@@ -89,7 +89,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         );
 
         for(var i=0; i < apis.length; i++) { 
-            var api = resolve(bennett.api, apis[i]);
+            var api = jsresolve(bennett.api, apis[i]);
             if(api.url === undefined)
                 throw "No url defined for " + key + " " + (api.desc === undefined ? "'no description'" : "'" + api.desc + "'");
         }
@@ -162,7 +162,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     var apiName = scenarioData;
                     var scenarioOverrides = {};
                 }
-                var apiData = resolve(bennett.api, apiName);
+                var apiData = jsresolve(bennett.api, apiName);
                 apiData = $.extend({}, apiData, scenarioOverrides);
 
                 if(apiData !== undefined) { 
@@ -207,7 +207,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                         Object.keys(apiData.cookies).forEach( 
                             function(cookie) { 
                                 // try looking in fixtures
-                                var source = resolve(bennett.fixtures, apiData.cookies[cookie]);
+                                var source = jsresolve(bennett.fixtures, apiData.cookies[cookie]);
                                 if(source === undefined) { 
                                     // try looking for recall tag
                                     if(apiData.cookies[cookie].recall !== undefined) { 
@@ -255,7 +255,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                         else {
                             var urlDataSource = parseType(apiData.urldata);
                             if(typeof(urlDataSource) === 'string') {
-                                var d = resolve(bennett.fixtures, apiData.urldata);
+                                var d = jsresolve(bennett.fixtures, apiData.urldata);
                             }
                             else
                                 var d = urlDataSource;
@@ -273,7 +273,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     **/
 
                     if(apiData.body!==undefined) { 
-                        var source = resolve(bennett.fixtures, apiData.body);
+                        var source = jsresolve(bennett.fixtures, apiData.body);
                         if(source === undefined) { 
                             if(apiData.body.recall !== undefined) { 
                                 var source = { recall: apiData.body.recall };
@@ -367,30 +367,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             }
         }
         return value;
-    };
-
-    /**
-     *  Resolve a deep sub object, referred to by a string, within another 
-     *  object. Returns undefined if anything does't fit.
-    **/
-
-    function resolve(base, path) { 
-        if(base === undefined) return undefined;
-        if(path === undefined) return undefined;
-        if(typeof(path)!=='string') return undefined;
-        var levels = path.split(".");
-        var result = base;
-        for(var i=0; i<levels.length; i++) { 
-            var level = levels[i];
-            if(result[level]!==undefined) { 
-                result = result[level];
-            }
-            else { 
-                console.log("Warning: unable to resolve " + path);
-                return undefined;
-            }
-        }
-        return result;
     };
 
     function logAction(message, options) { 
@@ -515,7 +491,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     };
 
     this.parseApiSpec = function(apiData, path, targetElement) { 
-        var apiSpec = resolve(apiData, path);
+        var apiSpec = jsresolve(apiData, path);
         var output = $(targetElement).append( 
               "<div class='section'>"
             + "<h2>" 
@@ -605,7 +581,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                         }
                         else { 
                             var path = path + "." + key;
-                            var target = resolve(apiData, path);
+                            var target = jsresolve(apiData, path);
                         }
 
                         if(typeof(target) === 'object') { 
