@@ -21,6 +21,7 @@
         };
 
         $("#self-test").click(function(e) { 
+            $("body").addClass("loading"); 
             $("#self-test").hide();
             jasmineEnv.execute();
             $('.jasmine_reporter').appendTo("#jasmine-self-test-results");
@@ -28,3 +29,4 @@
 
     });
 </script>
+<div class="modal"></div>

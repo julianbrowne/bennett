@@ -21,11 +21,23 @@ get_and_remember_result_and_recall:
     - memory.get_and_remember
     - memory.recall_and_post
 
+#
+#   Test uri population from:
+#   - fixture data
+#   - static data
+#   - session data
+
 url_template_variations:
     - uri_template                          # run with default (fixture) data
+    - uri_template:                         # run with override data
+        urldata:                            # run with no data at all (undefined reverts to fixture data)
     - uri_template:                         # run with override data
         urldata: >
             { 
                 "a": 99, 
                 "b": 100
             }
+    - memory.get_and_remember
+    - uri_template:                         # run with session data
+        urldata: 
+            recall: session

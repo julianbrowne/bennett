@@ -19,6 +19,7 @@ uri_template:
     desc: "tests interpolation of uri template data"
     url: "/one/{a}/{b}"
     urldata: some_data_about_a_and_b
+    response: 200
 
 memory:
 
@@ -26,7 +27,7 @@ memory:
         desc: "fetch some session data"
         url: "/three"
         method: get
-        remember: result1
+        remember: session
         response: 200
 
     recall_and_post:
@@ -34,7 +35,7 @@ memory:
         url: "/four"
         method: post
         body:
-            recall: result1
+            recall: session
         response: 201
 
     send_a_cookie:
@@ -43,7 +44,7 @@ memory:
         method: get
         cookies:
             gingernut:
-                recall: result1
+                recall: session
             bourbon: "just a string"
             jaffacake: some_data_about_a_and_b.a
         response: 201

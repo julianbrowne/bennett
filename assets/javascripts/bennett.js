@@ -196,7 +196,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     }
 
                     /**
-                     *  add cookies to request header
+                     *  Add cookies to request header
                      *
                      *  cookie is one of: 
                      *      some.obj.reference => resolve within fixtures    type: string
@@ -212,9 +212,8 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                                 if(source === undefined) { 
                                     // try looking for recall tag
                                     if(apiData.cookies[cookie].recall !== undefined) { 
-                                        apiConfigData.cookies[cookie] = { a: 10, 
-                                            recall: apiData.cookies[cookie].recall,
-                                            b: "xx"
+                                        apiConfigData.cookies[cookie] = { 
+                                            recall: apiData.cookies[cookie].recall
                                         };
                                     }
                                     else { 
@@ -237,32 +236,39 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                     }
 
                     /**
-                     *  Interpolate uri-template
-                     *
-                     *  url: /blah/{this}/{that}
-                     *
-                     *  urldata is one of: 
-                     *     "nothing" => look through all fixtures            type: undefined
-                     *     some.obj.reference => look within sub fixtures    type: string
-                     *     recall object => look with session state          type: object
+                     *  Add url or url plus data structure to resolve (static or recall object)
+                     *  
+                     *  Options are:
+                     *  - regular string ("/my/url") => use as is
+                     *  - uri template with
+                     *      (a) no urldata defined => use fixtures in urldata
+                     *      (b) recall object => pass recall object to piggybank
+                     *      (c) static object => pass as is in urldata
+                     *      (d) fixture reference => resolve from fixtures in urldata
                     **/
 
                     if(apiData.url.search(/{.*?}/) !== -1) { 
-                        var template = UriTemplate.parse(apiData.url);
-                        apiConfigData.template = apiData.url;
-                        if(apiData.urldata === undefined) { 
-                            var d = bennett.fixtures;
+                        if(apiData.urldata === undefined || apiData.urldata === null) { 
+                            apiConfigData.urldata = bennett.fixtures;
                         }
-                        else {
-                            var urlDataSource = parseType(apiData.urldata);
-                            if(typeof(urlDataSource) === 'string') {
-                                var d = jsresolve(bennett.fixtures, apiData.urldata);
+                        else { 
+                            if(apiData.urldata.recall !== undefined) {
+                                apiConfigData.urldata = { recall: apiData.urldata.recall };
                             }
-                            else
-                                var d = urlDataSource;
+                            else { 
+                                var d = parseType(apiData.urldata);
+                                if(typeof(d) === 'object') { 
+                                    apiConfigData.urldata = d;
+                                }
+                                else { 
+                                    apiConfigData.urldata = jsresolve(bennett.fixtures, apiData.urldata);
+                                }
+                            }
                         }
-                        apiData.url = template.expand(d);
                     }
+                    // else {
+                    //      url is a regular string so use as-is
+                    // }
 
                     /**
                      *  add post put request body

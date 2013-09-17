@@ -24,7 +24,7 @@ describe("Piggybank", function() {
 
   });
 
-  describe("Basic operations", function() { 
+  describe("Basic HTTP operations", function() { 
 
     beforeEach(function() { 
       jasmine.Ajax.useMock();
@@ -137,6 +137,21 @@ describe("Piggybank", function() {
 
   });
 
+  describe("URI Operations", function() { 
+
+    it("should have a URI parser", function() { 
+      expect(UriTemplate).toBeDefined();
+    });
+
+    it("should expand URI templates", function() { 
+      var template = UriTemplate.parse('/users/{id}');
+      var uri = template.expand({id: 42});
+      expect(uri).toEqual("/users/42");
+    });
+
+  });
+
+
   describe("Fake Server", function() { 
 
     var http400 = { status: 400, responseText: { "message": "Bad Request" } };
@@ -193,7 +208,12 @@ describe("Piggybank", function() {
       piggy.status = function(s) { flag = s; };
       piggy.logger = function(m) { message = m; };
 
-      piggy.makeCallsSynchronously().done(function(data) { resultData = data; });
+      piggy.makeCallsSynchronously().done(
+        function(data) { 
+          $("body").removeClass("loading"); 
+          resultData = data;
+        }
+      );
       waitsFor(
         function() { 
           return resultData !== undefined;

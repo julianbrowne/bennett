@@ -1,7 +1,16 @@
 
 root: testonly
 
+#
+#   a and b are set:
+#   - to 10 and 20 in fixture data
+#   - to 99 and 100 in static data
+#   - to 254 and 255 in session data
+#
+
 some_data_about_a_and_b:
     a: 10
     b: 20
 
+a: 10
+b: 20

@@ -20,7 +20,6 @@ All dependencies are included but they are:
 *	[TheGrid](https://github.com/julianbrowne/thegrid)       v0.0.1  (Jenkins-like grid layout)  
 *	JS-Yaml       v2.1.0  (for reading and parsing the config files)  
 *	[Piggybank](https://github.com/julianbrowne/piggybank)     v0.0.1  (for managing ajax calls synchronously)  
-*	Uritemplate   v0.3.4  (mashing uri templates and fixture data)  
 
 ## Basic Configuration
 
@@ -363,7 +362,7 @@ is more typing than:
 		method: get
 		headers:
 			client: client_app_name
-			ApiSession: session.APiSession
+			ApiSession: session.sessionid
 		response: 200  
 
 Data required to run this:  
@@ -381,17 +380,17 @@ On calling the log\_in api the HTTP payload will be:
 
 The returned data should look something like this:  
 
-	{ "ApiSession": "ABC123XYZ" }
+	{ "sessionid": "ABC123XYZ" }
 
 Which will be verified against the response code (201), the JSON schema, and then stored for later calls to access as:  
 
-	session.ApiSession: "ABC123XYZ"
+	session.sessionid: "ABC123XYZ"
 
 So the second call will be:
 
 	GET /user/fred
 	client: "Bennett API Verifier"
-	ApiSession: "ABC123XYZ"
+	sessionid: "ABC123XYZ"
 
 Which will be verified against the response code (200)	
 
@@ -404,5 +403,9 @@ Any data requirements defined in the API config file by body, parameters or URI 
 	user_details:
     	name: "fred"
 
-**root:** The root/stub address of the API that all API calls will be appended to. In this case Bennett will be calling "http://127.0.0.1/users/{userid}"  
-**userid:** The value to interpolate into the URI template, making the actual call now "http://127.0.0.1/users/42". Bennett uses [URI Template JS](https://github.com/fxa/uritemplate-js) for this making it fully [RFC6570](http://tools.ietf.org/html/rfc6570) compliant.
+*   **root:** The root/stub address of the API that all API calls will be appended to. In this case Bennett will be calling "http://127.0.0.1/users/{userid}"  
+*   **userid:** The value to interpolate into the URI template, making the actual call now "http://127.0.0.1/users/42".
+
+
+
+
