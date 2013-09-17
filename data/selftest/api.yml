@@ -15,6 +15,11 @@ basic_post:
     body: some_data_about_a_and_b
     response: 201
 
+uri_template:
+    desc: "tests interpolation of uri template data"
+    url: "/one/{a}/{b}"
+    urldata: some_data_about_a_and_b
+
 memory:
 
     get_and_remember:

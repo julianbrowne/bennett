@@ -8,6 +8,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.fixtures = null;
     this.api = null;
     this.scenarios = null;
+    this.results = { };
     this.gridster = null;
     this.scenarioInProgress = false;        // is there a test scenario in progress
     this.lastScenarioPass = null;           // last run scenario result
@@ -405,6 +406,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
     function reporter(widget, name) { 
         return function(data) { 
+            bennett.results[name] = data;
             var scenarioResultText = (data['summary'].passed === true ? 'pass' : 'fail');
             logAction("Callback for " + niceName(name) + " with result " + scenarioResultText);
             widget.addClass(scenarioResultText);

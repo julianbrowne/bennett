@@ -1,14 +1,34 @@
 describe("Bennett", function() { 
 
   var bennett;
+  var results=null;
+  var scenarios = 7;
 
   beforeAll(function() { 
 
     var domain = location.protocol + location.hostname + ":" + location.port;
-    var responseTime = 300;
+    var responseTime = 50;
 
     $.mockjax({ 
         url: domain + "/one",
+        type: "get",
+        responseTime: responseTime,
+        status: 200
+    });
+
+    // uri templated variant 1
+
+    $.mockjax({ 
+        url: domain + "/one/10/20",
+        type: "get",
+        responseTime: responseTime,
+        status: 200
+    });
+
+    // uri templated variant 2
+
+    $.mockjax({ 
+        url: domain + "/one/99/100",
         type: "get",
         responseTime: responseTime,
         status: 200
@@ -54,12 +74,29 @@ describe("Bennett", function() {
       "Bennet object creation timed out",
       10000
     );
+
     bennett.runTests();
+
+    // wait for all test results to be collected
+
+    waitsFor( 
+      function() { return Object.keys(bennett.results).length === scenarios; },
+      "Bennet return-results timed out",
+      10000
+    );
+
   });
 
   it("should be present", function() { 
     expect(bennett).toBeDefined();
     expect(bennett).not.toBeNull();
+  });
+
+  it("should expand URI templates", function() { 
+    var template = UriTemplate.parse('/users/{id}');
+    var uri = template.expand({id: 42});
+    expect(uri).toEqual("/users/42");
+    //console.log(bennett);
   });
 
   it("should have an API spec", function() { 
@@ -83,17 +120,21 @@ describe("Bennett", function() {
   });
 
   it("should have parsed all scenarios", function() { 
-      expect(Object.keys(bennett.scenarios).length).toEqual(6);
+      expect(Object.keys(bennett.scenarios).length).toEqual(scenarios);
   });
 
   it("should have detected response override", function() { 
       expect(bennett.scenarios.override_an_expected_response["0"].basic_get.response).toEqual(201);
   });
 
-  it("should expand URI templates", function() { 
-    var template = UriTemplate.parse('/users/{id}');
-    var uri = template.expand({id: 42});
-    expect(uri).toEqual("/users/42");
+  it("should have parsed all scenarios", function() { 
+      expect(Object.keys(bennett.scenarios).length).toEqual(scenarios);
+  });
+
+  it("should have parsed URI template variations", function() { 
+      console.log(bennett);
+      expect(bennett.results["url_template_variations"]["0"].url).toEqual("/one/10/20");
+      expect(bennett.results["url_template_variations"]["1"].url).toEqual("/one/99/100");
   });
 
 });

@@ -20,3 +20,12 @@ get_and_remember_result:
 get_and_remember_result_and_recall:
     - memory.get_and_remember
     - memory.recall_and_post
+
+url_template_variations:
+    - uri_template                          # run with default (fixture) data
+    - uri_template:                         # run with override data
+        urldata: >
+            { 
+                "a": 99, 
+                "b": 100
+            }
