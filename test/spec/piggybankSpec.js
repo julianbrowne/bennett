@@ -257,37 +257,40 @@ describe("Piggybank", function() {
 
   describe("Schema operations", function() { 
 
-    it("should validate compliant, and fail non-compliant, JSON", function() { 
-
-        var schema = {
-            "title": "Example Person Schema",
-            "type": "object",
-            "properties": {
-                "firstName": {
-                    "type": "string"
-                },
-                "lastName": {
-                    "type": "string"
-                },
-                "age": {
-                    "description": "Age in years",
-                    "type": "integer",
-                    "minimum": 0
-                }
+    var schema = {
+        "title": "Example Person Schema",
+        "type": "object",
+        "properties": {
+            "firstName": {
+                "type": "string"
             },
-            "required": ["firstName", "lastName"]
-        };
-        var json   = { firstName: "fred", lastName: "Smith", age: 99 };
-        var json2  = { firstName: "fred", age: 99 };
+            "lastName": {
+                "type": "string"
+            },
+            "age": {
+                "description": "Age in years",
+                "type": "integer",
+                "minimum": 0
+            }
+        },
+        "required": ["firstName", "lastName"]
+    };
 
-        var result  = tv4.validateMultiple(json, schema);
-        var result2 = tv4.validateMultiple(json2, schema);
-
-        expect(result.valid).toEqual(true);
-        expect(result2.valid).toEqual(false);
-
+    it("should have schema validator present", function() { 
+      expect(tv4).toBeDefined();
     });
 
+    it("should validate compliant JSON", function() { 
+        var json   = { firstName: "fred", lastName: "Smith", age: 99 };
+        var result  = tv4.validateMultiple(json, schema);
+        expect(result.valid).toEqual(true);
+    });
+
+    it("should fail non-compliant JSON", function() { 
+        var json  = { firstName: "fred", age: 99 };
+        var result = tv4.validateMultiple(json, schema);
+        expect(result.valid).toEqual(false);
+    });
 
   });
 
