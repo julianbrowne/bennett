@@ -1,0 +1,31 @@
+
+
+<h2>Swagger Test</h2>
+
+<div class="bbutton" id="swagger-test">start</div>
+
+<div id="swagger" style="color: black; background: white;">
+    <pre>
+        <code>
+        </code>
+    </pre>
+</div>
+
+<script>
+    $(function() { 
+
+        var api = "test/swagger.json";
+
+        $("#swagger-test").click(function(e) { 
+
+            $.getJSON(api, function(data) { 
+                console.log(data);
+                var apiSpec = Bennett.swagger(data);
+                var yml = Bennett.jsonToYaml(apiSpec);
+                console.log(yml);
+                $("#swagger pre code").html(yml);
+            });
+        });
+
+    });
+</script>

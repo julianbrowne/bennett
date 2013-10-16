@@ -111,9 +111,9 @@ describe("Bennett", function() {
     expect(bennett.fixtures).not.toBeNull();
   });
 
-  it("should have an API root URL in the fixture data", function() { 
-    expect(bennett.fixtures.root).toBeDefined();
-    expect(bennett.fixtures.root).not.toBeNull();
+  it("should have an API base path URL in the fixture data", function() { 
+    expect(bennett.fixtures.basePath).toBeDefined();
+    expect(bennett.fixtures.basePath).not.toBeNull();
   });
 
   it("should have test scenarios", function() { 

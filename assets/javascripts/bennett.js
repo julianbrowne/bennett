@@ -53,18 +53,18 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 throw "YAML Load error - " + e;
             }
 
-            logAction("Set-up: Using server " + bennett.fixtures.root);
+            logAction("Set-up: Using server " + bennett.fixtures.basePath);
 
             $(window).resize(function () { 
                 // nowt yet
             });
 
-            if(bennett.fixtures.root === "testonly") { 
-                bennett.fixtures.root = location.protocol + location.hostname + ":" + location.port;
-                logAction("Test Mode: Set API root to " + bennett.fixtures.root);
+            if(bennett.fixtures.basePath === "testonly") { 
+                bennett.fixtures.basePath = location.protocol + location.hostname + ":" + location.port;
+                logAction("Test Mode: Set API base path to " + bennett.fixtures.basePath);
             }
 
-            xssCheck(bennett.fixtures.root);
+            xssCheck(bennett.fixtures.basePath);
 
             apiDataCheck(bennett.api);
 
@@ -92,7 +92,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         for(var i=0; i < apis.length; i++) { 
             var api = jsresolve(bennett.api, apis[i]);
             if(api.url === undefined)
-                throw "No url defined for " + key + " " + (api.desc === undefined ? "'no description'" : "'" + api.desc + "'");
+                throw "No url defined for " + key + " " + (api.description === undefined ? "'no description'" : "'" + api.description + "'");
         }
 
     };
@@ -144,7 +144,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
 
         var scenarioDisplayName = niceName(scenarioName);
 
-        var b = new Piggybank(bennett.fixtures.root, { 
+        var b = new Piggybank(bennett.fixtures.basePath, { 
             //ignore404: true // do not treat 404 as a general error
         });
 
@@ -509,7 +509,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
             + "</span>"
             + "</h2>"
             + "<p>"
-            + ( apiSpec.desc || "- not defined -")
+            + ( apiSpec.description || "- not defined -")
             + "</p>"
             + "</div>"
         );
@@ -562,7 +562,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                             + error.toUpperCase()
                             + "</dt>"
                             + "<dd>"
-                            + apiSpec.errors[error].desc
+                            + apiSpec.errors[error].description
                             + "</dd>"
                             + "</dl>"
                         );
@@ -603,6 +603,120 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 }
             }
         );
+    };
+
+};
+
+Bennett.swagger = function(json) { 
+
+    spec = {};
+
+    json.apis.forEach(
+        function(api, i) { 
+            api.operations.forEach( 
+                function(operation, j) {
+                    spec[operation.nickname] = {}
+                    spec[operation.nickname].url = api.path;
+                    spec[operation.nickname].method = operation.httpMethod;
+                    spec[operation.nickname].notes = operation.notes;
+                    spec[operation.nickname].description = operation.summary;
+                    spec[operation.nickname].schema = operation.responseClass;
+                    spec[operation.nickname].arguments = {};
+                    if(operation.parameters) {
+                        operation.parameters.forEach( 
+                            function(parameter, k) { 
+                                var name = json.apis[i].operations[j].parameters[k].name;
+                                var type = json.apis[i].operations[j].parameters[k].dataType;
+                                spec[operation.nickname].arguments[name] = type;
+                            }
+                        )
+                    }
+                }
+            )
+        }
+    );
+
+    return spec;
+
+};
+
+Bennett.jsonToYaml = function(data) {
+
+    var handlers;
+    var indentLevel = "";
+
+    var classes = "Boolean Number String Function Array Date RegExp Object".split(" ");
+    var class2type = {};
+    var name;
+
+    for (var i in classes) { 
+      if (classes.hasOwnProperty(i)) { 
+        name = classes[i];
+        class2type["[object " + name + "]"] = name.toLowerCase();
+      }
     }
 
+    function typeOf(obj) {
+      return (null === obj || undefined === obj) ? String(obj) : class2type[Object.prototype.toString.call(obj)] || "object";
+    };
+
+    handlers = { 
+        undefined: function () {
+            return "null"
+        },
+        "null": function () {
+            return "null"
+        },
+        number: function (x) {
+            return x
+        },
+        "boolean": function (x) {
+            return x ? "true" : "false"
+        },
+        string: function (x) {
+            return JSON.stringify(x)
+        },
+        array: function (x) {
+            var output = "";
+            if (0 === x.length) {
+                output += "[]";
+                return output
+            }
+            indentLevel = indentLevel.replace(/$/, "  ");
+            x.forEach(function (y) {
+                var handler = handlers[typeOf(y)];
+                if (!handler) {
+                    throw new Error("what the crap: " + typeOf(y))
+                }
+                output += "\n" + indentLevel + "- " + handler(y)
+            });
+            indentLevel = indentLevel.replace(/  /, "");
+            return output
+        },
+        object: function (x) {
+            var output = "";
+            if (0 === Object.keys(x).length) {
+                output += "{}";
+                return output
+            }
+            indentLevel = indentLevel.replace(/$/, "  ");
+            Object.keys(x).forEach(function (k) {
+                var val = x[k],
+                    handler = handlers[typeOf(val)];
+                if ("undefined" === typeof val) {
+                    return
+                }
+                if (!handler) {
+                    throw new Error("what the crap: " + typeOf(val))
+                }
+                output += "\n" + indentLevel + k + ": " + handler(val)
+            });
+            indentLevel = indentLevel.replace(/  /, "");
+            return output
+        },
+        "function": function () {
+            return "[object Function]"
+        }
+    };
+    return "---" + handlers[typeOf(data)](data) + "\n"
 };

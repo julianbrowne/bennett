@@ -32,21 +32,21 @@ An API spec is a sequence of definitions for each endpoint in the target API. Th
 	my_api_spec:
 		session:
 			login:
-		  		desc: "Login to the service"
+		  		description: "Login to the service"
 		  		url: "/session"
 		  		method: post
 		  		body: some_user_data
 		  		remember: session_data
 		  		response: 201
 			logout:
-		  		desc: "Logout of the service"
+		  		description: "Logout of the service"
 		  		url: "/session/{session_id}"
 		  		urldata:
 		  			recall: session_data
 		  		method: delete
 		  		response: 201
 
-This defines two API calls: login and logout. Each has a description (desc), a url, an HTTP method and an expected HTTP response defined. Additionally the login definition will populate its POST body with some fixture data (see below) and it will also "remember" any data (e.g. JSON) in a session structure called _session\_data_. This is then "recalled" by logout to populate the uri template defined for the url. In this case Bennett will look for a variable within the _session\_data_ object called _session\_id_
+This defines two API calls: login and logout. Each has a description (description), a url, an HTTP method and an expected HTTP response defined. Additionally the login definition will populate its POST body with some fixture data (see below) and it will also "remember" any data (e.g. JSON) in a session structure called _session\_data_. This is then "recalled" by logout to populate the uri template defined for the url. In this case Bennett will look for a variable within the _session\_data_ object called _session\_id_
 
 ### Fixture Data
 
@@ -68,7 +68,7 @@ Note that any nesting of API definitions in the API spec must be mirroed in the 
 
 	logout_without_login:
 		- my_api_spec.session.logout:
-			desc: "expect to fail a logout with no active session"
+			description: "expect to fail a logout with no active session"
 			response: 400
 
 ## Installation
@@ -164,14 +164,14 @@ This maps an upstream API server (api.openweathermap.org) and an upstream web se
 	my_api_spec:
 		session:
 			login:
-		  		desc: "Login to the service"
+		  		description: "Login to the service"
 		  		url: "/api/session"					# prefixed "/api/*"
 		  		method: post
 		  		body: some_user_data
 		  		remember: session_data
 		  		response: 201
 			logout:
-		  		desc: "Logout of the service"
+		  		description: "Logout of the service"
 		  		url: "/api/session/{session_id}"	# prefixed "/api/*"
 		  		urldata:
 		  			recall: session_data
@@ -211,7 +211,7 @@ Not all keys are valid in all circumstances. Here's a full list of API keys with
 
 	key			mandatory	description							type					example
 	---			---------	-----------							----					-------
-	desc		no			textual description					string					"Login and start user session"
+	description		no			textual description					string					"Login and start user session"
 	url			yes			url of endpoint						string					"/session"
 	method		no			HTTP method (defaults to get) 		get|put|post|delete 	"post"
 	encoding	no			Style of body encoding to use   	form					"form"
@@ -398,12 +398,12 @@ Which will be verified against the response code (200)
 
 Any data requirements defined in the API config file by body, parameters or URI templates, must be catered for in the test data. The example above requires a userid for the endpoint call "/users/{userid}" and some data for the request body defined in the spec as "user\_details".
 
-	root: "http://127.0.0.1"
+	basePath: "http://127.0.0.1"
 	userid: 42
 	user_details:
     	name: "fred"
 
-*   **root:** The root/stub address of the API that all API calls will be appended to. In this case Bennett will be calling "http://127.0.0.1/users/{userid}"  
+*   **basePath:** The root address of the API that all API calls will be appended to. In this case Bennett will be calling "http://127.0.0.1/users/{userid}"  
 *   **userid:** The value to interpolate into the URI template, making the actual call now "http://127.0.0.1/users/42".
 
 

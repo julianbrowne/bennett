@@ -1,22 +1,23 @@
 
 general:
   test_name: "Self Test API"
+  apiVersion: "0.1"
 
 basic_get:
-    desc: "HTTP GET to /one, expecting 200"
+    description: "HTTP GET to /one, expecting 200"
     method: get
     url: "/one"
     response: 200
 
 basic_post:
-    desc: "HTTP POST to /two, expecting 201"
+    description: "HTTP POST to /two, expecting 201"
     url: "/two"
     method: post
     body: some_data_about_a_and_b
     response: 201
 
 uri_template:
-    desc: "tests interpolation of uri template data"
+    description: "tests interpolation of uri template data"
     url: "/one/{a}/{b}"
     urldata: some_data_about_a_and_b
     response: 200
@@ -24,14 +25,14 @@ uri_template:
 memory:
 
     get_and_remember:
-        desc: "fetch some session data"
+        description: "fetch some session data"
         url: "/three"
         method: get
         remember: session
         response: 200
 
     recall_and_post:
-        desc: "retreive some session_data"
+        description: "retreive some session_data"
         url: "/four"
         method: post
         body:
@@ -39,7 +40,7 @@ memory:
         response: 201
 
     send_a_cookie:
-        desc: "recall session data for a cookie"
+        description: "recall session data for a cookie"
         url: "/four"
         method: get
         cookies:

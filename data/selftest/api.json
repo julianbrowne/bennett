@@ -1,0 +1,212 @@
+{
+  "apiVersion": "0.1",
+  "swaggerVersion": "1.2",
+  "basePath": "http://example.com",
+  "description": "Swagger Test API",
+  "resourcePath": "/yoga",
+  "produces": [
+    "application/json"
+  ],
+  "apis": [
+    {
+      "path": "/yoga/hot",
+      "operations": [
+        {
+          "method": "GET",
+          "summary": "Finds Pets by tags",
+          "notes": "Muliple tags can be provided with comma seperated strings. Use tag1, tag2, tag3 for testing.",
+          "responseClass": "List[Pet]",
+          "nickname": "findPetsByTags",
+          "produces": [
+            "application/json",
+            "application/xml"
+          ],
+          "parameters": [
+            {
+              "name": "tags",
+              "description": "Tags to filter by",
+              "required": true,
+              "allowMultiple": true,
+              "dataType": "string",
+              "paramType": "query"
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 400,
+              "message": "Invalid tag value"
+            }
+          ],
+          "deprecated": "true"
+        }
+      ]
+    },
+    {
+      "path": "/yoga/hatha",
+      "operations": [
+        {
+          "method": "GET",
+          "summary": "Finds Pets by status",
+          "notes": "Multiple status values can be provided with comma seperated strings",
+          "responseClass": "List[Pet]",
+          "nickname": "findPetsByStatus",
+          "produces": [
+            "application/json",
+            "application/xml"
+          ],
+          "parameters": [
+            {
+              "name": "status",
+              "description": "Status values that need to be considered for filter",
+              "defaultValue": "available",
+              "required": true,
+              "allowMultiple": true,
+              "dataType": "string",
+              "allowableValues": {
+                "valueType": "LIST",
+                "values": [
+                  "available",
+                  "pending",
+                  "sold"
+                ]
+              },
+              "paramType": "query"
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 400,
+              "message": "Invalid status value"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/yoga/ashtanga",
+      "operations": [
+        {
+          "method": "PUT",
+          "summary": "Update an existing pet",
+          "notes": "",
+          "responseClass": "void",
+          "nickname": "updatePet",
+          "parameters": [
+            {
+              "name": "body",
+              "description": "Pet object that needs to be updated in the store",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "Pet",
+              "paramType": "body"
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 400,
+              "message": "Invalid ID supplied"
+            },
+            {
+              "code": 404,
+              "message": "Pet not found"
+            },
+            {
+              "code": 405,
+              "message": "Validation exception"
+            }
+          ]
+        },
+        {
+          "method": "POST",
+          "summary": "Add a new pet to the store",
+          "notes": "",
+          "responseClass": "void",
+          "nickname": "addPet",
+          "parameters": [
+            {
+              "name": "body",
+              "description": "Pet object that needs to be added to the store",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "Pet",
+              "paramType": "body"
+            }
+          ],
+          "responseMessages": [
+            {
+              "code": 405,
+              "message": "Invalid input"
+            }
+          ]
+        }
+      ]
+    },
+  ],
+  "models": {
+    "Tag": {
+      "id": "Tag",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "Pet": {
+      "id": "Pet",
+      "description": "A pet is a person's best friend",
+      "required": [
+        "name",
+        "id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "Tag"
+          }
+        },
+        "photoUrls": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "status": {
+          "type": "string",
+          "description": "pet status in the store",
+          "enum": [
+            "available",
+            "pending",
+            "sold"
+          ]
+        },
+        "category": {
+          "$ref": "Category"
+        }
+      }
+    },
+    "Category": {
+      "id": "Category",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    }
+  }
+}

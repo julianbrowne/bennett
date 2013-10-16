@@ -1,5 +1,5 @@
 
-root: testonly
+basePath: testonly
 
 #
 #   a and b are set:

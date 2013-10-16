@@ -1,0 +1,2296 @@
+{
+  "apiVersion": "v1",
+  "swaggerVersion": "1.1",
+  "basePath": "http://api.staging.zoo.alertme.com:8080/api",
+  "resourcePath": "/users",
+  "apis": [
+    {
+      "path": "/users/{username}/ui/status",
+      "description": "",
+      "operations": [
+        {
+          "httpMethod": "GET",
+          "summary": "Retrieve users installation status",
+          "notes": "Will return either UI_STATUS_NORMAL  or UI_STATUS_NOT_INSTALLED.",
+          "responseClass": "UiStatus",
+          "nickname": "getUIStatus",
+          "parameters": [
+            {
+              "name": "username",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            }
+          ]
+        },
+        {
+          "httpMethod": "POST",
+          "summary": "Update UI status",
+          "notes": "STUB Implementation, does nothing.",
+          "responseClass": "UiStatusUpdateResult",
+          "nickname": "setUIStatus",
+          "parameters": [
+            {
+              "name": "username",
+              "description": "username",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/users/{username}/settings",
+      "description": "",
+      "operations": [
+        {
+          "httpMethod": "POST",
+          "summary": "Update users details",
+          "notes": "Allows updating of users details. Any one or more of the fields in the request object can be specified",
+          "responseClass": "void",
+          "nickname": "setSettings",
+          "parameters": [
+            {
+              "name": "username",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "userSettingsRequest",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "UpdateUserSettingsRequest"
+            }
+          ],
+          "errorResponses": [
+            {
+              "code": 400,
+              "reason": "If any of the specified parameters fails validation. Check response body for details."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/users/{username}/hubs/{hubId}/services/support/actionableDevices",
+      "description": "",
+      "operations": [
+        {
+          "httpMethod": "GET",
+          "summary": "Returns information about supported devices",
+          "notes": "Returns result as a map device name => device type. Requires admin privileges",
+          "responseClass": "[<br>\"string\": {<br>\" deviceType\" : \" string\"<br> }<br>]",
+          "nickname": "getFlstActionableDevices",
+          "parameters": [
+            {
+              "name": "hubId",
+              "description": "Hub id",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "username",
+              "description": "username",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/users/{username}/search/mobile/{mobile}",
+      "description": "",
+      "operations": [
+        {
+          "httpMethod": "GET",
+          "summary": "Search for user by mobile number",
+          "notes": "This is intended to be used by  services that want to find who this mobile number belongs to. Will also search contacts. In the case of contacts, will return the user to whom that contact belongs. Requires admin privileges. ",
+          "responseClass": "UserSearchMatch",
+          "nickname": "getByMobile",
+          "parameters": [
+            {
+              "name": "mobile",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "username",
+              "description": "username",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/users",
+      "description": "",
+      "operations": [
+        {
+          "httpMethod": "GET",
+          "summary": "Get currently logged in user",
+          "notes": "Returns current username.",
+          "responseClass": "[\"string\"]",
+          "nickname": "getCurrentUser"
+        },
+        {
+          "httpMethod": "POST",
+          "summary": "Create new user",
+          "notes": "Requires admin privileges. ",
+          "responseClass": "CreateUserResult",
+          "nickname": "createUser",
+          "parameters": [
+            {
+              "name": "createUserRequest",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "CreateUserRequest"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/users/{username}/subscription/active",
+      "description": "",
+      "operations": [
+        {
+          "httpMethod": "GET",
+          "summary": "Retrieve subscription status",
+          "notes": "STUB Implementation, always returns true",
+          "responseClass": "SubscriptionStatus",
+          "nickname": "getActiveSubscription",
+          "parameters": [
+            {
+              "name": "username",
+              "description": "username",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/users/{username}/confirmtandc",
+      "description": "",
+      "operations": [
+        {
+          "httpMethod": "PUT",
+          "summary": "Set T&C confirmation",
+          "notes": "STUB Implementation, does nothing.",
+          "responseClass": "void",
+          "nickname": "putConfirmTandC",
+          "parameters": [
+            {
+              "name": "username",
+              "description": "username",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/users/all/search",
+      "description": "",
+      "operations": [
+        {
+          "httpMethod": "GET",
+          "summary": "Search for users",
+          "notes": "Requires admin privileges. ",
+          "responseClass": "UsersSearchResult",
+          "nickname": "searchUsers",
+          "parameters": [
+            {
+              "name": "fieldSet",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "first",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "int"
+            },
+            {
+              "name": "query",
+              "paramType": "query",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "quantity",
+              "paramType": "query",
+              "required": false,
+              "allowMultiple": false,
+              "dataType": "int"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/users/{username}",
+      "description": "",
+      "operations": [
+        {
+          "httpMethod": "GET",
+          "summary": "Retrieve information about user",
+          "notes": "Returns users details.",
+          "responseClass": "UserSettingsResponse",
+          "nickname": "getSettings",
+          "parameters": [
+            {
+              "name": "username",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/users/{username}/hubs/{hubId}/services/support/devicesStatus",
+      "description": "",
+      "operations": [
+        {
+          "httpMethod": "GET",
+          "summary": "Returns status for hub and all its devices",
+          "notes": "Returns result as a map device id => device information. Requires admin privileges",
+          "responseClass": "{<br>\" hub\": {<br>\" uptime\" : \"integer\",<br>\" connection\" : \"string\",<br> \" configuring\" : \"string\",<br>\" configUpdateTime\" : \"string\",<br>\" version\" : \"string\",<br>\" latestVersion\" : \"string\"<br>},<br>\" device-id\" : {<br>\" type\" : \"string\",<br>\" battery\" : \"double\",<br>\" batteryLow\" : \"boolean\",<br>\" batteryLevel\" : \"integer\",<br>\" batteryPercentage\" : \"integer\",<br>\" mains\" : \"boolean\",<br>\" power\" : \"string\",<br>\" signal\" : \"integer\",<br>\" presence\" : \"boolean\",<br>\" temperature\" : \"double\",<br>\" version\" : \"string\",<br>\" latestVersion\" : \"string\",<br>\" upgrade\" : \"string\",<br>\" reason\" : \"string\",<br>\" hardwareRevision\" : \"string\"<br>}<br>}<br>",
+          "nickname": "getFlstDevicesStatus",
+          "parameters": [
+            {
+              "name": "hubId",
+              "description": "Hub id",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "username",
+              "description": "username",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/users/{username}/settings/{setting}",
+      "description": "",
+      "operations": [
+        {
+          "httpMethod": "GET",
+          "summary": "Retrieve a specific detail",
+          "notes": "Retrieves a specific detail. Will return null for invalid settings",
+          "responseClass": "UserSetting",
+          "nickname": "getSpecificSetting",
+          "parameters": [
+            {
+              "name": "username",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            },
+            {
+              "name": "setting",
+              "paramType": "path",
+              "required": true,
+              "allowMultiple": false,
+              "dataType": "string"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "models": {
+    "NodeEventBehaviour": {
+      "id": "NodeEventBehaviour",
+      "properties": {
+        "HOME": {
+          "type": "Map[string,Object]"
+        },
+        "NIGHT": {
+          "type": "Map[string,Object]"
+        },
+        "AWAY": {
+          "type": "Map[string,Object]"
+        }
+      }
+    },
+    "OnOffStatusInfo": {
+      "id": "OnOffStatusInfo",
+      "properties": {
+        "confirmed": {
+          "type": "boolean"
+        },
+        "onOffState": {
+          "type": "string"
+        }
+      }
+    },
+    "SubscriptionStatus": {
+      "id": "SubscriptionStatus",
+      "properties": {
+        "value": {
+          "type": "boolean"
+        }
+      }
+    },
+    "HubState": {
+      "id": "HubState",
+      "properties": {
+        "createdOn": {
+          "type": "Date"
+        },
+        "id": {
+          "type": "string"
+        },
+        "acquisitionStartTime": {
+          "type": "Date"
+        },
+        "lastSeen": {
+          "type": "Date"
+        },
+        "changedOn": {
+          "type": "Date"
+        },
+        "lastUpdateTransactionId": {
+          "type": "string"
+        },
+        "snapshots": {
+          "items": {
+            "$ref": "com.alertme.zoo.model.hubcache.TimeAwareModel.com.alertme.zoo.model.hubcache.TimeAwareModel$Endpoint<T>"
+          },
+          "type": "Array"
+        },
+        "offline": {
+          "type": "boolean"
+        }
+      }
+    },
+    "BaseScheduleData": {
+      "id": "BaseScheduleData",
+      "properties": {
+        "temperatureUnit": {
+          "type": "string"
+        },
+        "days": {
+          "type": "Map[string,List[Map[string,string]]]"
+        }
+      }
+    },
+    "ThisWeekPeriod": {
+      "id": "ThisWeekPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "TargetTemperature": {
+      "id": "TargetTemperature",
+      "properties": {
+        "formatting": {
+          "type": "Formatting"
+        },
+        "temperature": {
+          "type": "double"
+        }
+      }
+    },
+    "LoginSuccessful": {
+      "id": "LoginSuccessful",
+      "properties": {
+        "username": {
+          "required": true,
+          "description": "Username of this user",
+          "type": "string"
+        },
+        "hubIds": {
+          "required": true,
+          "description": "List of Hub id's that belong to the user",
+          "items": {
+            "type": "string"
+          },
+          "type": "Array"
+        },
+        "ApiSession": {
+          "required": true,
+          "description": "Session Id",
+          "type": "string"
+        },
+        "userId": {
+          "required": true,
+          "description": "Id of the logged in user",
+          "type": "long"
+        },
+        "partnerId": {
+          "required": true,
+          "description": "Id of this users partner",
+          "type": "int"
+        },
+        "tandcConfirmed": {
+          "required": true,
+          "description": "Whether the user has confirmed terms and conditions",
+          "type": "boolean"
+        }
+      }
+    },
+    "HotWaterStatus": {
+      "id": "HotWaterStatus",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "control": {
+          "type": "string"
+        },
+        "targetTemperature": {
+          "type": "double"
+        },
+        "temperatureUnit": {
+          "type": "string"
+        },
+        "onOffState": {
+          "type": "string"
+        },
+        "currentTemperature": {
+          "type": "double"
+        }
+      }
+    },
+    "TemperatureHistoryRequest": {
+      "id": "TemperatureHistoryRequest",
+      "properties": {
+        "month_from": {
+          "type": "int"
+        },
+        "year_from": {
+          "type": "int"
+        },
+        "month": {
+          "type": "int"
+        },
+        "year_to": {
+          "type": "int"
+        },
+        "year": {
+          "type": "int"
+        },
+        "month_to": {
+          "type": "int"
+        },
+        "hour": {
+          "type": "int"
+        },
+        "day": {
+          "type": "int"
+        },
+        "day_from": {
+          "type": "int"
+        },
+        "period": {
+          "type": "string"
+        },
+        "day_to": {
+          "type": "int"
+        },
+        "week": {
+          "type": "int"
+        }
+      }
+    },
+    "UserSettingsResponse": {
+      "id": "UserSettingsResponse",
+      "properties": {
+        "phone": {
+          "type": "string"
+        },
+        "installStep": {
+          "type": "string"
+        },
+        "settings": {
+          "type": "string"
+        },
+        "defaultCountry": {
+          "type": "string"
+        },
+        "userConfigSource": {
+          "type": "string"
+        },
+        "enable": {
+          "type": "boolean"
+        },
+        "timeFormat": {
+          "type": "string"
+        },
+        "skin": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "memorable_question": {
+          "type": "string"
+        },
+        "energyPrice": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "int"
+        },
+        "username": {
+          "type": "string"
+        },
+        "userLevel": {
+          "type": "string"
+        },
+        "dateFormat": {
+          "type": "string"
+        },
+        "daylightSaving": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "deactivationTime": {
+          "type": "long"
+        },
+        "weatherQueryType": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "answer": {
+          "type": "string"
+        },
+        "availableLanguages": {
+          "items": {
+            "type": "string"
+          },
+          "type": "Array"
+        },
+        "postcode": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "hasSmartMeters": {
+          "type": "boolean"
+        },
+        "mobile": {
+          "type": "string"
+        },
+        "temperatureFormat": {
+          "type": "string"
+        },
+        "partnerId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "memorable": {
+          "type": "string"
+        },
+        "swingometerShare": {
+          "type": "boolean"
+        },
+        "addressAdditional": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "imageId": {
+          "type": "int"
+        },
+        "hasEnergyDevices": {
+          "type": "boolean"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "weightUnit": {
+          "type": "string"
+        },
+        "webVersion": {
+          "type": "int"
+        },
+        "regDate": {
+          "type": "string"
+        },
+        "partnerSpecificId": {
+          "type": "string"
+        },
+        "access": {
+          "type": "string"
+        },
+        "tandcConfirmed": {
+          "type": "int"
+        },
+        "pin": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "defaultCity": {
+          "type": "string"
+        },
+        "dob": {
+          "type": "string"
+        },
+        "availableCurrencies": {
+          "items": {
+            "type": "string"
+          },
+          "type": "Array"
+        }
+      }
+    },
+    "TemperatureControllerInfo": {
+      "id": "TemperatureControllerInfo",
+      "properties": {
+        "temperatureUnit": {
+          "type": "string"
+        },
+        "inside": {
+          "type": "Inside"
+        },
+        "outside": {
+          "type": "com.alertme.zoo.api.models.response.TemperatureControllerInfo.com.alertme.zoo.api.models.response.TemperatureControllerInfo$Outside<?>"
+        }
+      }
+    },
+    "CreatedContact": {
+      "id": "CreatedContact",
+      "properties": {
+        "contactId": {
+          "type": "string"
+        }
+      }
+    },
+    "UserSetting": {
+      "id": "UserSetting",
+      "properties": {
+        "value": {
+          "required": true,
+          "description": "Value of the setting requested",
+          "type": "string"
+        }
+      }
+    },
+    "ChannelMinMax": {
+      "id": "ChannelMinMax",
+      "properties": {
+        "min": {
+          "type": "Number"
+        },
+        "max": {
+          "type": "Number"
+        },
+        "start": {
+          "type": "int"
+        },
+        "end": {
+          "type": "int"
+        }
+      }
+    },
+    "HotWaterSetpoint": {
+      "id": "HotWaterSetpoint",
+      "properties": {
+        "time": {
+          "type": "string"
+        },
+        "op": {
+          "type": "string"
+        },
+        "start": {
+          "type": "long"
+        },
+        "event": {
+          "type": "int"
+        },
+        "name": {
+          "type": "string"
+        },
+        "temperature": {
+          "type": "double"
+        }
+      }
+    },
+    "HotWaterSchedule": {
+      "id": "HotWaterSchedule",
+      "properties": {
+        "control": {
+          "type": "string"
+        },
+        "confirmed": {
+          "type": "boolean"
+        },
+        "advancedSchedule": {
+          "type": "boolean"
+        },
+        "temperatureUnit": {
+          "type": "string"
+        },
+        "days": {
+          "type": "Map[string,java.util.LinkedList<com.alertme.zoo.api.models.response.hotwater.HotWaterSchedule$HotWaterSetpoint>]"
+        },
+        "next": {
+          "type": "HotWaterSetpoint"
+        },
+        "current": {
+          "type": "HotWaterSetpoint"
+        },
+        "prev": {
+          "type": "HotWaterSetpoint"
+        }
+      }
+    },
+    "NewDevice": {
+      "id": "NewDevice",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "CustomPeriod": {
+      "id": "CustomPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "YesterdayPeriod": {
+      "id": "YesterdayPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "HourViewPeriod": {
+      "id": "HourViewPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "ClimateControllerStatusInfo": {
+      "id": "ClimateControllerStatusInfo",
+      "properties": {
+        "control": {
+          "type": "string"
+        },
+        "validControls": {
+          "items": {
+            "type": "string"
+          },
+          "type": "Array"
+        },
+        "confirmed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ReceivedNodeEventItem": {
+      "id": "ReceivedNodeEventItem",
+      "properties": {
+        "deleteActions": {
+          "items": {
+            "$ref": "Map[string,string"
+          },
+          "type": "Array"
+        },
+        "actions": {
+          "items": {
+            "$ref": "Map[string,string"
+          },
+          "type": "Array"
+        }
+      }
+    },
+    "ClimateControllerSchedule": {
+      "id": "ClimateControllerSchedule",
+      "properties": {
+        "control": {
+          "type": "string"
+        },
+        "days": {
+          "type": "java.util.LinkedHashMap<java.lang.String, java.util.LinkedList<com.alertme.zoo.api.models.response.climate.ClimateControllerScheduleSetpoint>>"
+        },
+        "relativeSetpoints": {
+          "type": "java.util.LinkedHashMap<java.lang.String, com.alertme.zoo.api.models.response.climate.ClimateControllerScheduleSetpoint>"
+        },
+        "complexity": {
+          "type": "string"
+        },
+        "setpoints": {
+          "type": "Array[String]"
+        },
+        "formatting": {
+          "type": "Formatting"
+        },
+        "mode": {
+          "type": "string"
+        }
+      }
+    },
+    "Formatting": {
+      "id": "Formatting",
+      "properties": {
+        "currencyUnit": {
+          "type": "string"
+        },
+        "temperatureUnit": {
+          "type": "string"
+        },
+        "locale": {
+          "type": "string"
+        },
+        "timezoneOffset": {
+          "type": "string"
+        }
+      }
+    },
+    "HeatingControllerScheduleData": {
+      "id": "HeatingControllerScheduleData",
+      "properties": {
+        "numberOfEvents": {
+          "type": "string"
+        },
+        "temperatureUnit": {
+          "type": "string"
+        },
+        "days": {
+          "type": "Map[string,List[Map[string,string]]]"
+        },
+        "numberOfSetpoints": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string"
+        }
+      }
+    },
+    "Values": {
+      "id": "Values",
+      "properties": {
+        "min": {
+          "items": {
+            "$ref": "Number"
+          },
+          "type": "Array"
+        },
+        "max": {
+          "items": {
+            "$ref": "Number"
+          },
+          "type": "Array"
+        },
+        "average": {
+          "items": {
+            "$ref": "Number"
+          },
+          "type": "Array"
+        }
+      }
+    },
+    "ExtendedHubInfo": {
+      "id": "ExtendedHubInfo",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "behaviourType": {
+          "type": "string"
+        },
+        "simHistory": {
+          "items": {
+            "$ref": "Object"
+          },
+          "type": "Array"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "configured": {
+          "type": "boolean"
+        },
+        "behaviourId": {
+          "type": "int"
+        },
+        "currentImei": {
+          "type": "long"
+        },
+        "gprsSignalStrength": {
+          "type": "double"
+        },
+        "macAddress": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "latestVersion": {
+          "type": "string"
+        },
+        "timezone": {
+          "type": "int"
+        },
+        "simPresent": {
+          "type": "boolean"
+        },
+        "battery": {
+          "type": "double"
+        },
+        "batteryLevel": {
+          "type": "int"
+        },
+        "name": {
+          "type": "string"
+        },
+        "externalIp": {
+          "type": "string"
+        },
+        "daylightSaving": {
+          "type": "string"
+        },
+        "onSince": {
+          "type": "long"
+        },
+        "hardwareRevision": {
+          "type": "int"
+        },
+        "connectionType": {
+          "type": "string"
+        },
+        "zigbeeNetworkInfo": {
+          "type": "int"
+        },
+        "currentIccid": {
+          "type": "long"
+        },
+        "available": {
+          "type": "boolean"
+        },
+        "upgrading": {
+          "type": "boolean"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "upgrade": {
+          "type": "UpgradeState"
+        },
+        "currentSimId": {
+          "type": "string"
+        },
+        "upTime": {
+          "type": "int"
+        },
+        "powerType": {
+          "type": "string"
+        }
+      }
+    },
+    "Weather": {
+      "id": "Weather",
+      "properties": {
+        "now": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "Entry": {
+      "id": "Entry",
+      "properties": {
+        "time": {
+          "type": "long"
+        },
+        "test": {
+          "type": "string"
+        },
+        "logType": {
+          "type": "int"
+        }
+      }
+    },
+    "TemperatureInfo": {
+      "id": "TemperatureInfo",
+      "properties": {
+        "date": {
+          "type": "string"
+        },
+        "temperature": {
+          "type": "Object"
+        }
+      }
+    },
+    "UserSearchMatch": {
+      "id": "UserSearchMatch",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "timeZone": {
+          "type": "string"
+        },
+        "partnerSpecificId": {
+          "type": "string"
+        },
+        "postcode": {
+          "type": "string"
+        },
+        "deactivateTime": {
+          "type": "int"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "hubs": {
+          "items": {
+            "$ref": "ShortHubInformation"
+          },
+          "type": "Array"
+        },
+        "username": {
+          "type": "string"
+        },
+        "county": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "addressSecondLine": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "long"
+        },
+        "userLevel": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "mobile": {
+          "type": "string"
+        }
+      }
+    },
+    "Map": {
+      "id": "Map",
+      "properties": {
+        "empty": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Averages": {
+      "id": "Averages",
+      "properties": {
+        "yesterday": {
+          "type": "double"
+        },
+        "lastWeek": {
+          "type": "double"
+        },
+        "today": {
+          "type": "double"
+        }
+      }
+    },
+    "Trap": {
+      "id": "Trap",
+      "properties": {
+        "android": {
+          "items": {
+            "type": "string"
+          },
+          "type": "Array"
+        },
+        "iphone": {
+          "items": {
+            "type": "string"
+          },
+          "type": "Array"
+        },
+        "web3": {
+          "items": {
+            "type": "string"
+          },
+          "type": "Array"
+        }
+      }
+    },
+    "Outside": {
+      "id": "Outside",
+      "properties": {
+        "now": {
+          "type": "double"
+        },
+        "weather": {
+          "type": "Weather"
+        }
+      }
+    },
+    "YearViewPeriod": {
+      "id": "YearViewPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "LastWeekPeriod": {
+      "id": "LastWeekPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "HubLog": {
+      "id": "HubLog",
+      "properties": {
+        "entries": {
+          "items": {
+            "$ref": "Entry"
+          },
+          "type": "Array"
+        },
+        "numEntriesAvailable": {
+          "type": "int"
+        }
+      }
+    },
+    "HubVersion": {
+      "id": "HubVersion",
+      "properties": {
+        "upgrade": {
+          "type": "UpgradeState"
+        },
+        "latestVersion": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "DataFetchPeriod": {
+      "id": "DataFetchPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "Channels": {
+      "id": "Channels",
+      "properties": {
+        "tamper": {
+          "type": "boolean"
+        },
+        "presence": {
+          "type": "boolean"
+        },
+        "battery": {
+          "type": "double"
+        },
+        "batteryLevel": {
+          "type": "int"
+        },
+        "signal": {
+          "type": "int"
+        },
+        "batteryPercentage": {
+          "type": "int"
+        },
+        "temperature": {
+          "type": "double"
+        }
+      }
+    },
+    "AssociatedHub": {
+      "id": "AssociatedHub",
+      "properties": {
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "String": {
+      "id": "string",
+      "properties": {
+        "bytes": {
+          "type": "Array[byte]"
+        },
+        "empty": {
+          "type": "boolean"
+        }
+      }
+    },
+    "BaseDataFetchPeriod": {
+      "id": "BaseDataFetchPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "HotWaterControlStatusInfo": {
+      "id": "HotWaterControlStatusInfo",
+      "properties": {
+        "temperatureUnit": {
+          "type": "string"
+        },
+        "current": {
+          "type": "string"
+        },
+        "available": {
+          "items": {
+            "type": "string"
+          },
+          "type": "Array"
+        },
+        "temperature": {
+          "type": "string"
+        }
+      }
+    },
+    "TodayPeriod": {
+      "id": "TodayPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "ErrorInformation": {
+      "id": "ErrorInformation",
+      "properties": {
+        "setting": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "parameter": {
+          "type": "string"
+        },
+        "cause": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      }
+    },
+    "DeviceStatus": {
+      "id": "DeviceStatus",
+      "properties": {
+        "tamper": {
+          "type": "boolean"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "hardwareRevision": {
+          "type": "string"
+        },
+        "batteryLow": {
+          "type": "boolean"
+        },
+        "signal": {
+          "type": "int"
+        },
+        "type": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "temperature": {
+          "type": "double"
+        },
+        "upgrade": {
+          "type": "string"
+        },
+        "latestVersion": {
+          "type": "string"
+        },
+        "mains": {
+          "type": "boolean"
+        },
+        "presence": {
+          "type": "boolean"
+        },
+        "batteryLevel": {
+          "type": "int"
+        },
+        "battery": {
+          "type": "double"
+        },
+        "power": {
+          "type": "string"
+        },
+        "batteryPercentage": {
+          "type": "int"
+        }
+      }
+    },
+    "GenericError": {
+      "id": "GenericError",
+      "properties": {
+        "error": {
+          "type": "ErrorInformation"
+        }
+      }
+    },
+    "HotWaterScheduleEvents": {
+      "id": "HotWaterScheduleEvents",
+      "properties": {
+        "events": {
+          "type": "int"
+        }
+      }
+    },
+    "ChannelValues": {
+      "id": "ChannelValues",
+      "properties": {
+        "values": {
+          "type": "Values"
+        },
+        "interval": {
+          "type": "int"
+        },
+        "start": {
+          "type": "int"
+        },
+        "end": {
+          "type": "int"
+        }
+      }
+    },
+    "SetVersionResponse": {
+      "id": "SetVersionResponse",
+      "properties": {
+        "result": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateUserRequest": {
+      "id": "CreateUserRequest",
+      "properties": {
+        "lastName": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "flags": {
+          "type": "Map[string,string]"
+        },
+        "partnerId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "partnerSpecificId": {
+          "type": "string"
+        },
+        "postcode": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "addressAdditional": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "pin": {
+          "type": "string"
+        },
+        "tariff": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "mobile": {
+          "type": "string"
+        }
+      }
+    },
+    "Inside": {
+      "id": "Inside",
+      "properties": {
+        "now": {
+          "type": "double"
+        },
+        "averages": {
+          "type": "Averages"
+        }
+      }
+    },
+    "UpdateUserSettingsRequest": {
+      "id": "UpdateUserSettingsRequest",
+      "properties": {
+        "lastName": {
+          "type": "string"
+        },
+        "old_password": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "answer": {
+          "type": "string"
+        },
+        "partnerId": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "password_2": {
+          "type": "string"
+        },
+        "partnerSpecificId": {
+          "type": "string"
+        },
+        "postcode": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "addressAdditional": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "confirmPin": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "dob": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "newPin": {
+          "type": "string"
+        },
+        "mobile": {
+          "type": "string"
+        }
+      }
+    },
+    "UsersSearchResult": {
+      "id": "UsersSearchResult",
+      "properties": {
+        "matches": {
+          "items": {
+            "$ref": "UserSearchMatch"
+          },
+          "type": "Array"
+        },
+        "totalMatches": {
+          "type": "int"
+        }
+      }
+    },
+    "ThisHourPeriod": {
+      "id": "ThisHourPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "WeekViewPeriod": {
+      "id": "WeekViewPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "UiStatus": {
+      "id": "UiStatus",
+      "properties": {
+        "time": {
+          "required": true,
+          "description": "Last updated, unix time",
+          "type": "long"
+        },
+        "value": {
+          "required": true,
+          "description": "Current UI status value",
+          "type": "string"
+        }
+      }
+    },
+    "AlarmStatus": {
+      "id": "AlarmStatus",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "time": {
+          "type": "long"
+        }
+      }
+    },
+    "Tariff": {
+      "id": "Tariff",
+      "properties": {
+        "id": {
+          "type": "int"
+        },
+        "title": {
+          "type": "string"
+        }
+      }
+    },
+    "ClimateControllerSummary": {
+      "id": "ClimateControllerSummary",
+      "properties": {
+        "shadowTemperature": {
+          "type": "double"
+        },
+        "control": {
+          "type": "string"
+        },
+        "maxTargetTemperature": {
+          "type": "double"
+        },
+        "targetTemperature": {
+          "type": "double"
+        },
+        "outsideTemperature": {
+          "type": "double"
+        },
+        "presenceStatus": {
+          "type": "string"
+        },
+        "next": {
+          "type": "ClimateControllerScheduleSetpoint"
+        },
+        "type": {
+          "type": "string"
+        },
+        "currentTemperature": {
+          "type": "double"
+        },
+        "mode": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "minTargetTemperature": {
+          "type": "double"
+        },
+        "schedule": {
+          "type": "boolean"
+        },
+        "confirmed": {
+          "type": "boolean"
+        },
+        "hubAvailable": {
+          "type": "boolean"
+        },
+        "battery": {
+          "type": "string"
+        },
+        "current": {
+          "type": "ClimateControllerScheduleSetpoint"
+        },
+        "on": {
+          "type": "boolean"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "devices": {
+          "type": "Map[string,string]"
+        },
+        "formatting": {
+          "type": "Formatting"
+        },
+        "messageIcon": {
+          "type": "string"
+        },
+        "deviceId": {
+          "type": "string"
+        },
+        "deviceAvailable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "List": {
+      "id": "List",
+      "properties": {
+        "empty": {
+          "type": "boolean"
+        }
+      }
+    },
+    "UserSubscription": {
+      "id": "UserSubscription",
+      "properties": {
+        "widgets": {
+          "items": {
+            "type": "string"
+          },
+          "type": "Array"
+        },
+        "technicalSupportNumber": {
+          "type": "string"
+        },
+        "iPhoneAppLink": {
+          "type": "string"
+        },
+        "trap": {
+          "type": "Trap"
+        },
+        "skin": {
+          "type": "string"
+        },
+        "androidAppLink": {
+          "type": "string"
+        },
+        "tarTitle": {
+          "type": "string"
+        },
+        "smsGatewayNumber": {
+          "type": "string"
+        },
+        "maxContacts": {
+          "type": "int"
+        },
+        "technicalSupportEmail": {
+          "type": "string"
+        },
+        "UIHelpLink": {
+          "type": "string"
+        },
+        "tarId": {
+          "type": "int"
+        },
+        "premiumTariff": {
+          "type": "boolean"
+        },
+        "installerHubType": {
+          "type": "string"
+        },
+        "webUiVersion": {
+          "type": "int"
+        }
+      }
+    },
+    "Partner": {
+      "id": "Partner",
+      "properties": {
+        "restrictedmanager": {
+          "type": "int"
+        },
+        "id": {
+          "type": "int"
+        },
+        "paratureAccount": {
+          "type": "int"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "hasMonitoringOptions": {
+          "type": "int"
+        },
+        "paratureSLA": {
+          "type": "string"
+        },
+        "shopUrl": {
+          "type": "string"
+        },
+        "hasStatusReports": {
+          "type": "int"
+        },
+        "contact": {
+          "type": "string"
+        }
+      }
+    },
+    "ShortDeviceType": {
+      "id": "ShortDeviceType",
+      "properties": {
+        "model": {
+          "type": "string"
+        },
+        "deviceType": {
+          "type": "string"
+        }
+      }
+    },
+    "BaseScheduleSetpoint": {
+      "id": "BaseScheduleSetpoint",
+      "properties": {
+        "time": {
+          "type": "string"
+        },
+        "start": {
+          "type": "long"
+        },
+        "name": {
+          "type": "string"
+        },
+        "temperature": {
+          "type": "double"
+        }
+      }
+    },
+    "HubSystemAlertInformation": {
+      "id": "HubSystemAlertInformation",
+      "properties": {
+        "nightAlerts": {
+          "type": "boolean"
+        },
+        "failuresEmail": {
+          "type": "boolean"
+        },
+        "failuresSMS": {
+          "type": "boolean"
+        },
+        "warningsEmail": {
+          "type": "boolean"
+        },
+        "warningsSMS": {
+          "type": "boolean"
+        }
+      }
+    },
+    "CreateUserResult": {
+      "id": "CreateUserResult",
+      "properties": {
+        "username": {
+          "required": true,
+          "description": "Created user's username",
+          "type": "string"
+        },
+        "userId": {
+          "required": true,
+          "description": "Created user's id",
+          "type": "long"
+        }
+      }
+    },
+    "Contact": {
+      "id": "Contact",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "mobile": {
+          "type": "string"
+        }
+      }
+    },
+    "DeviceInfo": {
+      "id": "DeviceInfo",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "channels": {
+          "type": "Channels"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "AlarmInformation": {
+      "id": "AlarmInformation",
+      "properties": {
+        "targetBehavior": {
+          "type": "string"
+        },
+        "showSlider": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "AlarmStatus"
+        },
+        "behavior": {
+          "type": "string"
+        },
+        "behaviors": {
+          "items": {
+            "type": "string"
+          },
+          "type": "Array"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "AcquisitionState": {
+      "id": "AcquisitionState",
+      "properties": {
+        "progress": {
+          "type": "int"
+        },
+        "action": {
+          "type": "string"
+        }
+      }
+    },
+    "ThisYearPeriod": {
+      "id": "ThisYearPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "ChannelValue": {
+      "id": "ChannelValue",
+      "properties": {
+        "value": {
+          "type": "double"
+        }
+      }
+    },
+    "ClimateControllerScheduleSetpoint": {
+      "id": "ClimateControllerScheduleSetpoint",
+      "properties": {
+        "time": {
+          "type": "string"
+        },
+        "start": {
+          "type": "long"
+        },
+        "name": {
+          "type": "string"
+        },
+        "setpoint": {
+          "type": "int"
+        },
+        "temperature": {
+          "type": "double"
+        }
+      }
+    },
+    "ThisMonthPeriod": {
+      "id": "ThisMonthPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "UsersHubListEntry": {
+      "id": "UsersHubListEntry",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "TemperatureHistoryResponse": {
+      "id": "TemperatureHistoryResponse",
+      "properties": {
+        "temperatureUnit": {
+          "type": "string"
+        },
+        "data": {
+          "items": {
+            "$ref": "TemperatureInfo"
+          },
+          "type": "Array"
+        },
+        "period": {
+          "type": "string"
+        }
+      }
+    },
+    "DeviceVersion": {
+      "id": "DeviceVersion",
+      "properties": {
+        "upgrade": {
+          "type": "UpgradeState"
+        },
+        "progress": {
+          "type": "string"
+        },
+        "latestVersion": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "hardwareRevision": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "SupportedChannel": {
+      "id": "SupportedChannel",
+      "properties": {
+        "unit": {
+          "type": "string"
+        },
+        "hasHistoricalValues": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "hasFutureValues": {
+          "type": "boolean"
+        },
+        "hasCurrentValue": {
+          "type": "boolean"
+        }
+      }
+    },
+    "UiStatusUpdateResult": {
+      "id": "UiStatusUpdateResult",
+      "properties": {
+        "updated": {
+          "type": "boolean"
+        }
+      }
+    },
+    "MonthViewPeriod": {
+      "id": "MonthViewPeriod",
+      "properties": {
+        "formatString": {
+          "type": "string"
+        },
+        "timestampTo": {
+          "type": "long"
+        },
+        "timestampFrom": {
+          "type": "long"
+        },
+        "periodName": {
+          "type": "string"
+        },
+        "rateSeconds": {
+          "type": "int"
+        }
+      }
+    },
+    "HotWaterScheduleData": {
+      "id": "HotWaterScheduleData",
+      "properties": {
+        "numberOfEvents": {
+          "type": "string"
+        },
+        "temperatureUnit": {
+          "type": "string"
+        },
+        "days": {
+          "type": "Map[string,List[Map[string,string]]]"
+        }
+      }
+    }
+  }
+}

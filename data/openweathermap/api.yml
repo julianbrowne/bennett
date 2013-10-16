@@ -3,7 +3,7 @@ general:
   test_name: "Openweather API"
 
 find:
-    desc: "Find City"
+    description: "Find City"
     method: get
     url: "/find?lat={latitude}&lon={longitude}&cnt={count}"
     urldata: query
@@ -29,7 +29,7 @@ find:
         }
 
 weather:
-    desc: "Weather in City"
+    description: "Weather in City"
     method: get
     url: "/weather?q={city}"
     urldata: "({ recall: 'cities.list[0].name' })"
