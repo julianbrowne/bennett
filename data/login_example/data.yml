@@ -1,0 +1,21 @@
+#
+#    test data
+#
+
+---
+
+basePath: "http://127.0.0.1:8105/api" # local no XSS proxy to actual API
+
+login:
+
+    credentials:
+        username: "fred"
+        password: "mysecret"
+
+    bad_credentials:
+        username: "fred"
+        password: "wrongpassword"
+
+    malformed_credentials:
+        usrname: "fred"
+        psswrd: "dontmatter"

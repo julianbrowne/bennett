@@ -1,0 +1,29 @@
+#
+#   Test Cases
+#
+
+---
+
+login_success:
+   - session.login
+
+login_fail_incorrect_password:
+   - session.login:
+      body: login.bad_credentials
+      response: 401
+
+login_fail_incorrect_http_method:
+   - session.login:
+      method: "get"
+      response: 405
+
+login_fail_malformed_json:
+   - session.login:
+      body: login.malformed_credentials
+      response: 400
+
+#  Need to workout some identifier (http header?) for this to fail
+#
+#login_fail_untrusted_client:
+#   - session.login
+#      response: 403

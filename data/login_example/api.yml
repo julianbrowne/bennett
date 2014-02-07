@@ -1,0 +1,44 @@
+#
+#    API Specification
+#
+
+---
+
+general:
+  test_name: "Login API Example"
+  apiVersion: "0.1"
+
+session:
+
+  login:
+    description: "Creates a client app session to allow use of other API calls. Sessions expire after 20 minutes"
+    url: "/login"
+    method: "post"
+    response: 200
+    body: login.credentials
+    remember: ApiSession
+    latency: 500
+    schema: > 
+        {
+            "title": "Session Schema",
+            "type": "object",
+            "properties": { 
+                "ApiSession": { "type": "string" }
+            },
+            "required": [
+                "ApiSession"
+            ]
+        }
+    errors:
+        method_not_allowed:
+            response: 405
+            description: "The client called endpoint with method other than POST"
+        bad_request:
+            response: 400
+            description: "The client submitted badly formatted JSON"
+        access_denied:
+            response: 401
+            description: "Invalid credentials submitted by the client"
+        api_forbidden:
+            response: 403
+            description: "The client is not permitted to call this endpoint"

@@ -12,7 +12,7 @@
     <!-- Bennett -->
     <link rel="stylesheet" media="all" href="assets/stylesheets/bennett.css" />
     <link rel="stylesheet" media="all" href="assets/jquery-ui/css/le-frog/jquery-ui-1.10.3.custom.css" />
-    <link rel="stylesheet" media="all" href="assets/fonts/jolly-lodger.css" />
+    <link rel="stylesheet" media="all" href="assets/fonts/bennett-title.css" />
     <link rel="stylesheet" media="all" href="assets/stylesheets/api-doc.css" />
     <script src="assets/javascripts/jquery-2.0.3.js"></script>
     <script src="assets/jquery-ui/js/jquery-ui-1.10.3.custom.js"></script>
@@ -89,19 +89,13 @@
                 scenarios: "data/openweathermap/scenarios.yml"
             };
 
-            var alertme = { 
-                data: "data/alertme/data.yml",
-                api: "data/alertme/api.yml",
-                scenarios: "data/alertme/scenarios.yml"
-            };
-
             var example = { 
-                data: "data/example/data.yml",
-                api: "data/example/api.yml",
-                scenarios: "data/example/scenarios.yml"
+                data: "data/login_example/data.yml",
+                api: "data/login_example/api.yml",
+                scenarios: "data/login_example/scenarios.yml"
             };
 
-            var config = alertme;
+            var config = example; //openweathermap;
 
             var data = config.data;
             var api = config.api;
