@@ -1,13 +1,13 @@
 
 # Bennett
 
-Bennet is a simple javascript data-driven REST API verification tool.   
+Bennet is a client-side javascript data-driven REST API verification tool. You specifiy the API, Bennet does the REST.
 
 Bennett requires three sets of data to be able to run its verification process. These are provided as YAML files. They are:   
 
-*	API Spec: The behavioural characteristics of the API
-*	Fixture Data: Some sample test data with which to populate the API calls
-*	Scenarios: A series of API call combinations that make up each test case
+*	An API Spec: The behavioural characteristics of all the API end points
+*	Some Fixture Data: Sample test data with which to populate API calls
+*	Some Test Scenarios: A series of API Call and Fixture Data combinations that make up each test case
 
 ![screen-shot](https://raw.github.com/julianbrowne/bennett/master/assets/images/screen-shot.png)
 
@@ -19,7 +19,7 @@ All dependencies are included but they are:
 *	JQuery UI     v1.10.3 (Tabs)  
 *	[TheGrid](https://github.com/julianbrowne/thegrid)       v0.0.1  (Jenkins-like grid layout)  
 *	JS-Yaml       v2.1.0  (for reading and parsing the config files)  
-*	[Piggybank](https://github.com/julianbrowne/piggybank)     v0.0.1  (for managing ajax calls synchronously)  
+*	[Piggybank](https://github.com/julianbrowne/piggybank)     v0.0.1  (for managing ajax calls and response in logical order)  
 
 ## Basic Configuration
 
