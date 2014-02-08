@@ -31,8 +31,9 @@ find:
 weather:
     description: "Weather in City"
     method: get
-    url: "/weather?q={city}"
-    urldata: "({ recall: 'cities.list[0].name' })"
+    url: "/weather?q={name}"
+    urldata: 
+        recall: "cities.list"
     response: 200
     latency: 2000
     schema: >
