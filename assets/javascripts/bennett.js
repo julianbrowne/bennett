@@ -444,14 +444,22 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 var line = widget.addKeyValue( 
                     apiNameText, 
                     apiResultText, 
-                    { class: "test-name" }, 
-                    { class: apiResultText }, 
                       "URI - " + data[0].url 
                     + "<br/>Method - " + data[0].method 
                     + "<br/>Expected - " + data[0].expectation.response 
                     + "<br/>Received - " + data[0].outcome.response.received 
                     + "<br/>Latency - "  + data[0].outcome.timer.latency, 
-                    { class: "result-popup" }
+                    { 
+                        key: { 
+                            class: "test-name"
+                        },
+                        value: { 
+                            class: apiResultText
+                        }, 
+                        msg: {
+                            class: "result-popup"
+                        }
+                    }
                 );
                 //var detail = addDetailDialog(widget.index, widget.lines, data[i]);
                 //$(line).on("click", function() { detail.dialog("open"); } );
