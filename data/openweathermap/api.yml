@@ -33,7 +33,7 @@ weather:
     method: get
     url: "/weather?q={name}"
     urldata: 
-        recall: "cities.list"
+        recall: cities.list.0
     response: 200
     latency: 2000
     schema: >
