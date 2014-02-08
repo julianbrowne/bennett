@@ -10,13 +10,17 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.scenarios = null;
     this.results = { };
     this.gridster = null;
-    this.scenarioInProgress = false;        // is there a test scenario in progress
-    this.lastScenarioPass = null;           // last run scenario result
-    this.stopOnFailure = true;              // stop if last run scenario failed
-    this.allScenariosDone = false;          // tripped when all scenarios complete (pass or fail)
+    this.active = false;                            // is bennett running scenarios
+    this.scenarioInProgress = false;                // is there a test scenario in progress
+    this.lastScenarioPass = null;                   // last run scenario result
+    this.stopOnFailure = true;                      // stop if last run scenario failed
+    this.allScenariosDone = false;                  // tripped when all scenarios complete (pass or fail)
+    this.refreshFrequency = 10000; //300000;        // rerun tests every refreshFrequency milliseconds
+    this.timer = false;                             // refresh interval timer {false || interval}
+    this.testResultsDOMElement = "#test-results";   // place to put the results
     this.testId = 0;
     this.grid = null;
-    this.testReport = {};                   // summary test report by scenario
+    this.testReport = {};                           // summary test report by scenario
     this.sources = { 
         api: specSrc,
         data: dataSrc,
@@ -24,13 +28,6 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     };
 
     logAction("Bennett tester instantiated");
-
-    this.targetElement = function(element) {
-        bennett.grid = new Grid(element);
-        bennett.grid.widgetDefaults.width = 340;
-        bennett.grid.widgetDefaults.height = 190;
-        // bennett.grid.autoHeight = true;
-    };
 
     this.dataLoad = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc), getDataFrom("conf/bennett.yml"));
 
@@ -128,16 +125,37 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         logAction("*** ERROR : " + category + " / " + message, { class : "bold error" });
     };
 
+    this.loopTests = function() { 
+        bennett.runTests();
+        console.log("Starting timer");
+        bennett.timer = setInterval(bennett.runTests, bennett.refreshFrequency);
+    };
+
+    this.stopTests = function() { 
+        if(bennett.timer) { 
+            console.log("Stopping timer");
+            clearInterval(bennett.timer);
+            bennett.timer = false;
+        }
+        lastScenarioDoneEvent();
+    };
+
     this.runTests = function() { 
-        bennett.dataLoad.then( 
-            function() { 
-                var scenarios = Object.keys(bennett.scenarios)
+
+        if(bennett.active) { 
+            console.log("Warning: call to runTests() ignored, Bennett already running");
+            return;
+        }
+
+        firstScenarioStartingEvent(); // TODO: replace with proper event hook mechanism
+        bennett.dataLoad
+            .then(function() { 
+                var scenarios = Object.keys(bennett.scenarios);
                 for(var i=0; i < scenarios.length; i++) { 
                     var scenarioName = scenarios[i];
                     runScenario(scenarioName);
                 }
-            }
-        );
+            });
     };
 
     function runScenario(scenarioName) { 
@@ -342,21 +360,23 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         **/
 
         function prepNextTest() { 
+
             logAction("Scenario : " + scenarioDisplayName, { class: "bold" });
 
             var widget = new bennett.grid.Widget(scenarioDisplayName);
             widget.addClass("scenario");
 
             if(bennett.lastScenarioPass === false && bennett.stopOnFailure === true) { 
-                bennett.allScenariosDone = true;
                 logAction("*** Aborting because last test failed");
                 widget.addLine("Aborted: Last Scenario Failed", "warning");
                 widget.addClass("aborted");
+                lastScenarioDoneEvent();
             }
             else { 
                 bennett.scenarioInProgress = true;
                 b.makeCallsSynchronously().done(reporter(widget, scenarioName));
             }
+
         };
 
     };
@@ -404,7 +424,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
      *  Reporter
      *
      *  Returns function that can process return test data from Piggybank.
-     *  Sets class (colour) for secnario widget.
+     *  Sets class (colour) for scenario widget.
      *  Alerts subsequent scnearios what the status (pass/fail) of this scenario was.
      *  Iterates through results list recording results of each API call made.
      *
@@ -421,12 +441,66 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
                 if(data[i] === undefined) break;
                 var apiResultText = (testPassOrFail(data[i]) === true ? 'pass' : 'fail');
                 var apiNameText = niceName(lastElementInPath(data[i].callData.name));
-                var line = widget.addKeyValue(apiNameText, apiResultText, { class: "test-name" }, { class: apiResultText });
-                var detail = addDetailDialog(widget.index, widget.lines, data[i]);
-                $(line).on("click", function() { detail.dialog("open"); } );
+                var line = widget.addKeyValue( 
+                    apiNameText, 
+                    apiResultText, 
+                    { class: "test-name" }, 
+                    { class: apiResultText }, 
+                      "URI - " + data[0].url 
+                    + "<br/>Method - " + data[0].method 
+                    + "<br/>Expected - " + data[0].expectation.response 
+                    + "<br/>Received - " + data[0].outcome.response.received 
+                    + "<br/>Latency - "  + data[0].outcome.timer.latency, 
+                    { class: "result-popup" }
+                );
+                //var detail = addDetailDialog(widget.index, widget.lines, data[i]);
+                //$(line).on("click", function() { detail.dialog("open"); } );
             }
+
+            var numScenarios = Object.keys(bennett.scenarios).length;
+            var lastScenarioName = Object.keys(bennett.scenarios)[numScenarios -1];
+
             bennett.scenarioInProgress = false;
+
+            if(name === lastScenarioName) lastScenarioDoneEvent();
+
         }
+    };
+
+    /**
+     *  Before first scenario and after last scenario events
+    **/
+
+    function firstScenarioStartingEvent() { 
+        bennett.active = true;
+        bennett.allScenariosDone = false;
+        disableButton("#start-tests");
+        disableButton("#loop-tests");
+        bennett.initialiseOutputGrid(bennett.testResultsDOMElement);
+    };
+
+    function lastScenarioDoneEvent() { 
+        bennett.active = false;
+        bennett.allScenariosDone = true;
+        $("#start-tests")
+            .addClass('bbutton')
+            .removeClass('bbutton-dead')
+            .prop('disabled', false);
+    };
+
+    function disableButton(buttonElementId) { 
+        $(buttonElementId)
+            .removeClass('bbutton')
+            .addClass('bbutton-dead')
+            .prop('disabled', true);
+    };
+
+    this.initialiseOutputGrid = function(element) { 
+        $(element).empty();
+        bennett.grid = new Grid(element);
+        bennett.grid.widgetDefaults.width = 340;
+        bennett.grid.widgetDefaults.height = 190;
+        // bennett.grid.autoHeight = true;
     };
 
     function addDetailDialog(scenarioId, testId, data) { 

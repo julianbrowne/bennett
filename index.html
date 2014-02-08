@@ -10,8 +10,8 @@
     <script src="assets/jsresolve/jsresolve.js"></script>
 
     <!-- Bennett -->
-    <link rel="stylesheet" media="all" href="assets/stylesheets/bennett.css" />
     <link rel="stylesheet" media="all" href="assets/jquery-ui/css/le-frog/jquery-ui-1.10.3.custom.css" />
+    <link rel="stylesheet" media="all" href="assets/stylesheets/bennett.css" />
     <link rel="stylesheet" media="all" href="assets/fonts/bennett-title.css" />
     <link rel="stylesheet" media="all" href="assets/stylesheets/api-doc.css" />
     <script src="assets/javascripts/jquery-2.0.3.js"></script>
@@ -52,7 +52,11 @@
         </ul>
         <div id="tab1">
             <h2 id="test-name">Test Results</h2>
-            <div class="bbutton" id="start-tests">start</div>
+            <div style="text-align: center; margin: 20px;">
+                <a class="button green long" id="start-tests">once</a>
+                <a class="button darkblue long" id="loop-tests">loop</a>
+                <a class="button red long sharp" id="stop-tests">stop</a>
+            </div>
             <div id="test-results"></div>
         </div>
         <div id="tab2">
@@ -104,11 +108,17 @@
             var harness = new Bennett(data, api, scenarios);
 
             harness.stopOnFailure = false; // default to true: stops if last scenario fails
-            harness.targetElement("#test-results");
 
             $("#start-tests").click(function(e) { 
-                $("#start-tests").hide();
                 harness.runTests();
+            });
+
+            $("#loop-tests").click(function(e) { 
+                harness.loopTests();
+            });
+
+            $("#stop-tests").click(function(e) { 
+                harness.stopTests();
             });
 
             $("#build-doc").click(function(e) { 
