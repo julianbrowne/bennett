@@ -88,24 +88,22 @@
             });
 
             var openweathermap = { 
-                data: "data/openweathermap/data.yml",
-                api: "data/openweathermap/api.yml",
-                scenarios: "data/openweathermap/scenarios.yml"
+                src: { 
+                    data: "data/openweathermap/data.yml",
+                    api: "data/openweathermap/api.yml",
+                    scenarios: "data/openweathermap/scenarios.yml"
+                }
             };
 
             var example = { 
-                data: "data/login_example/data.yml",
-                api: "data/login_example/api.yml",
-                scenarios: "data/login_example/scenarios.yml"
+                src: { 
+                    data: "data/login_example/data.yml",
+                    api: "data/login_example/api.yml",
+                    scenarios: "data/login_example/scenarios.yml"
+                }
             };
 
-            var config = openweathermap; // { example | openweathermap };
-
-            var data = config.data;
-            var api = config.api;
-            var scenarios = config.scenarios;
-
-            var harness = new Bennett(data, api, scenarios);
+            var harness = new Bennett(openweathermap);
 
             harness.stopOnFailure = false; // default to true: stops if last scenario fails
 

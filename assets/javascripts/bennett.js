@@ -2,7 +2,7 @@
  *  Bennett API Verifier
 **/
 
-var Bennett = function(dataSrc, specSrc, testSrc) {
+var Bennett = function(options) { 
 
     var bennett = this;
     this.fixtures = null;
@@ -21,15 +21,16 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     this.testId = 0;
     this.grid = null;
     this.testReport = {};                           // summary test report by scenario
-    this.sources = { 
-        api: specSrc,
-        data: dataSrc,
-        scenarios: testSrc
-    };
+    this.settings = parseOptions(options);    
 
     logAction("Bennett tester instantiated");
 
-    this.dataLoad = $.when(getDataFrom(dataSrc), getDataFrom(specSrc), getDataFrom(testSrc), getDataFrom("conf/bennett.yml"));
+    this.dataLoad = $.when( 
+        getDataFrom(bennett.settings.src.data), 
+        getDataFrom(bennett.settings.src.api), 
+        getDataFrom(bennett.settings.src.scenarios), 
+        getDataFrom("conf/bennett.yml")
+    );
 
     this.dataLoad.then(
         function(data, specs, scenarios, app) { 
@@ -406,6 +407,37 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
         );
     };
 
+    function parseOptions(options) { 
+
+        if(options === undefined || options === null) options = {};
+
+        defaults = {
+            src: {
+                api : null,
+                data: null,
+                scenarios: null
+            }
+        };
+
+        var settings = $.extend(true, {}, defaults, options);
+
+        var mandatoryFields = [ 
+            settings.src.api,
+            settings.src.data,
+            settings.src.scenarios
+        ];
+
+        for(var i=0; i < mandatoryFields.length; i++) { 
+            if(!mandatoryFields[i]) { 
+                console.error("Mandatory field " + i + " is not defined");
+                return;
+            }
+        }
+
+        return settings;
+
+    };
+
     /**
      * Returns uniform width timestamp 00:00:00:000
     **/
@@ -654,7 +686,7 @@ var Bennett = function(dataSrc, specSrc, testSrc) {
     }
 
     this.documentApi = function(targetElement) { 
-        var apiResponse = $.when($.get(this.sources.api));
+        var apiResponse = $.when($.get(bennett.settings.src.api));
         apiResponse.then(
             function(apiRawData) { 
                 try { var apiData = jsyaml.load(apiRawData) } catch(e) { throw e; }

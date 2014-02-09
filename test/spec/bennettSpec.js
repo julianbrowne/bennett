@@ -73,10 +73,16 @@ describe("Bennett", function() {
         status: 201
     });
 
-    var data = "data/selftest/data.yml";
-    var api  = "data/selftest/api.yml";
-    var scn  = "data/selftest/scenarios.yml";
-    bennett = new Bennett(data, api, scn);
+    var config = { 
+      src: { 
+        data:      "data/selftest/data.yml",
+        api:       "data/selftest/api.yml",
+        scenarios: "data/selftest/scenarios.yml"
+      }
+    };
+
+    bennett = new Bennett(config);
+
     waitsFor( 
       function() { return bennett.scenarios !== null; },
       "Bennet object creation timed out",
