@@ -6,6 +6,8 @@
 
 basePath: "http://127.0.0.1:8105/api" # local no XSS proxy to actual API
 
+clientIP: 10.20.30.40
+
 login:
 
     credentials:

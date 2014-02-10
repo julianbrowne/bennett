@@ -277,27 +277,31 @@ a.button:hover, a.button:focus, button:hover, button:focus, input[type=submit]:h
     background-image:-moz-linear-gradient(top, rgba(255,255,255,.9), rgba(255,255,255,0.2));
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,.9)), to(rgba(255,255,255,0.2)));
 }
-a.button:active, button:active, input[type=submit]:active {
+a.button.disabled, a.button:active, button:active, input[type=submit]:active {
     background-image:-moz-linear-gradient(top, rgba(75,75,75,.4), rgba(255,255,255,.4));
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(75,75,75,.4)), to(rgba(255,255,255,.4)));
     line-height:26px;
 }
-a.button:active:before, button:active:before {
+
+a.button.disabled:before, a.button:active:before, button:active:before { 
     border-color: rgba(255, 255, 255, 0.11) rgba(255, 255, 255, 0.23) rgba(255, 255, 255, 0.27);
 }
 
-a.button.bg {
+a.button.bg { 
     -webkit-transition: all .185s linear;
     -moz-transition: all .185s linear;
 }
+
 a.button.bg, a.button.bg:hover, a.button.bg:focus {
     background-image: -moz-linear-gradient(top, rgba(255,255,255,.75), rgba(255,255,255,0));
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(255,255,255,.75)), to(rgba(255,255,255,0)));
 }
+
 a.button.bg:hover, a.button.bg:focus {
     background-color:#a8c0cb;
 }
-a.button.bg:active {
+
+a.button.bg:active { 
     background-image:-moz-linear-gradient(top, rgba(75,75,75,.4), rgba(255,255,255,.4));
     background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(rgba(75,75,75,.4)), to(rgba(255,255,255,.4)));
 }
@@ -334,7 +338,7 @@ a.button.blue {
     background-color:#9eb4bf;
 }
 
-a.button.darkblue {
+a.button.darkblue { 
     background-color:#046;
     color:#fff;
     text-shadow:-1px -1px 0 rgba(0,0,0,.3);
@@ -368,6 +372,11 @@ a.button.black {
 
 a.button.black:before {
     border-top-color:rgba(255,255,255,.67);
+}
+
+a.button.disabled { 
+    color: #BBBBBB;
+    background-color: #777777;
 }
 
 a.button.sharp {

@@ -17,6 +17,7 @@ session:
     response: 200
     body: login.credentials
     remember: ApiSession
+    ip: 10.20.30.40
     latency: 500
     schema: > 
         {

@@ -11,9 +11,9 @@ var Bennett = function(options) {
     this.results = { };
     this.gridster = null;
     this.active = false;                            // is bennett running scenarios
+    this.looping = false;                           // is loop mode on
     this.scenarioInProgress = false;                // is there a test scenario in progress
     this.lastScenarioPass = null;                   // last run scenario result
-    this.stopOnFailure = true;                      // stop if last run scenario failed
     this.allScenariosDone = false;                  // tripped when all scenarios complete (pass or fail)
     this.refreshFrequency = 10000; //300000;        // rerun tests every refreshFrequency milliseconds
     this.timer = false;                             // refresh interval timer {false || interval}
@@ -127,6 +127,7 @@ var Bennett = function(options) {
     };
 
     this.loopTests = function() { 
+        bennett.looping = true;
         bennett.runTests();
         console.log("Starting timer");
         bennett.timer = setInterval(bennett.runTests, bennett.refreshFrequency);
@@ -137,6 +138,7 @@ var Bennett = function(options) {
             console.log("Stopping timer");
             clearInterval(bennett.timer);
             bennett.timer = false;
+            bennett.looping = false;
         }
         lastScenarioDoneEvent();
     };
@@ -208,6 +210,10 @@ var Bennett = function(options) {
 
                     if(apiData.encoding !== undefined) { 
                         apiConfigData.encoding = apiData.encoding;
+                    }
+
+                    if(apiData.ip !== undefined) { 
+                        apiConfigData.clientIP = apiData.ip;
                     }
 
                     if(apiData.remember !== undefined) { 
@@ -367,7 +373,7 @@ var Bennett = function(options) {
             var widget = new bennett.grid.Widget(scenarioDisplayName);
             widget.addClass("scenario");
 
-            if(bennett.lastScenarioPass === false && bennett.stopOnFailure === true) { 
+            if(bennett.lastScenarioPass === false && bennett.settings.stopOnFail === true) { 
                 logAction("*** Aborting because last test failed");
                 widget.addLine("Aborted: Last Scenario Failed", "warning");
                 widget.addClass("aborted");
@@ -407,6 +413,11 @@ var Bennett = function(options) {
         );
     };
 
+    function Error(mesg) {
+        // console.error(mesg);
+        this.mesg = mesg;
+    };
+
     function parseOptions(options) { 
 
         if(options === undefined || options === null) options = {};
@@ -416,7 +427,8 @@ var Bennett = function(options) {
                 api : null,
                 data: null,
                 scenarios: null
-            }
+            },
+            stopOnFail: true                // stop all subsequent tests if last one failed
         };
 
         var settings = $.extend(true, {}, defaults, options);
@@ -429,8 +441,10 @@ var Bennett = function(options) {
 
         for(var i=0; i < mandatoryFields.length; i++) { 
             if(!mandatoryFields[i]) { 
-                console.error("Mandatory field " + i + " is not defined");
-                return;
+                throw new Error("Mandatory option " + i + " is not defined");
+            }
+            else {
+                console.log("Option " + i + " set to " + mandatoryFields[i]);
             }
         }
 
@@ -476,11 +490,12 @@ var Bennett = function(options) {
                 var line = widget.addKeyValue( 
                     apiNameText, 
                     apiResultText, 
-                      "URI - " + data[0].url 
-                    + "<br/>Method - " + data[0].method 
-                    + "<br/>Expected - " + data[0].expectation.response 
-                    + "<br/>Received - " + data[0].outcome.response.received 
-                    + "<br/>Latency - "  + data[0].outcome.timer.latency, 
+                      "URI: " + data[0].url 
+                    + "<br/>Method: " + data[0].method 
+                    + "<br/>Expected Response: " + data[0].expectation.response 
+                    + "<br/>Received Response: " + data[0].outcome.response.received 
+                    + "<br/>Expected Latency:  " + data[0].expectation.latency + " ms"
+                    + "<br/>Received Latency:  " + data[0].outcome.timer.latency + " ms", 
                     { 
                         key: { 
                             class: "test-name"
@@ -520,19 +535,24 @@ var Bennett = function(options) {
     };
 
     function lastScenarioDoneEvent() { 
-        bennett.active = false;
         bennett.allScenariosDone = true;
-        $("#start-tests")
-            .addClass('bbutton')
-            .removeClass('bbutton-dead')
-            .prop('disabled', false);
+        bennett.active = false;
+        if(!bennett.looping) { 
+            enableButton("#start-tests");
+            enableButton("#loop-tests");
+        }
     };
 
     function disableButton(buttonElementId) { 
         $(buttonElementId)
-            .removeClass('bbutton')
-            .addClass('bbutton-dead')
+            .addClass('disabled')
             .prop('disabled', true);
+    };
+
+    function enableButton(buttonElementId) { 
+        $(buttonElementId)
+            .removeClass('disabled')
+            .prop('disabled', false);
     };
 
     this.initialiseOutputGrid = function(element) { 
