@@ -2,28 +2,20 @@
 <head>
     <title>Bennett</title>
 
-    <!-- TheGrid -->
-    <script src="assets/thegrid/thegrid.js"></script>
-    <link rel="stylesheet" media="all" href="assets/thegrid/thegrid.css" />
+    <!-- Dependencies -->
+    <script src="vendor/jquery-3.3.1.min.js"></script>
+    <script src="vendor/jquery.gridagram.js"></script>
+    <script src="vendor/js-yaml.js"></script>
+    <script src="vendor/jquery.cookie.js"></script>
+    <script src="vendor/tv4.js"></script>
+    <script src="vendor/uritemplate.js"></script>
+    <script src="vendor/piggybank.js"></script>
 
-    <!-- JSResolve -->
-    <script src="assets/jsresolve/jsresolve.js"></script>
+    <link rel="stylesheet" href="vendor/bootstrap-4.0.0-dist/css/bootstrap.min.css" />
+    <script src="vendor/bootstrap-4.0.0-dist/js/bootstrap.min.js"></script>
 
     <!-- Bennett -->
-    <link rel="stylesheet" media="all" href="assets/jquery-ui/css/le-frog/jquery-ui-1.10.3.custom.css" />
-    <link rel="stylesheet" media="all" href="assets/stylesheets/bennett.css" />
-    <link rel="stylesheet" media="all" href="assets/fonts/bennett-title.css" />
-    <link rel="stylesheet" media="all" href="assets/stylesheets/api-doc.css" />
-    <script src="assets/javascripts/jquery-2.0.3.js"></script>
-    <script src="assets/jquery-ui/js/jquery-ui-1.10.3.custom.js"></script>
-    <script src="assets/javascripts/js-yaml-2.1.0.js"></script>
-    <script src="assets/javascripts/bennett.js"></script>
-
-    <!-- Piggybank -->
-    <script src="assets/piggybank/jquery.cookie.js"></script>
-    <script src="assets/piggybank/tv4.js"></script>
-    <script src="assets/piggybank/uritemplate.js"></script>
-    <script src="assets/piggybank/piggybank.js"></script>
+    <script src="lib/bennett.js"></script>
 
     <!-- Test -->
     <link rel="stylesheet" media="all" href="test/assets/stylesheets/prettify-obsidian.css" />
@@ -41,58 +33,39 @@
 
 </head>
 <body>
-    <h1 class="bennett">Bennett: REST API Verifier</h1>
-    <div id="tabs">
-        <ul>
-            <li><a href="#tab1" class="bennett">Verify</a></li>
-            <li><a href="#tab2" class="bennett">Log</a></li>
-            <li><a href="#tab3" class="bennett">Documentation</a></li>
-            <li><a href="test/index.html" class="bennett">Self-Test</a></li>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Bennett</a>
+        <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Verify
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a id="test-start" class="dropdown-item" href="#">once</a>
+                    <a id="test-loop"  class="dropdown-item" href="#">loop</a>
+                    <a id="test-stop"  class="dropdown-item" href="#">stop</a>
+                </div>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Log
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a id="log-view"  class="dropdown-item" href="#">view</a>
+                    <a id="log-clear" class="dropdown-item" href="#">clear</a>
+                </div>
+            </li>
+            <li class="nav-item active">
+                <a id="build-doc" class="nav-link" href="#">Docs</a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Test</a>
+            </li>
         </ul>
-        <div id="tab1">
-            <h2 id="test-name">Test Results</h2>
-            <div style="text-align: center; margin: 20px;">
-                <a class="button green long" id="start-tests">once</a>
-                <a class="button darkblue long" id="loop-tests">loop</a>
-                <a class="button red long sharp" id="stop-tests">stop</a>
-            </div>
-            <div id="test-results"></div>
-        </div>
-        <div id="tab2">
-            <h2>Test Log</h2>
-            <a class="button red long sharp" id="clear-log">clear log</a>
-            <ul id="test-log">
-            </ul>
-        </div>
-        <div id="tab3">
-            <h2>API Documentation</h2>
-            <a class="button darkblue long" id="build-doc">build doc</a>
-            <div id="api-doc" class="doc calls"></div>
-        </div>
-    </div>
+    </nav>
 
     <script type="text/javascript">
         $(function() { 
-
-            $("#tabs").tabs({ 
-                beforeLoad: function( event, ui ) { 
-                    if (ui.tab.data("loaded")) { 
-                        event.preventDefault();
-                        return;
-                    }
-                    ui.jqXHR.success(function() { 
-                        ui.tab.data("loaded", true);
-                    });
-                }
-            });
-
-            var openweathermap = { 
-                src: { 
-                    data: "data/openweathermap/data.yml",
-                    api: "data/openweathermap/api.yml",
-                    scenarios: "data/openweathermap/scenarios.yml"
-                }
-            };
 
             var example = { 
                 src: { 
@@ -102,26 +75,26 @@
                 }
             };
 
-            var harness = new Bennett(openweathermap);
+            var harness = new Bennett(example);
 
-            $("#start-tests").click(function(e) { 
+            $("#test-start").click(function(e) { 
                 harness.runTests();
             });
 
-            $("#loop-tests").click(function(e) { 
+            $("#test-loop").click(function(e) { 
                 harness.loopTests();
             });
 
-            $("#stop-tests").click(function(e) { 
+            $("#test-stop").click(function(e) { 
                 harness.stopTests();
             });
 
-            $("#build-doc").click(function(e) { 
-                $("#build-doc").hide();
+            $("#doc-build").click(function(e) { 
+                $("#doc-build").hide();
                 harness.documentApi("#api-doc");
             });
 
-            $("#clear-log").click(function(e) { 
+            $("#log-clear").click(function(e) { 
                 $("#test-log").empty();
             });
 
